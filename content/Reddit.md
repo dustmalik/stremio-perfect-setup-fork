@@ -2,15 +2,13 @@
 **[⚡ DEBRID / 🧲 P2P / 🌐 HTTP]** (*v2.0*)
 
 
-![img](xd3jbgpapmig1 "Homescreen (left) & Stream Source Selection (right)")
+![img](u8edx7wlmrzg1 "Homescreen (left) & Stream Source Selection (right)")
 
-**✨ NEW: Check out the extended guide with screenshots [**HERE**](https://luckynumb3rs.github.io/stremio-perfect-setup/).**
+# ✨ GO [**HERE**](https://luckynumb3rs.github.io/stremio-perfect-setup/) FOR THE EXTENDED GUIDE.
 
 **If this guide helps you, PLEASE UPVOTE this post so it remains relevant for others to find it and also benefit from it.** 😊
 
-After a few iterations trying out what works and what doesn't for me, and testing various addons, I think I have reached the optimal Stremio setup. Of course it's a matter of taste and everyone has different preferences, but I will share my guide here for anyone interested, or at least get started easily and then modify in reverse whatever changes they want. So here it is completely from scratch:
-
-**Don't be scared. Although it may look like a very long guide, it's actually just a few simple steps and very easy. I just wanted to be thorough and describe everything totally step-by-step so you understand what you're doing.**
+Don't be scared. Although it may look like a very long guide, it's actually just a few simple steps and very easy. I just wanted to be thorough and describe everything totally step-by-step so you understand what you're doing.
 
 >**NOTES**:
 >* If you already followed this guide and would like to **update to the latest template** (check out the version number on the title), go to [**🔔 Updates**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/Updates) on the extended guide.
@@ -273,7 +271,7 @@ At this point you are done, YAY!, so you can start enjoying it already OR you ca
    3. Click "**Add**" and that's it!
 * Now, every time you open a show, beside the **AIOStreams** tab which will show the available streams for it, there will also be a "**Watch Next**" tab showing similar/related content that you might like.
 
-And now you're really done! Check out the [**❓ Configuration Q&A**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/8-Configuration-QA) and [**🛠️ Additional Stuff**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/7-Additional-Stuff.md) if you want to tweak it further.
+And now you're really done!
 
 ---
 
@@ -305,14 +303,10 @@ If you followed this guide and are encountering issues or have configuration que
 
 # 🔔 Updates
 
-To do a regular update when a new version of the template for **AIOStreams** is announced/released on this guide (*you can check the version number on the title of the guide*), unless described otherwise in specific updates listed further down, you can simply load the template again by following the same steps on the AIOStreams setup section.
-
-As for **AIOMetadata**, there's normally not as many changes as AIOStreams so you shouldn't need to perform any updates unless explicitly mentioned, but you can also load the configuration again when necessary.
-
-Go to [**🔔 Updates**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/Updates) on the extended guide to learn more.
+Go to [**🔔 Updates**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/Updates) on the extended guide to learn how to update to the latest version of this setup.
 
 ---
 
 # 📜 Changelog
 
-If you're interested in knowing the changes of each new version of the guide and templates on it, check out the [**📜 Changelog**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/Changelog).
+Go to [**📜 Changelog**](https://luckynumb3rs.github.io/stremio-perfect-setup/guide/Changelog) on the extended guide to see the change history.
