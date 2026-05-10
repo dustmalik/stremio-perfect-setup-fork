@@ -1,6 +1,6 @@
 ---
 layout: guide
-title: "🚀 NUVIO"
+title: "🚀 Nuvio"
 ---
 
 # 🚀 NUVIO
