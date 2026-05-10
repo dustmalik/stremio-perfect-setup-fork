@@ -3,7 +3,7 @@ layout: guide
 title: "🚀 NUVIO"
 ---
 
-# 🚀 NUVIO
+# 🚀 Nuvio
 
 ![Nuvio Collections](../images/collections.webp)
 
