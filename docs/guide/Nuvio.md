@@ -81,16 +81,18 @@ Now we prepare the addons. You still follow the normal setup chapters for them, 
 
 1. First, you need to follow the [**📝 Accounts Preparation**](1-Accounts-Preparation.md) chapter to create the necessary accounts.
    * *Since the same addons are used, you still need a **Debrid** (optional), **TMDB**, **TVDB** and **Gemini** (optional) **API Keys**, and a **Stremio** and **Trakt** account (optional, but both needed especially if you want to use **Watchly**).*
-2. Follow the [**📚 AIOStreams**](3-AIOStreams-Setup.md) chapter to configure **AIOStreams**.
+2. Follow the [**📚 AIOStreams**](3-AIOStreams-Setup.md) chapter to configure **AIOStreams** (*For HTTP users it's optional but recommended, see next step*).
    * *Do all the normal steps: import the template, select your services, enter your API keys, adjust preferences if needed, and save the configuration.*
    * **IMPORTANT**: *On the final step, do **not** install it on Stremio.*
    * *Instead, copy the final **Manifest URL** shown in the **Save & Install** tab. Store it somewhere temporarily, because you will paste it into Nuvio later.*
-3. Follow the [**🔎 AIOMetadata**](4-AIOMetadata-Setup.md) chapter to configure **AIOMetadata**.
+3. **For 🌐 HTTP Users**: Go [**here**](https://nuvio-plugin-library.vercel.app/) to choose the *Plugins* that are suitable for you and to learn how to install them on Nuvio.
+   * *In addition to supporting Stremio addons, such as **AIOStreams** you installed above, which also includes HTTP sources that are properly filtered and formatted, Nuvio also supports **Plugins**, which can provide many additional HTTP sources. They don't go through AIOStreams unfortunately, so you won't get the optimized sources list like that addon does, but you would get additional stream sources. This is not necessary if you go for the **🧲 P2P** or **⚡ Debrid** configuration, but recommended for **🌐 HTTP** if you notice you are not getting enough streams from AIOStreams.*
+4. Follow the [**🔎 AIOMetadata**](4-AIOMetadata-Setup.md) chapter to configure **AIOMetadata**.
    * *Again, do the normal setup: import the configuration, enter API keys, connect Trakt if you want, adjust catalogs if needed, and save the configuration.*
    * *Nuvio supports more catalogs than Stremio, so you can also enable the catalogs that come disabled initially, such as the **Studio** and/or **Anime** catalogs.
    * **IMPORTANT**: *On the final step, do **not** install it on Stremio.*
    * *Instead, copy the final **Manifest URL** from AIOMetadata and store it together with the AIOStreams Manifest URL.*
-4. **Optional**: Follow the [**🤖 Personalized & Automated Lists**](6-Personalized-Lists.md) chapter to configure **Watchly**, but use [**this**](https://1ccea4301587-watchly.baby-beamup.club/) instance instead of the one linked on that chapter.
+5. **Optional**: Follow the [**🤖 Personalized & Automated Lists**](6-Personalized-Lists.md) chapter to configure **Watchly**, but use [**this**](https://1ccea4301587-watchly.baby-beamup.club/) instance instead of the one linked on that chapter.
    * *This step is optional, but I recommend it if you want personalized catalogs and more Netflix-like recommendations.*
    * **IMPORTANT:**
    * *Even if used with Nuvio, Watchly requires a Stremio account to configure your preferences, but you don't have to use the account for anything else.*
