@@ -30,7 +30,8 @@ Important parameters:
         discover filters.
     --output-root
         Collections root where generated files are written in the existing
-        layout: `<group>/backdrop/<folder>.jpg`.
+        layout: `<group>/backdrop/<folder>.jpg` plus a matching `.webp`
+        sidecar.
     --catalog
         Optional folder selector in shorthand `group/slug` form, for example
         `genres/k-drama` or `discover/popular`. Repeat this flag to target
@@ -51,10 +52,10 @@ Important parameters:
         catalogs are merged.
     --size
         Output size: `4k`, `1080p`, or `both`.
+    --profile
+        Named output profile: `compressed` or `high`. Default is `compressed`.
     --quality
-        Named JPEG profile: `compressed` or `high`. Default is `compressed`.
-    --jpg-quality
-        Advanced manual JPEG quality override.
+        Advanced manual output quality override used for both JPG and WEBP.
     --parallelism
         Number of folders to generate at the same time. Keep this relatively
         low to avoid hitting TMDB rate limits.
@@ -86,12 +87,12 @@ Examples:
       --api-key YOUR_TMDB_KEY \
       --fanart-key YOUR_FANART_KEY \
       --preferred-language en \
-      --quality compressed
+      --profile compressed
 
     python3 -B generate_backdrops.py \
       --api-key YOUR_TMDB_KEY \
       --fanart-key YOUR_FANART_KEY \
-      --quality high
+      --profile high
 
     python3 -B generate_backdrops.py \
       --api-key YOUR_TMDB_KEY \
@@ -306,12 +307,22 @@ def normalize_catalog_selector(value):
     return f"collections.{parts[0]}.{parts[1]}"
 
 
-def resolve_quality_args(quality, jpg_quality):
+def resolve_quality_args(profile, quality):
     """Convert wrapper quality options into the kwargs expected by backdrop.py."""
     return {
+        "profile": profile,
         "quality": quality,
-        "jpg_quality": jpg_quality,
     }
+
+
+def expected_artifacts(path):
+    """Return the JPG output path plus its WEBP sidecar."""
+    return (path, path.with_suffix(".webp"))
+
+
+def describe_artifacts(path):
+    """Render the expected artifact paths as one log-friendly string."""
+    return ", ".join(str(artifact) for artifact in expected_artifacts(path))
 
 
 def build_jobs(collections_data, catalog_index, output_root, cover_root, allowed_ids, size):
@@ -338,7 +349,11 @@ def build_jobs(collections_data, catalog_index, output_root, cover_root, allowed
 
 def missing_output_sizes(job):
     """Return the list of output size keys that are missing for this job."""
-    return [size for size, path in job["expected_outputs"].items() if not path.exists()]
+    return [
+        size
+        for size, path in job["expected_outputs"].items()
+        if any(not artifact.exists() for artifact in expected_artifacts(path))
+    ]
 
 
 def run_accent(job):
@@ -369,7 +384,7 @@ def run_accent(job):
     return tuple(int(part) for part in parts)
 
 
-def run_job(job, api_key, fanart_key, preferred_language, focus_x, focus_y, count, size, quality, jpg_quality, stream_output):
+def run_job(job, api_key, fanart_key, preferred_language, focus_x, focus_y, count, size, profile, quality, stream_output):
     """Run one folder job and optionally stream child output while still capturing it."""
     accent = run_accent(job)
     command = [
@@ -382,7 +397,7 @@ def run_job(job, api_key, fanart_key, preferred_language, focus_x, focus_y, coun
         "--accent-color", ",".join(str(value) for value in accent),
         "--output", str(job["output_path"]),
         "--size", size,
-        "--quality", quality,
+        "--profile", profile,
         "--focus", f"{focus_x:.4f},{focus_y:.4f}",
         "--count", str(count),
     ]
@@ -390,8 +405,8 @@ def run_job(job, api_key, fanart_key, preferred_language, focus_x, focus_y, coun
         command.extend(["--fanart-key", fanart_key])
     if preferred_language:
         command.extend(["--preferred-language", preferred_language])
-    if jpg_quality is not None:
-        command.extend(["--jpg-quality", str(jpg_quality)])
+    if quality is not None:
+        command.extend(["--quality", str(quality)])
     for request in job["requests"]:
         command.extend(["--tmdb-request", request])
 
@@ -448,15 +463,15 @@ def main():
     parser.add_argument("--cover-root", default=str(DEFAULT_COVER_ROOT), help="Collections root containing `<group>/cover/<folder>.*` images for runtime accent scanning")
     parser.add_argument("--collections-file", default=str(DEFAULT_COLLECTIONS_FILE), help="Path to nuvio-collections.json")
     parser.add_argument("--catalogs-file", default=str(DEFAULT_CATALOGS_FILE), help="Path to AIOMetadata-Catalogs.json")
-    parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Root collections folder where `<group>/backdrop/<folder>.jpg` files are written")
+    parser.add_argument("--output-root", default=str(DEFAULT_OUTPUT_ROOT), help="Root collections folder where `<group>/backdrop/<folder>.jpg` files and matching `.webp` sidecars are written")
     parser.add_argument("--catalog", action="append", default=[], help="Only generate for the matching folder shorthand(s), like `genres/k-drama` or `discover/popular`. Repeat this flag to target multiple folders.")
     parser.add_argument("--folder-id", action="append", default=[], help="Only generate for the matching folder id(s). Repeat this flag to target multiple folders.")
     parser.add_argument("--missing-only", action="store_true", help="Only generate missing backdrop output file(s). For `--size both`, existing sizes are skipped and only missing ones are rendered.")
     parser.add_argument("--focus", default="center-right", help="Focus preset or x,y values passed to backdrop.py")
     parser.add_argument("--count", type=int, default=60, help="Max source titles to use per backdrop after the folder's catalogs are merged")
     parser.add_argument("--size", choices=("4k", "1080p", "both"), default="4k", help="Rendered output size(s)")
-    parser.add_argument("--quality", choices=("compressed", "high"), default="compressed", help="Named JPEG output profile. Default is compressed.")
-    parser.add_argument("--jpg-quality", type=int, default=None, help="Advanced override for JPEG quality from 1-95. If set, it overrides --quality.")
+    parser.add_argument("--profile", choices=("compressed", "high"), default="compressed", help="Named output profile. Default is compressed.")
+    parser.add_argument("--quality", type=int, default=None, help="Advanced override for output quality from 1-95. If set, it overrides --profile for both JPG and WEBP.")
     parser.add_argument("--parallelism", type=int, default=3, help="How many folders to generate at once. Keep this low to avoid TMDB rate limits.")
     parser.add_argument("--grouped-logs", action="store_true", help="Buffer each folder job log and print it after completion instead of streaming live output.")
     parser.add_argument("--dry-run", action="store_true", help="Print the resolved accent and TMDB requests without generating images")
@@ -475,8 +490,8 @@ def main():
         print(f"Error: {exc}")
         sys.exit(1)
     focus_x, focus_y = parse_focus_value(args.focus)
-    if args.jpg_quality is not None and (args.jpg_quality < 1 or args.jpg_quality > 95):
-        print("Error: --jpg-quality must be between 1 and 95.")
+    if args.quality is not None and (args.quality < 1 or args.quality > 95):
+        print("Error: --quality must be between 1 and 95.")
         sys.exit(1)
     if args.parallelism < 1:
         print("Error: --parallelism must be at least 1.")
@@ -501,7 +516,7 @@ def main():
             missing_sizes = missing_output_sizes(job)
             if not missing_sizes:
                 skipped += 1
-                existing = ", ".join(str(path) for path in job["expected_outputs"].values())
+                existing = "; ".join(describe_artifacts(path) for path in job["expected_outputs"].values())
                 print_job_line(job, f"Skipping: expected output already exists ({existing}).")
                 continue
 
@@ -511,7 +526,7 @@ def main():
                     print_job_line(
                         job,
                         f"Partial generate: only missing {requested_size} "
-                        f"({job['expected_outputs'][requested_size]}).",
+                        f"({describe_artifacts(job['expected_outputs'][requested_size])}).",
                     )
                 else:
                     requested_size = "both"
@@ -529,7 +544,7 @@ def main():
             print_job_line(job, f"Output -> {job['output_path']}")
             print_job_line(job, f"cover={job['cover_path'] or 'fallback-label'}")
             print_job_line(job, f"accent={accent}")
-            print_job_line(job, f"outputs={', '.join(str(path) for path in job['expected_outputs'].values())}")
+            print_job_line(job, f"outputs={'; '.join(describe_artifacts(path) for path in job['expected_outputs'].values())}")
             print_job_line(job, f"requested_size={job['requested_size']}")
             for request in job["requests"]:
                 print_job_line(job, request)
@@ -538,10 +553,10 @@ def main():
         print_overall_line(f"Skipped: {skipped}")
         return
 
-    quality_args = resolve_quality_args(args.quality, args.jpg_quality)
+    quality_args = resolve_quality_args(args.profile, args.quality)
     print_overall_line(
         f"Starting generation for {len(jobs)} folder(s) "
-        f"with parallelism={args.parallelism}, quality={quality_args['quality']}, size={args.size}, "
+        f"with parallelism={args.parallelism}, profile={quality_args['profile']}, size={args.size}, "
         f"preferred_language={args.preferred_language}."
     )
     for job in jobs:
@@ -560,8 +575,8 @@ def main():
                 focus_y,
                 args.count,
                 job["requested_size"],
+                quality_args["profile"],
                 quality_args["quality"],
-                quality_args["jpg_quality"],
                 not args.grouped_logs,
             ): job
             for job in jobs

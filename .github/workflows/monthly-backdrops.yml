@@ -37,7 +37,7 @@ jobs:
           python3 -B collections/scripts/backdrops.py \
             --api-key "$TMDB_API_KEY" \
             --fanart-key "$FANART_API_KEY" \
-            --quality compressed \
+            --profile compressed \
             --parallelism 3
 
       - name: Clean Python cache folders
