@@ -92,7 +92,7 @@ Now we prepare the addons. You still follow the normal setup chapters for them, 
    * *Nuvio supports more catalogs than Stremio, so you can also enable the catalogs that come disabled initially, such as the **Studio** and/or **Anime** catalogs.
    * **IMPORTANT**: *On the final step, do **not** install it on Stremio.*
    * *Instead, copy the final **Manifest URL** from AIOMetadata and store it together with the AIOStreams Manifest URL.*
-5. **Optional**: Follow the [**🤖 Personalized & Automated Lists**](6-Personalized-Lists.md) chapter to configure **Watchly**, but use [**this**](https://1ccea4301587-watchly.baby-beamup.club/) instance instead of the one linked on that chapter.
+5. **Optional**: Follow the [**🤖 Personalized & Automated Lists**](6-Personalized-Lists.md) chapter to configure **Watchly**, but use [**this**](https://1ccea4301587-watchly.baby-beamup.club/) instance instead of the one linked on that chapter. **DON'T DO THIS FOR NOW, THE INSTANCE IS HAVING SOME ISSUES.**
    * *This step is optional, but I recommend it if you want personalized catalogs and more Netflix-like recommendations.*
    * **IMPORTANT:**
    * *Even if used with Nuvio, Watchly requires a Stremio account to configure your preferences, but you don't have to use the account for anything else.*
