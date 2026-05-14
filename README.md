@@ -1,14 +1,17 @@
 # 🎬 STREMIO/NUVIO FULL & EASY TOTAL BEGINNER'S GUIDE
 **[⚡ DEBRID / 🧲 P2P / 🌐 HTTP]** (*v2.0*)
 
-![Stremio (left) / Stream Sources (center) / Nuvio (right)](docs/images/home.jpg)
+![Stremio](docs/images/stremio.webp)
 
-**If this guide helps you, PLEASE UPVOTE the Reddit post for [🎞️ Stremio](https://www.reddit.com/r/StremioAddons/comments/1stc6f6/stremio_perfect_setup_beginners_guide/)/[🚀 Nuvio](https://www.reddit.com/r/Nuvio/comments/1t9yub7/nuvio_perfect_setup_beginners_guide/) so it remains relevant for others to find it and also benefit from it.** 😊
+![Nuvio](docs/images/collections.webp)
+
+This is a full beginner-friendly guide for building a clean, reliable, and highly organized setup for both **Stremio** and **Nuvio**, using all community best practices and including streams, metadata, catalogs, recommendations, collections, and the extra tweaks that make the whole experience feel much more polished.
+
+**If this guide helps you, PLEASE UPVOTE the Reddit post for [🎞️ Stremio](https://www.reddit.com/r/StremioAddons/comments/1stc6f6/stremio_perfect_setup_beginners_guide/) / [🚀 Nuvio](https://www.reddit.com/r/Nuvio/comments/1t9yub7/nuvio_perfect_setup_beginners_guide/) so it remains relevant for others to find it and also benefit from it.** 😊
 
 Don't be scared. Although it may look like a very long guide, it's actually just a few simple steps and very easy. I just wanted to be thorough and describe everything totally step-by-step so you understand what you're doing.
 
 >**📢 NOTES:**
->* **✨ NEW:** If you want to use this setup with **Nuvio** instead of Stremio, or you want a good **Nuvio Collections** setup, including dynamic backdrops, title logos, and assets, check out the new [**🚀 Nuvio**](docs/guide/Nuvio.md) page.
 >* **If you are a total beginner and are curious to understand the concepts around Stremio** and how it works, go to [**🔰 Beginner Concepts**](docs/guide/0-Beginner-Concepts.md).
 >* If you already followed this guide and would like to **update to the latest template** (check out the version number on the title), go to [**🔔 Updates**](docs/guide/Updates.md).
 >* **If you followed this guide and are encountering issues or have configuration questions**, go to [**❓ Configuration Q&A**](docs/guide/8-Configuration-QA.md). If you're just starting, remember this for later in case you need it. **PLEASE avoid asking questions that are already answered there**.
