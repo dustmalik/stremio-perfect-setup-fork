@@ -20,12 +20,6 @@ This is a full beginner-friendly guide for building a clean, reliable, and highl
 
 Don't be scared. Although it may look like a very long guide, it's actually just a few simple steps and very easy. I just wanted to be thorough and describe everything totally step-by-step so you understand what you're doing.
 
->**📢 NOTES:**
->* **If you are a total beginner and are curious to understand the concepts around Stremio** and how it works, go to [**🔰 Beginner Concepts**]({{GUIDE_PATH}}/0-Beginner-Concepts.md).
->* If you already followed this guide and would like to **update to the latest template** (check out the version number on the title), go to [**🔔 Updates**]({{GUIDE_PATH}}/Updates.md).
->* **If you followed this guide and are encountering issues or have configuration questions**, go to [**❓ Configuration Q&A**]({{GUIDE_PATH}}/8-Configuration-QA.md). If you're just starting, remember this for later in case you need it. **PLEASE avoid asking questions that are already answered there**.
->* **🙏 A very explicit special THANKS** to the **Stremio/Nuvio** developers which goes without saying, and all the community collaborators without which we wouldn't be able to enjoy any of it: [**TamTaro**](https://ko-fi.com/tamtaro) for the template base and SEL filters, [**Vidhin**](https://ko-fi.com/vidhin) for the Regexes, and the addon developers [**Viren**](https://ko-fi.com/Viren070) for AIOStreams, [**Cedya**](https://buymeacoffee.com/cedya) for AIOMetadata, [**Sanopandit**](https://ko-fi.com/timilsinabimal) for Watchly, [**Sonic**](https://ko-fi.com/sonicx161) for AIOManager, the public addon instance hosters which make everything so much simpler for most, and anyone else I may have failed to mention. All of these people continue to develop and improve them actively together with the Stremio community, so shout out to all of them for their wonderful work, and consider buying them a coffee if you agree with me! Since a few of you have also asked about tipping me for helping, even though I did it for fun and an very happy if my guide helped you, [**here**](https://ko-fi.com/luckynumb3rs) is my coffee link :)
-
 In case you are wondering whether it's worth the effort, or you already have a Torrentio + RD setup and want to know what's better if you use this guide, here's a summary:
 
 * **Cleaner Management**: instead of one scraper and a messy pile of addons, you use *two central addons* (AIOStreams + AIOMetadata) to keep everything *clean, consistent, and easy to manage*.
@@ -35,6 +29,12 @@ In case you are wondering whether it's worth the effort, or you already have a T
 * **Cleaner Source Selection UI**: a *minimal, modern stream list view* with the info you actually need to choose fast.
 * **Netflix-like Automation**: Trakt-driven *personal lists, watch tracking, and progress syncing* and a *full-blown suggestions engine with dynamic catalogs* based on what you watch and like, for a more "recommended and organized" experience.
 * **Richer Browsing**: AIOMetadata gives *better catalogs + metadata integrations* (ratings, descriptions, artwork) and lets you *remove/replace Cinemeta clutter*.
+
+>**📢 NOTES:**
+>* **If you are a total beginner and are curious to understand the concepts around Stremio** and how it works, go to [**🔰 Beginner Concepts**]({{GUIDE_PATH}}/0-Beginner-Concepts.md).
+>* If you already followed this guide and would like to **update to the latest template** (check out the version number on the title), go to [**🔔 Updates**]({{GUIDE_PATH}}/Updates.md).
+>* **If you followed this guide and are encountering issues or have configuration questions**, go to [**❓ Configuration Q&A**]({{GUIDE_PATH}}/8-Configuration-QA.md). If you're just starting, remember this for later in case you need it. **PLEASE avoid asking questions that are already answered there**.
+>* **🙏 A very explicit special THANKS** to the **Stremio/Nuvio** developers which goes without saying, and all the community collaborators without which we wouldn't be able to enjoy any of it: [**TamTaro**](https://ko-fi.com/tamtaro) for the template base and SEL filters, [**Vidhin**](https://ko-fi.com/vidhin) for the Regexes, and the addon developers [**Viren**](https://ko-fi.com/Viren070) for AIOStreams, [**Cedya**](https://buymeacoffee.com/cedya) for AIOMetadata, [**Sanopandit**](https://ko-fi.com/timilsinabimal) for Watchly, [**Sonic**](https://ko-fi.com/sonicx161) for AIOManager, the public addon instance hosters which make everything so much simpler for most, and anyone else I may have failed to mention. All of these people continue to develop and improve them actively together with the Stremio community, so shout out to all of them for their wonderful work, and consider buying them a coffee if you agree with me! Since a few of you have also asked about tipping me for helping, even though I did it for fun and an very happy if my guide helped you, [**here**](https://ko-fi.com/luckynumb3rs) is my coffee link :)
 
 So, now that you know, it's up to you, but if you're up for it, let's do it 💪:
 
