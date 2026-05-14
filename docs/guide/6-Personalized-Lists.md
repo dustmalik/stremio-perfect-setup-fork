@@ -17,11 +17,9 @@ At this point you are done, YAY!, so you can start enjoying it already OR you ca
 4. You will then land on the Watchly "**Preferences**" page. Configure according to your personal preferences here.
 5. Scroll down and enter the **RPDB**, **TMDB**, **Simkl** (Optional), and **Gemini** *API Keys* in the respective fields.
    * The **RPDB** key is "*t0-free-rpdb*".
-6. Select **Trakt** in the "**Watch History Source**" if you integrated Trakt throughout the guide, or leave it at **Stremio** if you opted out of Trakt (or select **Simkl** if you went for that).
-7. Click "**Login with Trakt**" if you selected Trakt and follow the steps.
-8. Click on "**Next: Catalogs**" and configure catalogs here also according to your personal preferences.
-9. Click on "**Next: Install**" and click on "**Save & Install**".
-10. Click "**Install on Web**" and install the addon on Stremio.
+6. Click on "**Next: Catalogs**" and configure catalogs here also according to your personal preferences.
+7. Click on "**Next: Install**" and click on "**Save & Install**".
+8. Click "**Install on Web**" and install the addon on Stremio.
 * ***Notes:***
    * *If you want these Watchly catalogs to show on top (which you'll probably want), go to Cinebye again and change the order of the addons by putting Watchly second, after Cinemeta and before AIOMetadata.*
    * *If your Stremio account is new, it will not have a watch history yet, so you may get "Failed to fetch" or similar issues on the Watchly catalogs when showing on Stremio. Don't worry, they should show up properly once it has enough information to personalize your lists.*
