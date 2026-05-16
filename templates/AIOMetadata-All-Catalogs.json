@@ -7,7 +7,7 @@
       "type": "movie",
       "source": "trakt",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "trakt.recommendations.shows",
@@ -15,7 +15,7 @@
       "type": "series",
       "source": "trakt",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.top",
@@ -25,7 +25,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.top",
@@ -35,7 +35,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.trending",
@@ -45,7 +45,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.trending",
@@ -55,7 +55,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.top_rated",
@@ -65,7 +65,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.top_rated",
@@ -75,7 +75,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.airing_today",
@@ -192,7 +192,7 @@
       "type": "movie",
       "name": "🎬 Netflix",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -240,7 +240,7 @@
       "type": "series",
       "name": "🎬 Netflix",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -288,7 +288,7 @@
       "type": "movie",
       "name": "🎬 Disney Plus",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -328,7 +328,7 @@
       "type": "series",
       "name": "🎬 Disney Plus",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -368,7 +368,7 @@
       "type": "movie",
       "name": "🎬 Prime Video",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -416,7 +416,7 @@
       "type": "series",
       "name": "🎬 Prime Video",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -464,7 +464,7 @@
       "type": "movie",
       "name": "🎬 Apple TV",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -508,7 +508,7 @@
       "type": "series",
       "name": "🎬 Apple TV",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -552,7 +552,7 @@
       "type": "movie",
       "name": "🎬 HBO Max",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -596,7 +596,7 @@
       "type": "series",
       "name": "🎬 HBO Max",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -640,7 +640,7 @@
       "type": "movie",
       "name": "🎬 Hulu",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -680,7 +680,7 @@
       "type": "series",
       "name": "🎬 Hulu",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -720,7 +720,7 @@
       "type": "movie",
       "name": "🎬 Paramount Plus",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -772,7 +772,7 @@
       "type": "series",
       "name": "🎬 Paramount Plus",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -828,7 +828,7 @@
       "type": "movie",
       "name": "🎬 Peacock",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -872,7 +872,7 @@
       "type": "series",
       "name": "🎬 Peacock",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -916,7 +916,7 @@
       "type": "movie",
       "name": "🎬 Crunchyroll",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -960,7 +960,7 @@
       "type": "series",
       "name": "🎬 Crunchyroll",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1004,7 +1004,7 @@
       "type": "movie",
       "name": "🎬 Discovery Plus",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1048,7 +1048,7 @@
       "type": "series",
       "name": "🎬 Discovery Plus",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1092,7 +1092,7 @@
       "type": "movie",
       "name": "🎬 Curiosity Stream",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1140,7 +1140,7 @@
       "type": "series",
       "name": "🎬 Curiosity Stream",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1188,7 +1188,7 @@
       "type": "movie",
       "name": "🎬 JioHotstar",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1228,7 +1228,7 @@
       "type": "series",
       "name": "🎬 JioHotstar",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1268,7 +1268,7 @@
       "type": "movie",
       "name": "🎬 Starz",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1320,7 +1320,7 @@
       "type": "series",
       "name": "🎬 Starz",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1372,7 +1372,7 @@
       "type": "movie",
       "name": "🎬 Shudder",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1420,7 +1420,7 @@
       "type": "series",
       "name": "🎬 Shudder",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1468,7 +1468,7 @@
       "type": "movie",
       "name": "🎭 Action",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1505,7 +1505,7 @@
       "type": "movie",
       "name": "🎭 Adventure",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1542,7 +1542,7 @@
       "type": "series",
       "name": "🎭 Action & Adventure",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1579,7 +1579,7 @@
       "type": "movie",
       "name": "🎭 Animation",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1616,7 +1616,7 @@
       "type": "series",
       "name": "🎭 Animation",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1653,7 +1653,7 @@
       "type": "movie",
       "name": "🎭 Comedy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1690,7 +1690,7 @@
       "type": "series",
       "name": "🎭 Comedy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1727,7 +1727,7 @@
       "type": "movie",
       "name": "🎭 Crime",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1764,7 +1764,7 @@
       "type": "series",
       "name": "🎭 Crime",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1801,7 +1801,7 @@
       "type": "movie",
       "name": "🎭 Documentary",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1838,7 +1838,7 @@
       "type": "series",
       "name": "🎭 Documentary",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1875,7 +1875,7 @@
       "type": "movie",
       "name": "🎭 Drama",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1912,7 +1912,7 @@
       "type": "series",
       "name": "🎭 Drama",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1949,7 +1949,7 @@
       "type": "movie",
       "name": "🎭 Family",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -1986,7 +1986,7 @@
       "type": "series",
       "name": "🎭 Family",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2023,7 +2023,7 @@
       "type": "movie",
       "name": "🎭 Fantasy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2060,7 +2060,7 @@
       "type": "movie",
       "name": "🎭 History",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2097,7 +2097,7 @@
       "type": "movie",
       "name": "🎭 Horror",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2134,7 +2134,7 @@
       "type": "series",
       "name": "🎭 Kids",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2171,7 +2171,7 @@
       "type": "movie",
       "name": "🎭 Music",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2208,7 +2208,7 @@
       "type": "movie",
       "name": "🎭 Mystery",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2245,7 +2245,7 @@
       "type": "series",
       "name": "🎭 Mystery",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2282,7 +2282,7 @@
       "type": "series",
       "name": "🎭 News",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2324,7 +2324,7 @@
       "type": "series",
       "name": "🎭 Reality",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2361,7 +2361,7 @@
       "type": "movie",
       "name": "🎭 Romance",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2398,7 +2398,7 @@
       "type": "movie",
       "name": "🎭 Science Fiction",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2435,7 +2435,7 @@
       "type": "series",
       "name": "🎭 Sci-Fi & Fantasy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2472,7 +2472,7 @@
       "type": "series",
       "name": "🎭 Soap",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2514,7 +2514,7 @@
       "type": "series",
       "name": "🎭 Talk",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2556,7 +2556,7 @@
       "type": "movie",
       "name": "🎭 TV Movie",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2598,7 +2598,7 @@
       "type": "movie",
       "name": "🎭 Thriller",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2635,7 +2635,7 @@
       "type": "movie",
       "name": "🎭 War",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2672,7 +2672,7 @@
       "type": "series",
       "name": "🎭 War & Politics",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2709,7 +2709,7 @@
       "type": "movie",
       "name": "🎭 Western",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2746,7 +2746,7 @@
       "type": "series",
       "name": "🎭 Western",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -2786,7 +2786,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.upcoming",
@@ -2796,7 +2796,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.schedule",
@@ -2806,7 +2806,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.seasons",
@@ -2816,7 +2816,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.80sDecades",
@@ -2826,7 +2826,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.90sDecades",
@@ -2836,7 +2836,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.00sDecades",
@@ -2846,7 +2846,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.10sDecades",
@@ -2856,7 +2856,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.20sDecades",
@@ -2866,7 +2866,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.genres",
@@ -2876,7 +2876,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.studios",
@@ -2886,7 +2886,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.top_movies",
@@ -2896,7 +2896,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.top_series",
@@ -2906,7 +2906,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.most_favorites",
@@ -2916,7 +2916,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.most_popular",
@@ -2926,7 +2926,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "mal.top_anime",
@@ -2936,14 +2936,14 @@
       "order": "asc",
       "source": "mal",
       "enabled": true,
-      "showInHome": true
+      "showInHome": false
     },
     {
       "id": "tmdb.discover.movie.theme.time-travel",
       "type": "movie",
       "name": "🎨 Time Travel",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3000,7 +3000,7 @@
       "type": "series",
       "name": "🎨 Time Travel",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3057,7 +3057,7 @@
       "type": "movie",
       "name": "🎨 Revenge",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3118,7 +3118,7 @@
       "type": "series",
       "name": "🎨 Revenge",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3179,7 +3179,7 @@
       "type": "movie",
       "name": "🎨 Spy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3248,7 +3248,7 @@
       "type": "series",
       "name": "🎨 Spy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3317,7 +3317,7 @@
       "type": "movie",
       "name": "🎨 Magic",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3382,7 +3382,7 @@
       "type": "series",
       "name": "🎨 Magic",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3447,7 +3447,7 @@
       "type": "movie",
       "name": "🎨 K-Drama",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3488,7 +3488,7 @@
       "type": "series",
       "name": "🎨 K-Drama",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3529,7 +3529,7 @@
       "type": "movie",
       "name": "🎨 Treasure Hunt",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3598,7 +3598,7 @@
       "type": "series",
       "name": "🎨 Treasure Hunt",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3663,7 +3663,7 @@
       "type": "movie",
       "name": "🎨 Romantic Comedy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3728,7 +3728,7 @@
       "type": "series",
       "name": "🎨 Romantic Comedy",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3789,7 +3789,7 @@
       "type": "movie",
       "name": "🎨 Coming of Age",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3850,7 +3850,7 @@
       "type": "series",
       "name": "🎨 Coming of Age",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3911,7 +3911,7 @@
       "type": "movie",
       "name": "🎨 Superhero",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -3976,7 +3976,7 @@
       "type": "series",
       "name": "🎨 Superhero",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4041,7 +4041,7 @@
       "type": "movie",
       "name": "🎨 Space",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4110,7 +4110,7 @@
       "type": "series",
       "name": "🎨 Space",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4179,7 +4179,7 @@
       "type": "movie",
       "name": "🎨 Martial Arts",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4248,7 +4248,7 @@
       "type": "series",
       "name": "🎨 Martial Arts",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4317,7 +4317,7 @@
       "type": "movie",
       "name": "🎨 Vampire",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4386,7 +4386,7 @@
       "type": "series",
       "name": "🎨 Vampire",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4455,7 +4455,7 @@
       "type": "movie",
       "name": "🎨 Satire",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4520,7 +4520,7 @@
       "type": "series",
       "name": "🎨 Satire",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4645,7 +4645,7 @@
       "type": "movie",
       "name": "🏰 Cartoon Network",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4691,7 +4691,7 @@
       "type": "series",
       "name": "🏰 Cartoon Network",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4737,7 +4737,7 @@
       "type": "movie",
       "name": "🏰 DC",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4783,7 +4783,7 @@
       "type": "series",
       "name": "🏰 DC",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4829,7 +4829,7 @@
       "type": "movie",
       "name": "🏰 DreamWorks",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4867,7 +4867,7 @@
       "type": "series",
       "name": "🏰 DreamWorks",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4905,7 +4905,7 @@
       "type": "movie",
       "name": "🏰 Ghibli",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4943,7 +4943,7 @@
       "type": "series",
       "name": "🏰 Ghibli",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4981,7 +4981,7 @@
       "type": "movie",
       "name": "🏰 Marvel",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5027,7 +5027,7 @@
       "type": "series",
       "name": "🏰 Marvel",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5077,7 +5077,7 @@
       "type": "movie",
       "name": "🏰 Nickelodeon",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5123,7 +5123,7 @@
       "type": "series",
       "name": "🏰 Nickelodeon",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5169,7 +5169,7 @@
       "type": "movie",
       "name": "🏰 Pixar",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5207,7 +5207,7 @@
       "type": "series",
       "name": "🏰 Pixar",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5245,7 +5245,7 @@
       "type": "movie",
       "name": "🏰 Lucasfilm",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5287,7 +5287,7 @@
       "type": "series",
       "name": "🏰 Lucasfilm",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5329,7 +5329,7 @@
       "type": "movie",
       "name": "🎥 2020s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5363,7 +5363,7 @@
       "type": "series",
       "name": "🎥 2020s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5397,7 +5397,7 @@
       "type": "movie",
       "name": "🎥 2010s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5431,7 +5431,7 @@
       "type": "series",
       "name": "🎥 2010s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5465,7 +5465,7 @@
       "type": "movie",
       "name": "🎥 2000s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5499,7 +5499,7 @@
       "type": "series",
       "name": "🎥 2000s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5533,7 +5533,7 @@
       "type": "movie",
       "name": "🎥 1990s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5572,7 +5572,7 @@
       "type": "series",
       "name": "🎥 1990s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5611,7 +5611,7 @@
       "type": "movie",
       "name": "🎥 1980s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5650,7 +5650,7 @@
       "type": "series",
       "name": "🎥 1980s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5689,7 +5689,7 @@
       "type": "movie",
       "name": "🎥 1970s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5728,7 +5728,7 @@
       "type": "series",
       "name": "🎥 1970s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5767,7 +5767,7 @@
       "type": "movie",
       "name": "🎥 1960s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5806,7 +5806,7 @@
       "type": "series",
       "name": "🎥 1960s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5845,7 +5845,7 @@
       "type": "movie",
       "name": "🎥 1950s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5884,7 +5884,7 @@
       "type": "series",
       "name": "🎥 1950s",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5923,7 +5923,7 @@
       "type": "movie",
       "name": "🕒 Short (<90 min)",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5963,7 +5963,7 @@
       "type": "movie",
       "name": "🕒 Standard (90-150 min)",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6004,7 +6004,7 @@
       "type": "movie",
       "name": "🕒 Long (150-180 min)",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6045,7 +6045,7 @@
       "type": "movie",
       "name": "🕒 Epic (180+ min)",
       "enabled": true,
-      "showInHome": true,
+      "showInHome": false,
       "source": "tmdb",
       "metadata": {
         "discover": {

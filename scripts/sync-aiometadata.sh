@@ -64,7 +64,6 @@ def build_all_catalogs(catalogs):
     for catalog in all_catalogs:
         enabled = catalog.get("id") not in excluded_ids
         catalog["enabled"] = enabled
-        catalog["showInHome"] = enabled
     return all_catalogs
 
 
