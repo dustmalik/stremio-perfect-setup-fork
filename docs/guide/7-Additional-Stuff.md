@@ -181,7 +181,7 @@ In practice, most setups have three moving parts:
    * [**EasyNews**](https://www.easynews.com/) one of the most famous ones.
    * [**NewsHosting**](https://www.newshosting.com/) also very popular, in the same backbone as EasyNews.
    * [**Eweka**](https://www.eweka.nl/) is mainly popular in Europe.
-   * [**TorBox**](https://torbox.app/subscription?referral=210d0e72-2018-4628-ab7d-4f92f09bc2e7) has a **Pro** plan that includes Usenet access, but it's not a traditional Usenet provider, as you will read further down.
+   * [**TorBox**](https://torbox.app/subscription?referral=8000643c-a825-4e7b-a33d-1282f76791f1) has a **Pro** plan that includes Usenet access, but it's not a traditional Usenet provider, as you will read further down.
    * ***👉 Quick Tip**: Watch out for **Black Friday** deals, that's when you can get the best deals.*
 
 * **NZB Indexer**: The search layer that finds releases and generates an NZB file. The NZB is a small “manifest” (like a map) that points to the exact message IDs and groups needed to fetch all segments. *Equivalent to the Stremio scraper addons or a torrent indexer.* There are a lot of indexers available that have varying content focuses. Some are free with limits, but most are paid, either subscription-based, or some also offer lifetime packages. I can't provide an exhaustive list here and I don't even know all of them myself, but for those who are interested in getting the best long-term deals like me, here are some of the indexers with the best price-performance ratio:
