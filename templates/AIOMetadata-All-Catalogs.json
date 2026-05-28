@@ -85,7 +85,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.year",
@@ -95,7 +95,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.year",
@@ -105,7 +105,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.language",
@@ -115,7 +115,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.language",
@@ -125,7 +125,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvmaze.schedule",
@@ -135,7 +135,7 @@
       "order": "asc",
       "source": "tvmaze",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.trending",
@@ -145,7 +145,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.trending",
@@ -155,7 +155,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.genres",
@@ -165,7 +165,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.genres",
@@ -175,7 +175,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.collections",
@@ -185,7 +185,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.discover.movie.streaming.netflix",

@@ -85,7 +85,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.year",
@@ -95,7 +95,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.year",
@@ -105,7 +105,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.language",
@@ -115,7 +115,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.language",
@@ -125,7 +125,7 @@
       "order": "asc",
       "source": "tmdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvmaze.schedule",
@@ -135,7 +135,7 @@
       "order": "asc",
       "source": "tvmaze",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.trending",
@@ -145,7 +145,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.trending",
@@ -155,7 +155,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.genres",
@@ -165,7 +165,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.genres",
@@ -175,7 +175,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tvdb.collections",
@@ -185,7 +185,7 @@
       "order": "asc",
       "source": "tvdb",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "tmdb.discover.movie.streaming.netflix",
@@ -2786,7 +2786,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.upcoming",
@@ -2796,7 +2796,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.schedule",
@@ -2806,7 +2806,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.seasons",
@@ -2816,7 +2816,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.80sDecade",
@@ -2826,7 +2826,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.90sDecade",
@@ -2836,7 +2836,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.00sDecade",
@@ -2846,7 +2846,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.10sDecade",
@@ -2856,7 +2856,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.20sDecade",
@@ -2866,7 +2866,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.genres",
@@ -2876,7 +2876,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.studios",
@@ -2886,7 +2886,7 @@
       "order": "asc",
       "source": "mal",
       "enabled": false,
-      "showInHome": false
+      "showInHome": true
     },
     {
       "id": "mal.top_movies",
@@ -4645,7 +4645,7 @@
       "type": "movie",
       "name": "🏰 Cartoon Network",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4691,7 +4691,7 @@
       "type": "series",
       "name": "🏰 Cartoon Network",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4737,7 +4737,7 @@
       "type": "movie",
       "name": "🏰 DC",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4783,7 +4783,7 @@
       "type": "series",
       "name": "🏰 DC",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4829,7 +4829,7 @@
       "type": "movie",
       "name": "🏰 DreamWorks",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4867,7 +4867,7 @@
       "type": "series",
       "name": "🏰 DreamWorks",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4905,7 +4905,7 @@
       "type": "movie",
       "name": "🏰 Ghibli",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4943,7 +4943,7 @@
       "type": "series",
       "name": "🏰 Ghibli",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -4981,7 +4981,7 @@
       "type": "movie",
       "name": "🏰 Marvel",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5027,7 +5027,7 @@
       "type": "series",
       "name": "🏰 Marvel",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5077,7 +5077,7 @@
       "type": "movie",
       "name": "🏰 Nickelodeon",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5123,7 +5123,7 @@
       "type": "series",
       "name": "🏰 Nickelodeon",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5169,7 +5169,7 @@
       "type": "movie",
       "name": "🏰 Pixar",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5207,7 +5207,7 @@
       "type": "series",
       "name": "🏰 Pixar",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5245,7 +5245,7 @@
       "type": "movie",
       "name": "🏰 Lucasfilm",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -5287,7 +5287,7 @@
       "type": "series",
       "name": "🏰 Lucasfilm",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6085,7 +6085,7 @@
       "type": "movie",
       "name": "🇧🇷 Brazilian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6122,7 +6122,7 @@
       "type": "series",
       "name": "🇧🇷 Brazilian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6159,7 +6159,7 @@
       "type": "movie",
       "name": "🇨🇳 Chinese",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6196,7 +6196,7 @@
       "type": "series",
       "name": "🇨🇳 Chinese",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6233,7 +6233,7 @@
       "type": "movie",
       "name": "🇩🇪 German",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6270,7 +6270,7 @@
       "type": "series",
       "name": "🇩🇪 German",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6307,7 +6307,7 @@
       "type": "movie",
       "name": "🇪🇸 Spanish",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6344,7 +6344,7 @@
       "type": "series",
       "name": "🇪🇸 Spanish",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6381,7 +6381,7 @@
       "type": "movie",
       "name": "🇫🇷 French",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6418,7 +6418,7 @@
       "type": "series",
       "name": "🇫🇷 French",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6455,7 +6455,7 @@
       "type": "movie",
       "name": "🇮🇳 Indian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6492,7 +6492,7 @@
       "type": "series",
       "name": "🇮🇳 Indian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6529,7 +6529,7 @@
       "type": "movie",
       "name": "🇮🇹 Italian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6566,7 +6566,7 @@
       "type": "series",
       "name": "🇮🇹 Italian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6603,7 +6603,7 @@
       "type": "movie",
       "name": "🇯🇵 Japanese",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6640,7 +6640,7 @@
       "type": "series",
       "name": "🇯🇵 Japanese",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6677,7 +6677,7 @@
       "type": "movie",
       "name": "🇰🇷 Korean",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6714,7 +6714,7 @@
       "type": "series",
       "name": "🇰🇷 Korean",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6751,7 +6751,7 @@
       "type": "movie",
       "name": "🇲🇽 Latin American",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6788,7 +6788,7 @@
       "type": "series",
       "name": "🇲🇽 Latin American",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6825,7 +6825,7 @@
       "type": "movie",
       "name": "🇷🇺 Russian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6862,7 +6862,7 @@
       "type": "series",
       "name": "🇷🇺 Russian",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6899,7 +6899,7 @@
       "type": "movie",
       "name": "🇸🇪 Nordic",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6936,7 +6936,7 @@
       "type": "series",
       "name": "🇸🇪 Nordic",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -6973,7 +6973,7 @@
       "type": "movie",
       "name": "🇹🇷 Turkish",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
@@ -7010,7 +7010,7 @@
       "type": "series",
       "name": "🇹🇷 Turkish",
       "enabled": false,
-      "showInHome": false,
+      "showInHome": true,
       "source": "tmdb",
       "metadata": {
         "discover": {
