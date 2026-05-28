@@ -17,12 +17,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "trakt.recommendations.movies",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "trakt.recommendations.shows",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎯",
@@ -41,12 +43,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏆",
@@ -65,12 +69,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.trending",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.trending",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🔥",
@@ -89,12 +95,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top_rated",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.top_rated",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "⭐",
@@ -123,12 +131,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.netflix",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.netflix",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -147,12 +157,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.disney-plus",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.disney-plus",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -171,12 +183,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.prime-video",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.prime-video",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -195,12 +209,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.apple-tv",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.apple-tv",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -219,12 +235,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.hbo-max",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.hbo-max",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -243,12 +261,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.hulu",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.hulu",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -267,12 +287,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.paramount-plus",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.paramount-plus",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -291,12 +313,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.peacock",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.peacock",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -315,12 +339,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.crunchyroll",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.crunchyroll",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -339,12 +365,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.discovery-plus",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.discovery-plus",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -363,12 +391,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.curiosity-stream",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.curiosity-stream",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -387,12 +417,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.jiohotstar",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.jiohotstar",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -411,12 +443,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.starz",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.starz",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -435,12 +469,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.streaming.shudder",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.streaming.shudder",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎬",
@@ -469,17 +505,20 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.action",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Action"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.adventure",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Adventure"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.action-adventure",
-            "type": "series"
+            "type": "series",
+            "genre": "Action & Adventure"
           }
         ],
         "coverEmoji": "🎭",
@@ -498,12 +537,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.animation",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Animation"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.animation",
-            "type": "series"
+            "type": "series",
+            "genre": "Animation"
           }
         ],
         "coverEmoji": "🎭",
@@ -522,82 +563,98 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.airing",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.upcoming",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.schedule",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.seasons",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.80sDecade",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.90sDecade",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.00sDecade",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.10sDecade",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.20sDecade",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.genres",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.studios",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.top_movies",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.top_series",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.most_favorites",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.most_popular",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "mal.top_anime",
-            "type": "anime"
+            "type": "anime",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎭",
@@ -616,12 +673,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.comedy",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Comedy"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.comedy",
-            "type": "series"
+            "type": "series",
+            "genre": "Comedy"
           }
         ],
         "coverEmoji": "🎭",
@@ -640,12 +699,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.crime",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Crime"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.crime",
-            "type": "series"
+            "type": "series",
+            "genre": "Crime"
           }
         ],
         "coverEmoji": "🎭",
@@ -664,12 +725,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.documentary",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Documentary"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.documentary",
-            "type": "series"
+            "type": "series",
+            "genre": "Documentary"
           }
         ],
         "coverEmoji": "🎭",
@@ -688,12 +751,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.drama",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Drama"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.drama",
-            "type": "series"
+            "type": "series",
+            "genre": "Drama"
           }
         ],
         "coverEmoji": "🎭",
@@ -712,12 +777,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.family",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Family"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.kids",
-            "type": "series"
+            "type": "series",
+            "genre": "Kids"
           }
         ],
         "coverEmoji": "🎭",
@@ -736,17 +803,20 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.fantasy",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Fantasy"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.science-fiction",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Science Fiction"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.sci-fi-fantasy",
-            "type": "series"
+            "type": "series",
+            "genre": "Sci-Fi & Fantasy"
           }
         ],
         "coverEmoji": "🎭",
@@ -765,17 +835,20 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.history",
-            "type": "movie"
+            "type": "movie",
+            "genre": "History"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.war",
-            "type": "movie"
+            "type": "movie",
+            "genre": "War"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.war-politics",
-            "type": "series"
+            "type": "series",
+            "genre": "War & Politics"
           }
         ],
         "coverEmoji": "🎭",
@@ -794,7 +867,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.horror",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Horror"
           }
         ],
         "coverEmoji": "🎭",
@@ -813,7 +887,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.music",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Music"
           }
         ],
         "coverEmoji": "🎭",
@@ -832,12 +907,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.mystery",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Mystery"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.mystery",
-            "type": "series"
+            "type": "series",
+            "genre": "Mystery"
           }
         ],
         "coverEmoji": "🎭",
@@ -856,12 +933,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.news",
-            "type": "series"
+            "type": "series",
+            "genre": "News"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.talk",
-            "type": "series"
+            "type": "series",
+            "genre": "Talk"
           }
         ],
         "coverEmoji": "🎭",
@@ -880,12 +959,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.reality",
-            "type": "series"
+            "type": "series",
+            "genre": "Reality"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.soap",
-            "type": "series"
+            "type": "series",
+            "genre": "Soap"
           }
         ],
         "coverEmoji": "🎭",
@@ -904,7 +985,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.romance",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Romance"
           }
         ],
         "coverEmoji": "🎭",
@@ -923,7 +1005,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.thriller",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Thriller"
           }
         ],
         "coverEmoji": "🎭",
@@ -942,7 +1025,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.tv-movie",
-            "type": "movie"
+            "type": "movie",
+            "genre": "TV Movie"
           }
         ],
         "coverEmoji": "🎭",
@@ -961,12 +1045,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.genres.western",
-            "type": "movie"
+            "type": "movie",
+            "genre": "Western"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.genres.western",
-            "type": "series"
+            "type": "series",
+            "genre": "Western"
           }
         ],
         "coverEmoji": "🎭",
@@ -995,12 +1081,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.time-travel",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.time-travel",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1019,12 +1107,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.revenge",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.revenge",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1043,12 +1133,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.spy",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.spy",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1067,12 +1159,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.magic",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.magic",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1091,12 +1185,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.k-drama",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.k-drama",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1115,12 +1211,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.treasure-hunt",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.treasure-hunt",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1139,12 +1237,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.romantic-comedy",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.romantic-comedy",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1163,12 +1263,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.coming-of-age",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.coming-of-age",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1187,12 +1289,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.superhero",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.superhero",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1211,12 +1315,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.space",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.space",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1235,12 +1341,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.martial-arts",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.martial-arts",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1259,12 +1367,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.vampire",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.vampire",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1283,12 +1393,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.theme.satire",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.theme.satire",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎨",
@@ -1317,12 +1429,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.cartoon-network",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.cartoon-network",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1341,12 +1455,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.dc",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.dc",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1365,12 +1481,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.dreamworks",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.dreamworks",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1389,12 +1507,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.ghibli",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.ghibli",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1413,12 +1533,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.marvel",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.marvel",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1437,12 +1559,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.nickelodeon",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.nickelodeon",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1461,12 +1585,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.pixar",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.pixar",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1485,12 +1611,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.studios.lucasfilm",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.studios.lucasfilm",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🏰",
@@ -1519,12 +1647,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.2020s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.2020s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1543,12 +1673,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.2010s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.2010s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1567,12 +1699,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.2000s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.2000s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1591,12 +1725,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.1990s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.1990s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1615,12 +1751,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.1980s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.1980s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1639,12 +1777,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.1970s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.1970s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1663,12 +1803,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.1960s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.1960s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1687,12 +1829,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.decades.1950s",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.decades.1950s",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🎥",
@@ -1721,7 +1865,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.runtime.short",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🕒",
@@ -1740,7 +1885,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.runtime.standard",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🕒",
@@ -1759,7 +1905,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.runtime.long",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🕒",
@@ -1778,7 +1925,8 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.runtime.epic",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🕒",
@@ -1807,12 +1955,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.brazilian",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.brazilian",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇧🇷",
@@ -1831,12 +1981,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.chinese",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.chinese",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇨🇳",
@@ -1855,12 +2007,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.french",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.french",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇫🇷",
@@ -1879,12 +2033,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.german",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.german",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇩🇪",
@@ -1903,12 +2059,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.indian",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.indian",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇮🇳",
@@ -1927,12 +2085,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.italian",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.italian",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇮🇹",
@@ -1951,12 +2111,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.japanese",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.japanese",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇯🇵",
@@ -1975,12 +2137,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.korean",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.korean",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇰🇷",
@@ -1999,12 +2163,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.latin-american",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.latin-american",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇲🇽",
@@ -2023,12 +2189,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.nordic",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.nordic",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇸🇪",
@@ -2047,12 +2215,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.russian",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.russian",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇷🇺",
@@ -2071,12 +2241,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.spanish",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.spanish",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇪🇸",
@@ -2095,12 +2267,14 @@
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.movie.world.turkish",
-            "type": "movie"
+            "type": "movie",
+            "genre": "None"
           },
           {
             "addonId": "aio-metadata",
             "catalogId": "tmdb.discover.series.world.turkish",
-            "type": "series"
+            "type": "series",
+            "genre": "None"
           }
         ],
         "coverEmoji": "🇹🇷",
