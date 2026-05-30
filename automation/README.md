@@ -13,18 +13,26 @@ templates, install everything in the right order, and hand back every credential
 
 ```
 automation/
-  config.example.json        Parameterized config (instances, fallbacks, preferences)
-  src/
-    template-engine.js        Ports the AIOStreams directive engine (__if/__switch/{{inputs}})
-    schema-renderer.js        Builds the wizard form from template.metadata.inputs (dynamic UI)
-    orchestrator.js           Phase-1 Stremio flow (account -> aiostreams -> install)
-    adapters/
-      stremio.js              api.strem.io: login/register, addonCollectionGet/Set, ordering + Cinemeta patch
-      aiostreams.js           POST /api/v1/user -> {uuid, encryptedPassword, manifestUrl}
-  ui/
-    index.html, app.js        Static wizard, deployable to GitHub Pages
-  test/
-    template-engine.test.mjs  Offline tests against the REAL templates/AIOStreams.json
+  core/                    Template engine, catalog config, nuvio-collections, adapters, orchestrator
+  web/                     Vite + React wizard (npm run dev / npm run build)
+  assets/logos/            Mirrored service logos
+  test/                    Node offline tests (no network needed)
+  config.example.json      Instance URLs and default preferences
+```
+
+## Dev
+
+```bash
+# Core unit tests (no network)
+node automation/test/template-engine.test.mjs
+node automation/test/catalog-config.test.mjs
+
+# Wizard dev server
+cd automation/web && npm install && npm run dev
+# → http://localhost:5173/stremio-perfect-setup/automator/
+
+# Production build
+cd automation/web && npm run build
 ```
 
 ## Why this design
@@ -37,29 +45,6 @@ automation/
   the wizard can call it straight from GitHub Pages. **Stremio's `api.strem.io`** is browser-callable
   too and a single `addonCollectionSet` does install + ordering + Cinemeta clean-up (replacing
   Cinebye). Only **Trakt** strictly needs the Cloudflare Worker proxy (no CORS) — Phase 2.
-
-## Run the tests (no network needed)
-
-```bash
-node automation/test/template-engine.test.mjs
-```
-
-## Try the wizard locally
-
-```bash
-# serve the repo root so ui/ can fetch ../templates and ../src
-python3 -m http.server 8000
-# open http://localhost:8000/automation/ui/
-```
-
-Copy `config.example.json` to `config.json` to point at your preferred instances / fallbacks.
-API keys and passwords are entered in the wizard at runtime and are **never** written to disk.
-
-## Deploy to GitHub Pages
-
-Publish `automation/ui/` (it fetches `../src/*` and the templates by raw URL). The current Pages
-build serves from `docs/`; either add an `automation/` include to the Pages workflow or host the
-`ui/` folder as a separate Pages site / project page.
 
 ## Roadmap (see AUTOMATION-PLAN.md §8)
 
