@@ -156,34 +156,41 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-decoration: none;
-}
-
-.sidebar-support-link--github {
-  width: 44px;
-  height: 44px;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: linear-gradient(145deg, var(--panel-2), var(--panel));
   color: var(--text);
   box-shadow: var(--shadow);
+  text-decoration: none;
   transition: transform 0.18s ease, border-color 0.18s ease;
 }
 
-.sidebar-support-link--github:hover,
-.sidebar-support-link--github:focus-visible {
+.sidebar-support-link:hover,
+.sidebar-support-link:focus-visible {
   transform: translateY(-1px);
   border-color: var(--accent);
 }
 
-.sidebar-support-link--github svg {
+.sidebar-support-link--github {
+  width: 44px;
+  height: 44px;
+}
+
+.sidebar-support-link--github svg,
+.sidebar-support-link--kofi svg {
   width: 22px;
   height: 22px;
 }
 
 .sidebar-support-link--kofi {
-  line-height: 0;
   flex: 0 0 auto;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .sidebar-stat-card {
@@ -382,11 +389,10 @@ img {
   color: var(--muted);
 }
 
-.doc-card a[href*="ko-fi.com"] img,
-.sidebar-support-link--kofi img {
+.doc-card a[href*="ko-fi.com"] img {
   display: block !important;
-  width: 150px !important;
-  max-width: 150px !important;
+  width: auto !important;
+  max-width: min(100%, 150px) !important;
   height: auto !important;
   border: 0 !important;
   box-shadow: none !important;
