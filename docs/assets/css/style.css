@@ -142,15 +142,14 @@ body {
 .sidebar-footer {
   margin-top: auto;
   padding-top: 0.35rem;
+  text-align: center;
 }
 
 .sidebar-support-links {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: fit-content;
-  gap: 0.35rem;
-  margin: 0 auto 0.9rem;
+  gap: 0.25rem;
+  margin: 0 0 0.9rem;
 }
 
 .sidebar-support-link {
@@ -184,6 +183,7 @@ body {
 
 .sidebar-support-link--kofi {
   line-height: 0;
+  flex: 0 0 auto;
 }
 
 .sidebar-stat-card {
@@ -384,8 +384,9 @@ img {
 
 .doc-card a[href*="ko-fi.com"] img,
 .sidebar-support-link--kofi img {
-  width: auto !important;
-  max-width: min(100%, 150px) !important;
+  display: block !important;
+  width: 150px !important;
+  max-width: 150px !important;
   height: auto !important;
   border: 0 !important;
   box-shadow: none !important;
