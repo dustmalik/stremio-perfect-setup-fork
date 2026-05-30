@@ -66,15 +66,23 @@ function toDescriptor(m) {
 }
 
 // Reproduce Cinebye's three patches by trimming Cinemeta's advertised resources.
-// NOTE: exact resource removal must be verified against a real Cinemeta descriptor (API-NOTES §1).
+//
+// VERIFIED 2026-05-31 against live Cinemeta v3.0.12 (com.linvo.cinemeta) from a fresh account:
+//   manifest.resources = ["catalog", "meta", "addon_catalog"]  — plain strings, no objects.
+//   Catalogs with search: movie/top and series/top each have
+//     extra: [{name:"genre",...}, {name:"search"}, {name:"skip"}]
+//     extraSupported: ["search","genre","skip"]
+//   The filter below (checking both extra[].name and extraSupported) is correct for both fields.
+//   The resources filter (string vs object guard) is correct — resources are plain strings.
 function patchCinemeta(descriptor, { removeSearch, removeCatalogs, removeMetadata }) {
   const d = structuredClone(descriptor);
   if (!d.manifest) return d;
   if (removeCatalogs) d.manifest.catalogs = [];
   if (removeMetadata && Array.isArray(d.manifest.resources)) {
+    // resources are plain strings ("catalog", "meta", "addon_catalog"); guard handles future object form too
     d.manifest.resources = d.manifest.resources.filter((r) => (typeof r === 'string' ? r : r.name) !== 'meta');
   }
-  // removeSearch: drop search-typed catalogs (extra: {name:'search'})
+  // removeSearch: drop catalogs that declare search support via extra[].name or extraSupported
   if (removeSearch && Array.isArray(d.manifest.catalogs)) {
     d.manifest.catalogs = d.manifest.catalogs.filter(
       (c) => !(c.extra || []).some((e) => e.name === 'search') && !(c.extraSupported || []).includes('search')
