@@ -182,6 +182,11 @@ body {
   height: 22px;
 }
 
+.sidebar-support-link--kofi svg {
+  width: 25px;
+  height: 25px;
+}
+
 .sidebar-support-link--kofi {
   flex: 0 0 auto;
   gap: 0.55rem;
