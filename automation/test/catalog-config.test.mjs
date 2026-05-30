@@ -6,6 +6,7 @@ import {
   deriveCategoryKey, deriveCategories, deriveDiscoverFolders,
   defaultEnabledCategories, countEnabledCatalogs, buildAioMetadataConfig,
 } from '../core/catalog-config.js';
+import { filterCollections } from '../core/nuvio-collections.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..', '..');
@@ -102,6 +103,35 @@ const nuvioCfg = buildAioMetadataConfig(nuvioTemplate, {
   language: 'en-US',
 });
 ok('Nuvio: showInHome=false for ALL enabled catalogs', nuvioCfg.config.catalogs.filter(c => c.enabled).every(c => c.showInHome === false));
+
+// ─── nuvio-collections tests ───────────────────────────────────────────────
+
+console.log('\n# filterCollections — Nuvio collections filtered to enabled categories');
+{
+  // All enabled: all 8 groups pass through
+  const allCats = new Set(['🎬','🎭','🍥','🎨','🏰','🎥','🕒','world']);
+  const allDiscover = new Set(deriveDiscoverFolders(catalogs).map(d => d.id));
+  const all = filterCollections(collections, catalogs, { enabledCategories: allCats, enabledDiscoverFolderIds: allDiscover });
+  ok('All enabled: all top-level groups present', all.length === collections.length);
+
+  // Disable Studios: Studios group should be filtered out (no folders left)
+  const noStudios = new Set(['🎬','🎭','🍥','🎨','🎥','🕒','world']);
+  const filteredStudios = filterCollections(collections, catalogs, { enabledCategories: noStudios, enabledDiscoverFolderIds: allDiscover });
+  const studioGroup = filteredStudios.find(g => g.title?.includes('Studios'));
+  ok('Studios group absent when disabled', !studioGroup || studioGroup.folders.length === 0);
+
+  // Disable Anime: Genres group stays but anime folders removed
+  const noAnime = new Set(['🎬','🎭','🎨','🏰','🎥','🕒','world']);
+  const filteredAnime = filterCollections(collections, catalogs, { enabledCategories: noAnime, enabledDiscoverFolderIds: allDiscover });
+  const genreGroup = filteredAnime.find(g => g.title?.includes('Genres'));
+  ok('Genres group still present when only Anime disabled', !!genreGroup);
+  // Anime folders reference catalogs with IDs that have deriveCategoryKey(name) === '🍥'
+  const animeCatalogIds = catalogs.filter(c => deriveCategoryKey(c.name) === '🍥').map(c => c.id);
+  const hasAnimeFolders = genreGroup?.folders.some(f =>
+    (f.catalogSources || []).some(s => animeCatalogIds.includes(s.catalogId))
+  );
+  ok('No anime folders in Genres when Anime disabled', !hasAnimeFolders);
+}
 
 console.log(`\n${failed === 0 ? '✅' : '❌'} ${passed} passed, ${failed} failed\n`);
 process.exit(failed === 0 ? 0 : 1);
