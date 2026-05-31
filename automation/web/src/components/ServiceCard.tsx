@@ -1,4 +1,5 @@
 import type { Service } from '../lib/services';
+import { resolveLogoUrl } from '../lib/services';
 
 interface Props {
   service: Service;
@@ -7,22 +8,27 @@ interface Props {
 }
 
 export function ServiceCard({ service, selected, onToggle }: Props) {
+  const logoUrl = resolveLogoUrl(service.logo);
   return (
     <button
       onClick={onToggle}
-      className={`p-3 border-2 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
-        selected
-          ? 'border-accent bg-purple-50 shadow-sm'
-          : 'border-gray-200 hover:border-gray-300'
-      }`}
+      style={{
+        padding: '0.75rem 0.5rem',
+        border: `2px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
+        borderRadius: '12px',
+        background: selected ? 'var(--panel-2)' : 'var(--panel)',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem',
+        cursor: 'pointer', transition: 'all 0.15s', color: 'var(--text)',
+        boxShadow: selected ? '0 0 0 3px rgba(109,58,242,0.15)' : 'none',
+      }}
     >
-      {service.logo ? (
-        <img src={service.logo} alt={service.name} className="h-7 w-full object-contain" />
+      {logoUrl ? (
+        <img src={logoUrl} alt={service.name} style={{ height: '28px', width: '100%', objectFit: 'contain' }} />
       ) : (
-        <span className="text-lg">📦</span>
+        <span style={{ fontWeight: 700, fontSize: '0.8rem', color: 'var(--muted)' }}>{service.name[0]}</span>
       )}
-      <span className="text-xs font-semibold text-center leading-tight">{service.name}</span>
-      {selected && <span className="text-xs text-accent font-bold">✓</span>}
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, textAlign: 'center', lineHeight: 1.2 }}>{service.name}</span>
+      {selected && <span style={{ fontSize: '0.7rem', color: 'var(--accent)', fontWeight: 700 }}>✓</span>}
     </button>
   );
 }
