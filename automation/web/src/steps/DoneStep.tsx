@@ -24,8 +24,8 @@ export function DoneStep() {
           <h2 className="text-xl font-bold text-center mb-1">And now you're really done!</h2>
           <p className="text-gray-500 text-sm text-center mb-5">
             {target === 'stremio'
-              ? 'Open web.stremio.com and sign in — your addons are installed in the right order.'
-              : 'Open the Nuvio app and sign in — your addons and collections are ready.'}
+              ? 'Open web.stremio.com and sign in. Your addons are installed in the right order.'
+              : 'Open the Nuvio app and sign in. Your addons and collections are ready.'}
           </p>
 
           {(aiostreams || aiometadata) && (

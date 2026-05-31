@@ -61,7 +61,7 @@ export function CatalogStep() {
       {overLimit && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-700">
           ⚠️ <strong>Too many catalogs!</strong> Stremio supports up to ~{STREMIO_MAX_CATALOGS}.
-          You have {enabledCount} enabled — please disable some categories below.
+          You have {enabledCount} enabled. Please disable some categories below.
         </div>
       )}
 

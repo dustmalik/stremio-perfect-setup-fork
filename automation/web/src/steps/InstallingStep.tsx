@@ -27,19 +27,22 @@ export function InstallingStep() {
         catalogSelection, aiometadataLanguage, templates,
       } = wizard;
 
-      if (!templates) throw new Error('Templates not loaded — please go back and try again.');
+      if (!templates) throw new Error('Templates not loaded. Please go back and try again.');
 
       push('Building AIOStreams config…');
       const aiostreamsParams = {
         template: templates.aiostreams,
         inputs: aioStreamsInputs,
-        services: credentials.debridService ? [credentials.debridService] : [],
+        services: credentials.debridServices.map((d: { id: string }) => d.id),
         credentials: {
           tmdbApiKey: credentials.tmdbApiKey,
           tmdbAccessToken: credentials.tmdbAccessToken,
           tvdbApiKey: credentials.tvdbApiKey,
           geminiApiKey: credentials.geminiApiKey,
         },
+        serviceCredentials: Object.fromEntries(
+          credentials.debridServices.map((d: { id: string; apiKey: string }) => [d.id, { apiKey: d.apiKey }])
+        ),
       };
 
       // Fetch the correct AIOMetadata base template for the target
