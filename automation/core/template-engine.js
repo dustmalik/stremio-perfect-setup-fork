@@ -277,18 +277,21 @@ function resolveValueWithFlatten(value, ctx, keyHint) {
  * @param {object} opts.credentials   {tmdbApiKey, tmdbAccessToken, tvdbApiKey, ...}
  * @returns {object} resolved config (also injects selected services into config.services)
  */
-function resolveTemplate(template, { inputs = {}, services = [], credentials = {} } = {}) {
+function resolveTemplate(template, { inputs = {}, services = [], credentials = {}, serviceCredentials = {} } = {}) {
   const ctx = { inputs, services, credentials };
   const resolved = resolveNode(template.config, ctx, null);
 
-  // Inject the selected Debrid services (the template ships with services disabled).
+  // Inject the selected Debrid services with optional per-service credentials.
   if (Array.isArray(resolved.services)) {
     const known = new Map(resolved.services.map((s) => [s.id, s]));
     resolved.services = services.length
       ? services.map((id) => ({
           id,
           enabled: true,
-          credentials: known.get(id)?.credentials || {},
+          credentials: {
+            ...(known.get(id)?.credentials || {}),
+            ...(serviceCredentials[id] || {}),
+          },
         }))
       : resolved.services.map((s) => ({ ...s, enabled: false }));
   }

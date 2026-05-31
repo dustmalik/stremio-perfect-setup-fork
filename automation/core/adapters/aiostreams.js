@@ -17,8 +17,8 @@ export function createAioStreamsAdapter(instanceUrl) {
      * Resolve the repo template with the user's inputs + credentials, store it, return identifiers.
      * @returns {Promise<{uuid, encryptedPassword, manifestUrl, password}>}
      */
-    async createConfig({ template, inputs, services, credentials, password, addonPassword }) {
-      const config = resolveTemplate(template, { inputs, services, credentials });
+    async createConfig({ template, inputs, services, credentials, serviceCredentials, password, addonPassword }) {
+      const config = resolveTemplate(template, { inputs, services, credentials, serviceCredentials });
       const headers = { 'content-type': 'application/json' };
       if (addonPassword) headers['x-aiostreams-addon-password'] = addonPassword;
 
