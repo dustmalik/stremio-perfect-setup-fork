@@ -6,12 +6,8 @@ import { useWizard } from '../store/wizard';
 import { SERVICES, DEBRID_SERVICES } from '../lib/services';
 
 export function ServicesStep() {
-  const { credentials, setCredentials, nextStep } = useWizard();
-  const selectedId = credentials.debridService;
-
-  function toggle(id: string) {
-    setCredentials({ debridService: selectedId === id ? '' : id });
-  }
+  const { credentials, toggleDebridService, nextStep } = useWizard();
+  const selectedIds = credentials.debridServices.map(d => d.id);
 
   return (
     <WizardShell>
@@ -27,8 +23,8 @@ export function ServicesStep() {
           <ServiceCard
             key={s.id}
             service={s}
-            selected={s.id === selectedId}
-            onToggle={() => toggle(s.id)}
+            selected={selectedIds.includes(s.id)}
+            onToggle={() => toggleDebridService(s.id)}
           />
         ))}
       </div>
@@ -40,9 +36,9 @@ export function ServicesStep() {
         ))}
       </div>
 
-      {!selectedId && (
+      {selectedIds.length === 0 && (
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-2 mb-2 text-sm text-amber-700">
-          ⚠️ No service selected - P2P / HTTP-only mode will be used (free, but slower).
+          No service selected - P2P / HTTP-only mode will be used (free, but slower).
         </div>
       )}
 

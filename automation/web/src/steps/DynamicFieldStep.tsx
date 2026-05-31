@@ -61,9 +61,10 @@ export function DynamicFieldStep({ fieldIndex }: Props) {
     );
   }
 
-  const ctx = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ctx: any = {
     inputs: aioStreamsInputs,
-    services: credentials.debridService ? [credentials.debridService] : [],
+    services: credentials.debridServices.map((d: { id: string }) => d.id),
   };
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment

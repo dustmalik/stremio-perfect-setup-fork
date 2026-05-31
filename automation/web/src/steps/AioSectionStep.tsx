@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { MarkdownText } from '../components/MarkdownText';
@@ -54,7 +55,8 @@ export function AioSectionStep({ sectionIndex }: Props) {
   const allInputs = t?.metadata?.inputs ?? [];
   const inputsById = Object.fromEntries(allInputs.map((f: TemplateField) => [f.id, f]));
 
-  const ctx = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ctx: any = {
     inputs: aioStreamsInputs,
     services: credentials.debridServices.map((d: { id: string }) => d.id),
   };
@@ -111,14 +113,14 @@ interface FieldProps {
 }
 
 function FieldRenderer({ field, value, onChange }: FieldProps) {
-  const inputStyle: React.CSSProperties = {
+  const inputStyle: CSSProperties = {
     width: '100%', border: '1px solid var(--border)', borderRadius: '8px',
     padding: '0.5rem 0.75rem', fontSize: '0.875rem',
     background: 'var(--panel)', color: 'var(--text)', outline: 'none',
     boxSizing: 'border-box',
   };
 
-  const selectedBtn = (sel: boolean): React.CSSProperties => ({
+  const selectedBtn = (sel: boolean): CSSProperties => ({
     padding: '0.55rem 0.75rem', borderRadius: '10px',
     border: `2px solid ${sel ? 'var(--accent)' : 'var(--border)'}`,
     background: sel ? 'var(--panel-2)' : 'var(--panel)',

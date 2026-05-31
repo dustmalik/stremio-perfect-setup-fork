@@ -1,7 +1,9 @@
+import type { CSSProperties } from 'react';
+
 interface Props {
   text: string;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }
 
 /**

@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // All AIOStreams services with logo paths relative to the Vite base URL.
 // Use resolveLogoUrl(service.logo) when setting img src.
 // Logo paths do NOT have a leading slash so Vite can apply the base path correctly.
