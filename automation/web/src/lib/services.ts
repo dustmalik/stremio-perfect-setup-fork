@@ -21,7 +21,7 @@ export const SERVICES: Service[] = [
   { id: 'pikpak',          name: 'PikPak',         logo: '/assets/logos/pikpak.png',      isDebrid: true,  isUsenet: false },
   { id: 'offcloud',        name: 'Offcloud',       logo: '/assets/logos/offcloud.png',    isDebrid: true,  isUsenet: false },
   { id: 'seedr',           name: 'Seedr',          logo: '/assets/logos/seedr.png',       isDebrid: true,  isUsenet: false },
-  { id: 'putio',           name: 'Put.io',         logo: '',                              isDebrid: true,  isUsenet: false },
+  { id: 'putio',           name: 'Put.io',         logo: '/assets/logos/putio.svg',       isDebrid: true,  isUsenet: false },
   { id: 'easynews',        name: 'Easynews',       logo: '/assets/logos/easynews.png',    isDebrid: false, isUsenet: true  },
   { id: 'nzbdav',          name: 'NzbDAV',         logo: '',                              isDebrid: false, isUsenet: true  },
   { id: 'altmount',        name: 'AltMount',       logo: '',                              isDebrid: false, isUsenet: true  },
