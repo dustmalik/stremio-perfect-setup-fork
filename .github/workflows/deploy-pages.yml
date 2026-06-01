@@ -23,10 +23,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Install Jekyll dependencies
+        run: gem install github-pages -v 232
 
       - name: Install Python dependencies
         run: |
@@ -48,10 +54,7 @@ jobs:
         uses: actions/configure-pages@v5
 
       - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./.pages-source
-          destination: ./_site
+        run: jekyll build --source ./.pages-source --destination ./_site
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
