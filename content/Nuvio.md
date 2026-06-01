@@ -45,10 +45,10 @@ The cool part is the **Dynamic Backdrops**: Something you would probably not not
 Here are the main links:
 
 * [**Full Guide**](https://numb3rs.stream/guide/Nuvio/) [**READ BEFORE ASKING QUESTIONS**]
-* [**Collections Assets**](https://github.com/luckynumb3rs/stremio-perfect-setup/tree/main/collections)
-* [**AIOMetadata Catalogs**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All-Catalogs.json) (*JSON*) [**Only catalogs** for existing setups, import into AIOMetadata *Catalogs* tab]
-* [**AIOMetadata Full Configuration**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All.json) (*JSON*) [**Full** for new setups, import into AIOMetadata *Configuration* tab]
+* [**Collections Assets**](https://numb3rs.stream/collections/)
+* [**AIOMetadata Catalogs**](https://numb3rs.stream/templates/AIOMetadata-All-Catalogs.json) (*JSON*) [**Only catalogs** for existing setups, import into AIOMetadata *Catalogs* tab]
+* [**AIOMetadata Full Configuration**](https://numb3rs.stream/templates/AIOMetadata-All.json) (*JSON*) [**Full** for new setups, import into AIOMetadata *Configuration* tab]
 * [**Nuvio Community Collections Pack**](https://nuvioapp.space/community-collections/nuvio-perfect-collections-incl-dynamic-backdrops-2) [**Import directly** into Nuvio account]
-* [**Nuvio Collections**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Collections.json) (*JSON*) [**Alternative** file for manual import]
+* [**Nuvio Collections**](https://numb3rs.stream/templates/Nuvio-Collections.json) (*JSON*) [**Alternative** file for manual import]
 
 Hope you like it. Enjoy!

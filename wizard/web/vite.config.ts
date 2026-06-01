@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 
 function loadGuideGa4Id() {
-  const configPath = path.resolve(__dirname, '../../docs/_config.yml');
+  const configPath = path.resolve(__dirname, '../../_config.yml');
 
   try {
     const raw = fs.readFileSync(configPath, 'utf8');

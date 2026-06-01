@@ -58,8 +58,8 @@
     "v" + guideCompletionStorageVersion
   ].join("::");
 
-  function isGuidePath(path) {
-    return /^guide\/.+\.md$/.test(path);
+  function isDocsNavPath(path) {
+    return /^guide\/.+\.md$/.test(path) || path === "CHANGELOG.md";
   }
 
   function displayTitle(raw) {
@@ -82,15 +82,19 @@
   function guideSort(a, b) {
     var ap = normalizePath(a.path);
     var bp = normalizePath(b.path);
+    var aIsChangelog = ap === "CHANGELOG.md";
+    var bIsChangelog = bp === "CHANGELOG.md";
     var aIsUpdates = /\/Updates\.md$/i.test(ap);
     var bIsUpdates = /\/Updates\.md$/i.test(bp);
+    if (aIsChangelog && !bIsChangelog) return 1;
+    if (!aIsChangelog && bIsChangelog) return -1;
     if (aIsUpdates && !bIsUpdates) return 1;
     if (!aIsUpdates && bIsUpdates) return -1;
     return ap.localeCompare(bp, undefined, { numeric: true, sensitivity: "base" });
   }
 
   pages = pages.filter(function (p) {
-    return p && isGuidePath(normalizePath(p.path));
+    return p && isDocsNavPath(normalizePath(p.path));
   }).sort(guideSort);
 
   function buildTree(items) {
@@ -118,9 +122,7 @@
   }
 
   function renderNode(node, list, level) {
-    var keys = node.order.slice().sort(function (a, b) {
-      return a.localeCompare(b, undefined, { numeric: true, sensitivity: "base" });
-    });
+    var keys = node.order.slice();
 
     keys.forEach(function (key) {
       var child = node.children[key];
@@ -230,7 +232,7 @@
     if (!quick || !list || !article) return;
 
     list.innerHTML = "";
-    var headers = Array.prototype.slice.call(article.querySelectorAll("h2, h3, h4")).filter(function (h) {
+    var headers = Array.prototype.slice.call(article.querySelectorAll("h2")).filter(function (h) {
       return !h.closest("#quick-nav");
     });
     if (headers.length === 0) {
@@ -241,7 +243,7 @@
     headers.forEach(function (h) {
       if (!h.id) return;
       var li = document.createElement("li");
-      li.style.marginLeft = h.tagName === "H2" ? "0" : h.tagName === "H3" ? "0.6rem" : "1.1rem";
+      li.style.marginLeft = "0";
       var a = document.createElement("a");
       a.href = "#" + h.id;
       a.textContent = h.textContent;

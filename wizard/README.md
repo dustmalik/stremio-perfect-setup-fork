@@ -1,4 +1,4 @@
-# 🤖 Perfect Setup Wizard
+# 🔮 Perfect Setup Wizard
 
 Guided web app for automating the manual steps in the Stremio/Nuvio setup guide. The wizard is
 designed to collect the values a person actually has to provide, generate addon configs from the
@@ -38,7 +38,7 @@ wizard/
 cd wizard/web
 npm install
 npm run dev
-# → http://localhost:5173/stremio-perfect-setup/wizard/
+# → http://localhost:5173/
 
 # Full guide + wizard site
 cd /path/to/stremio-perfect-setup
@@ -62,5 +62,5 @@ output, and serves both from one local static server.
 
 ## For Maintainers
 
-Implementation status, architecture notes, API research, and historical planning docs live in
-[docs/superpowers/wizard-maintainer-notes.md](../docs/superpowers/wizard-maintainer-notes.md).
+Implementation status, architecture notes, API research, and historical planning docs live in the
+internal maintainer notes.

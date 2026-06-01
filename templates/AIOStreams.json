@@ -5,7 +5,7 @@
     "description": "This template is best combined with [this](https://numb3rs.stream) guide. It's built around a full and ready-to-go clean setup with multiple reliable scrapers for redundancy and sensible sorting and filtering, using best practice recommendations by the Stremio community. It can be configured for the following stream types: \n* **⚡ DEBRID** - Paid, but fast, safest and most reliable. Activated by selecting a service on the next step. \n* **🧲 P2P** - Free, but slower and risky depending on the laws of your country. Activated automatically if you don't select a Debrid service. \n* **🌐 HTTP** - Free, safe, but slower and less reliable than Debrid. Activated if you enable the *HTTP Addons* option two steps later. \n**Tamtaro's** template was used as inspiration.",
     "source": "external",
     "sourceUrl": "https://numb3rs.stream/templates/AIOStreams.json",
-    "changelogUrl": "https://numb3rs.stream/CHANGELOG.md",
+    "changelogUrl": "https://numb3rs.stream/templates/AIOStreams-Changelog.md",
     "author": "Lucky Numb3rs",
     "version": "2.0.7",
     "category": "Full",

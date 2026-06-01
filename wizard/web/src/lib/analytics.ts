@@ -73,7 +73,7 @@ export function trackWizardStepView(
   window.gtag('event', 'page_view', {
     page_location: pageLocation,
     page_path: pagePath,
-    page_title: `Perfect Setup Wizard - ${meta.name}`,
+    page_title: `🔮 Perfect Setup Wizard - ${meta.name}`,
   });
 
   window.gtag('event', 'wizard_step_view', {

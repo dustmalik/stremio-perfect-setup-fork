@@ -5,7 +5,7 @@
 // final `config` object ready to POST to `POST /api/v1/user`.
 //
 // Supported directives
-// (see docs/superpowers/plans/API-NOTES.md §6, grammar observed from templates/AIOStreams.json):
+// (see the internal API notes §6; grammar observed from templates/AIOStreams.json):
 //   {{inputs.X}}                          interpolation (standalone -> typed value; in arrays -> flatten)
 //   { __if: expr, __value: v }            include resolved v if expr truthy, else drop the key
 //   { __if: expr, ...obj }                keep obj (resolved) only if expr truthy, else drop it

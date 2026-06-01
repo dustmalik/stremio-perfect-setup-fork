@@ -1,0 +1,9 @@
+---
+layout: default
+---
+{{ content
+  | replace: 'src="images/', 'src="../images/'
+  | replace: "src='images/", "src='../images/"
+  | replace: 'href="images/', 'href="../images/'
+  | replace: "href='images/", "href='../images/"
+}}

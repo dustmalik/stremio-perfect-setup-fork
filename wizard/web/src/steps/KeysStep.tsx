@@ -94,7 +94,7 @@ function getContinueState(screenId: ServiceScreenId, values: Record<CredentialFi
     if (!hasAnyInput) {
       return {
         canContinue: hasConfiguredFallback,
-        label: hasConfiguredFallback ? 'Continue with pre-configured TMDB keys' : 'Enter your TMDB keys to continue',
+        label: hasConfiguredFallback ? 'Skip and use shared TMDB keys' : 'Enter your TMDB keys to continue',
       };
     }
 
@@ -109,7 +109,7 @@ function getContinueState(screenId: ServiceScreenId, values: Record<CredentialFi
     if (!hasInput) {
       return {
         canContinue: hasConfiguredFallback,
-        label: hasConfiguredFallback ? 'Continue with pre-configured TVDB key' : 'Enter your TVDB key to continue',
+        label: hasConfiguredFallback ? 'Skip and use shared TVDB key' : 'Enter your TVDB key to continue',
       };
     }
     return { canContinue: true, label: 'Continue' };
@@ -119,7 +119,7 @@ function getContinueState(screenId: ServiceScreenId, values: Record<CredentialFi
     if (!values.geminiApiKey.trim().length) {
       return {
         canContinue: true,
-        label: hasConfiguredFallback ? 'Continue with pre-configured Gemini key' : 'Continue without AI-powered search',
+        label: hasConfiguredFallback ? 'Skip and use shared Gemini key' : 'Continue without AI-Powered Search',
       };
     }
 
@@ -135,7 +135,7 @@ function getContinueState(screenId: ServiceScreenId, values: Record<CredentialFi
 
   return {
     canContinue: true,
-    label: hasConfiguredFallback ? 'Continue with pre-configured RPDB key' : 'Continue with default RPDB key',
+    label: hasConfiguredFallback ? 'Skip and use free RPDB key' : 'Continue with default RPDB key',
   };
 }
 
@@ -143,7 +143,7 @@ function getDebridContinueState(debridServices: Array<{ id: string; apiKey: stri
   if (debridServices.length === 0) {
     return {
       canContinue: true,
-      label: 'Continue with P2P / HTTP only',
+      label: 'Continue with 🧲 P2P / 🌐 HTTP only',
     };
   }
 

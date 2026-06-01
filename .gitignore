@@ -1,5 +1,5 @@
-docs/.jekyll-cache/
-docs/assets/data/guide-stats.json
+.jekyll-cache/
+assets/data/guide-stats.json
 hosting/.work
 .vscode
 _site/

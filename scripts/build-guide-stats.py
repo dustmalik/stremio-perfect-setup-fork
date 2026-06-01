@@ -9,8 +9,8 @@ from pathlib import Path
 
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
-CONFIG_PATH = ROOT_DIR / "docs" / "assets" / "js" / "guide-completion-config.js"
-OUTPUT_PATH = ROOT_DIR / "docs" / "assets" / "data" / "guide-stats.json"
+CONFIG_PATH = ROOT_DIR / "assets" / "js" / "guide-completion-config.js"
+OUTPUT_PATH = ROOT_DIR / "assets" / "data" / "guide-stats.json"
 GA4_EARLIEST_VALID_DATE = "2026-01-01"
 WIZARD_ACCOUNT_CREATED_EVENT = "wizard_account_created"
 

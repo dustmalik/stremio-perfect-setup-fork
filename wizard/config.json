@@ -41,7 +41,7 @@
           "markdown": "🤖 **Watchly** (Netflix-like recommendations) coming soon!"
         },
         {
-          "markdown": "🎯 **Trakt** is completely optional, but if you want it, this part needs to be connected manually because it cannot be automated here.\n\n- **AIOMetadata**: click on **Customize More** above, open the **Catalogs** tab, press the **Trakt** logo, and follow the setup steps.\n- **Stremio**: open **Settings** and enable **Trakt Scrobbling** there.\n- **Nuvio**: open **Settings** and connect **Trakt** there using the QR code.",
+          "markdown": "🎯 **Trakt** is optional, but needs to be connected manually because it cannot be automated here.\n\n- **AIOMetadata**: click on **Customize More** above, open the **Catalogs** tab, press the **Trakt** logo, and follow the setup steps.\n- **Stremio**: open **Settings** and enable **Trakt Scrobbling** there.\n- **Nuvio**: open **Settings** and connect **Trakt** there using the QR code.",
           "targets": ["stremio", "nuvio"],
           "style": {
             "background": "rgba(95, 24, 43, 0.68)",

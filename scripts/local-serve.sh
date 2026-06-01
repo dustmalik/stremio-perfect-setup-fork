@@ -5,10 +5,11 @@
 # What this script does:
 # 1. Generates guide stats data for local builds.
 #    If GA4 env vars are missing, the stats script falls back to baseline-only data.
-# 2. Builds the Jekyll guide into ./_site.
-# 3. Builds the React/Vite wizard from ./wizard/web.
-# 4. Copies the built wizard into ./_site/wizard to match the GitHub Pages layout.
-# 5. Serves ./_site over a local static HTTP server.
+# 2. Prepares a temporary Jekyll source with README.md promoted to the homepage.
+# 3. Builds the Jekyll guide into ./_site.
+# 4. Builds the React/Vite wizard from ./wizard/web.
+# 5. Copies the built wizard into ./_site/wizard to match the GitHub Pages layout.
+# 6. Serves ./_site over a local static HTTP server.
 #
 # Usage:
 #   scripts/local-serve.sh
@@ -39,6 +40,13 @@ SCRIPT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "${SCRIPT_DIR}/.." && pwd)"
 SITE_DIR="${REPO_ROOT}/_site"
 WIZARD_WEB_DIR="${REPO_ROOT}/wizard/web"
+STAGED_SOURCE_DIR="$(mktemp -d)"
+
+cleanup() {
+  rm -rf "${STAGED_SOURCE_DIR}"
+}
+
+trap cleanup EXIT
 
 usage() {
   sed -n '2,34p' "$0"
@@ -64,9 +72,12 @@ require_cmd jekyll
 echo "==> Building guide stats"
 python3 "${REPO_ROOT}/scripts/build-guide-stats.py"
 
+echo "==> Preparing staged site source"
+"${REPO_ROOT}/scripts/prepare-site-source.sh" "${STAGED_SOURCE_DIR}"
+
 echo "==> Building guide with Jekyll"
 rm -rf "${SITE_DIR}"
-jekyll build --source "${REPO_ROOT}/docs" --destination "${SITE_DIR}"
+jekyll build --source "${STAGED_SOURCE_DIR}" --destination "${SITE_DIR}"
 
 if [[ ! -d "${WIZARD_WEB_DIR}/node_modules" && "${SKIP_NPM_INSTALL}" != "1" ]]; then
   echo "==> Installing wizard dependencies"

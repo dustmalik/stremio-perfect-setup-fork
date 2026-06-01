@@ -176,7 +176,7 @@ export function DoneStep() {
     if (!addonDetailsFilename) return;
 
     const lines = [
-      'Stremio/Nuvio Perfect Setup - Add-on Details',
+      '🎬 Stremio/Nuvio Perfect Setup - Add-on Details',
       '',
       ...addons.flatMap(addon => [
         `${addon.name}`,

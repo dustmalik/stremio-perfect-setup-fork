@@ -17,18 +17,18 @@ Select an **AIOStreams** instance from [**this**](https://uptime.ibbylabs.dev/ai
 >* *You can keep the monitoring links above for later to check the instance online status, if it happens that it's not working and might be temporarily down.*
 
 1. Select "**Advanced**" on the welcome screen if it shows up.
-2. Copy [**this**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams.json) link (right-click and "*Copy link address*").
+2. Copy [**this**](https://numb3rs.stream/templates/AIOStreams.json) link (right-click and "*Copy link address*").
 3. Go to the "**Save & Install**" tab on AIOStreams (sidebar menu on the left), click "**Import**", "**Import Template**", paste the link you copied and click on "**Go**".
 
-   ![Import Template](../images/3.3.png)
+   ![Import Template](images/3.3.png)
 
 4. Click "**Use this Template Now**".
 
-   ![Use Template](../images/3.4.png)
+   ![Use Template](images/3.4.png)
 
 5. On the "**Select Services**" page that is shown, enable the services you want to use and click "**Next**". If you're not using any services and want to proceed with the **P2P/HTTP** setup, click "**Skip**".
 
-   ![Select Services](../images/3.5.png)
+   ![Select Services](images/3.5.png)
 
 6. On the "**Template Options**" page, you'll be able to personalize the configuration to match your preferences:
    * **🎨 Formatter Options**:
@@ -53,13 +53,13 @@ Select an **AIOStreams** instance from [**this**](https://uptime.ibbylabs.dev/ai
       * **🚩️ Language Priority**: This option can give priority to streams in your preferred languages by moving it up the sorting order. If you struggle to see your preferred languages in the results, even after adding it to the **Preferred Languages** list, try increasing the priority here. May rank lower-quality streams higher if your preferred languages are uncommon among the results, so use with caution.
       * **🌱 Seeders Priority** (*only for P2P*): Change this if you want highest seeders to be prioritized more on the sorting order, even if they have lower Resolution/Quality/SEL Scores. In most cases, low seeders will have already been filtered out by the internal filtering (SEL).
 
-   ![Template Options](../images/3.6.png)
+   ![Template Options](images/3.6.png)
 
 7. On the "**Enter Credentials**" page, enter all API keys you prepared earlier.
    * The **RPDB** key is "*t0-free-rpdb*" and it's already pre-entered.
 8. Click on "**Load Template**".
 
-   ![Load Template](../images/3.8.png)
+   ![Load Template](images/3.8.png)
 
 9. **Optional**: At this point AIOStreams is ready, but you can keep configuring it however you like. For example, if you want to further configure the scrapers or subtitle languages, you can go to the "**Installed Addons**" tab.
    * *You can configure each of them with the Pencil button on the right if needed.*
@@ -71,15 +71,15 @@ Select an **AIOStreams** instance from [**this**](https://uptime.ibbylabs.dev/ai
       5. **Library** is an addon that can search through your own Debrid library (if you e.g. download something manually in Debrid).
       6. **OpenSubtitles V3 Pro** is ***for the subtitles***, you can edit the languages and any other subtitle preferences here.
 
-   ![Addon Configuration](../images/3.9.1.png)
+   ![Addon Configuration](images/3.9.1.png)
 
    * *If you want to fine-tune how languages shound show on the results list, go to **Filters** tab, then **Language**, and add/remove your languages to the **Preferred Languages** list, and arrange them in the **Preference Order** list (shown in the picture with German language as an example). You can also add the languages in the **Required Languages** if you want to ONLY show streams in that language, but keep in mind that streams that might have no language tags at all or tagged as "multi" will be filtered out.*
 
-   ![Preferred Language](../images/3.9.2.png)
+   ![Preferred Language](images/3.9.2.png)
 
    * *If you want to take it a step further and totally prioritize your language, even before Quality and Resolution, then go to the **Sorting** tab, make sure you're in the **Global** tab, and on the **Split by Cache** section, move **Language** to the top or wherever you want to have it for both the **Cached Streams** and **Uncached Streams** lists.*
 
-      ![Sorting Language](../images/3.9.3.png)
+      ![Sorting Language](images/3.9.3.png)
 
 10. Go to the "**Save & Install**" tab, enter a password on the "**Create Configuration**" section, and click "**Create**".
    * **ALWAYS SAVE IN THIS TAB EVERY TIME YOU MAKE CHANGES LATER.**
@@ -94,9 +94,9 @@ Select an **AIOStreams** instance from [**this**](https://uptime.ibbylabs.dev/ai
 >**📢 NOTES FOR LATER:**
 >* *If you use a Debrid service, and are in a country where you can't torrent, be careful to not open any links with the 🧲 icon. They should normally never appear if you have a Debrid configured, but just making sure you know.*
 >* *If there are no streams for a show, you will see statistics instead (looking like below), so that you can find out why. Do not click them, they are only informational and will take you to GitHub if you do.*
->![Show Statistics](../images/3.12.0.png)
+>![Show Statistics](images/3.12.0.png)
 >* *If you see that you are getting results too slowly, try changing the fetching strategy. Go to **Addons**, scroll down to **Addon Fetching Strategy**. and select **Dynamic**. There should already be an exit condition pre-filled, which you can leave as is, and save the configuration. However, keep in mind that this might leave out relevant results, so try it yourself. On the other hand, if you feel you're not getting enough good results, do the opposite and select **Default** instead.*
->![Change Fetching](../images/3.12.1.png)
+>![Change Fetching](images/3.12.1.png)
 >* *If you prefer results for a language other than English, and you are not happy with the results you're getting, try disabling matching. Go to **Filters**, then **Matching**, and switch off the **Enable** toggle in all three sections (Title Matching, Year Matching, Season/Episode Matching).*
->![Disable Matching](../images/3.12.2.png)
+>![Disable Matching](images/3.12.2.png)
 >* ***AIOStreams** is a very powerful tool offering a lot of options. Although the template provided here for it should be more than enough for all kinds of normal usage, if you are interested in tinkering with it and customizing each detail, you can check out [**this**](https://docs.aiostreams.viren070.me/) guide directly from the developer, Viren, which is also very comprehensive and documents all configuration options for AIOStreams.*

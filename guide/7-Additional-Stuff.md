@@ -85,7 +85,7 @@ Prioritize streams that are ⚡ **cached**, high resolution, strong score (◆),
 
 ## Alternative Stream Information Icons
 
-You can import [**this**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams-Formatter.json) *AIOStreams* template directly (**AIOStreams → Save & Install → Import → Import Template → [Paste Link] → Go**) if you're only interested in the two formatter options provided in this guide without changing anything else from your configuration. Or you can manually update the formatter as follows:
+You can import [**this**](https://numb3rs.stream/templates/AIOStreams-Formatter.json) *AIOStreams* template directly (**AIOStreams → Save & Install → Import → Import Template → [Paste Link] → Go**) if you're only interested in the two formatter options provided in this guide without changing anything else from your configuration. Or you can manually update the formatter as follows:
 
 If you went with the ***Flat Monochrome Icons*** for the formatter and want instead more ***Colorful Icons*** on the stream information view, you can go to the **Formatter** tab in **AIOStreams**, and replace the text in the **Description Template** with this:
 
@@ -152,7 +152,7 @@ This is totally optional, but if you're looking for Trakt alternatives, or simpl
    9. Optional, but recommended: If you want to add popular and curated catalogs from **MDBList**, you can scroll further down on this page to the "**Popular Lists from Featured Curators**" section, click on one of the users showing there (e.g. *Snoak* or *Dan Pyjama*), and their lists will load. Select the lists you are interested in, and click on "**Import Selected Lists**". *Some lists are similar to the Trakt lists already provided in the AIOMetadata configuration downloaded from this guide, specifically the **snoak** user lists (named "Latest..."), so if you add them from MDBList, disable the provided Trakt lists to avoid duplicates.*
    10. Click "**Save & Close**", arrange the newly added catalogs however you like, and don't forget to **Save** the changes by going to the **Configuration** tab.
 
-   ![MDBList](../images/7.1.png)
+   ![MDBList](images/7.1.png)
 
 * **Simkl**:
    1. Create an account on [**Simkl**](https://simkl.com/).
@@ -164,7 +164,7 @@ This is totally optional, but if you're looking for Trakt alternatives, or simpl
    7. You can add any catalogs you want while still on the page once connected, and then click on "**Close**".
    8. Arrange the newly added catalogs however you like, and don't forget to **Save** the changes by going to the **Configuration** tab.
 
-   ![Simkl](../images/7.2.png)
+   ![Simkl](images/7.2.png)
 
 
 ## Usenet
@@ -210,7 +210,7 @@ Getting to the point, you can choose to do a proper Usenet setup and automate it
 7. You can repeat these steps for all indexers if you bought more than one (which is why you renamed Newznab to the indexer name earlier), just install additional **Newznab** addons.
 8. Don't forget to save the **AIOStreams** configuration by pressing "**Save**" on the "**Save & Install**" tab.
 
-![Newznab](../images/7.3.png)
+![Newznab](images/7.3.png)
 
 What you just did is configure the indexers, meaning you are able to search for streams on Usenet. However, you still haven't configured the provider. For that, there are two approaches on how you can set it up:
 
@@ -228,7 +228,7 @@ What you just did is configure the indexers, meaning you are able to search for 
    4. Click "**Save**" on both tabs, and save the **AIOStreams** configuration on the "**Save & Install**" tab.
    5. Now when you open a show, if there are any streams available for that show on the indexer, they are shown on the streams list marked as "**[SN] Indexer · USENET**", which should show with a ⚡ icon. You can open them directly and they should normally start playing in just a few seconds.
 
-![Stremio NNTP](../images/7.4.png)
+![Stremio NNTP](images/7.4.png)
 
 * **WARNING**: When using an indexer, there are two communication steps happening: first the indexer is queried (**Search step**) for what you're trying to watch, and then when you select it from the streams list, the NZB file is downloaded from the indexer (**Grab step**) so that the downloader can use it to retrieve the file parts. With the basic Usenet setup described here, the search step is performed by the *AIOStreams* instance, and the grab step by either *TorBox* or *your local Stremio installation* depending on the approach chosen earlier. This causes the indexer to be contacted from two different IPs for each step, and there are indexers that do not allow that. This may consequently cause your indexer account to get flagged or banned. **SceneNZBs** for example explicitly disallows streaming usage with Stremio. **NinjaCentral** supposedly allows it as long as you're not sharing the account with others, but I can't confirm this. You'll need to check online or with the indexer whether they allow different IPs (if you contact them, don't mention that you want to stream on Stremio specifically, because that would probably get you banned). There are ways to configure it to use the same IP, but this cannot be done from a public AIOStreams instance and would require self-hosting it, which is as mentioned in th beginning, beyond the scope of this guide.
 

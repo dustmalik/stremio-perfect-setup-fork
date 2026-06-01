@@ -670,14 +670,24 @@ pre {
 .topbar-wizard-btn:hover {
   transform: translateY(-1px);
 }
+.topbar-wizard-btn:hover,
+.topbar-wizard-btn:focus-visible {
+  text-decoration: none;
+}
 .topbar-wizard-btn--wizard:hover {
   color: var(--mode-wizard-text);
   box-shadow: 0 14px 28px rgba(57, 35, 116, 0.18);
+}
+.topbar-wizard-btn--wizard:focus-visible {
+  color: var(--mode-wizard-text);
 }
 .topbar-wizard-btn--guide:hover {
   background: color-mix(in srgb, var(--panel-2) 78%, var(--accent) 22%);
   color: var(--accent);
   box-shadow: none;
+}
+.topbar-wizard-btn--guide:focus-visible {
+  color: var(--accent);
 }
 .topbar-wizard-btn:active { transform: scale(0.97); }
 

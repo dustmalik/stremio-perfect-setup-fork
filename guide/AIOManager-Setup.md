@@ -35,7 +35,7 @@ And now let's start by going to either [**this**](https://aiomanagerfortheweebs.
 6. Click on the account that you added.
    * *You will see the **Cinemeta** and maybe also the **Local Files** addons. If you followed this guide, they will also be ordered just like you ordered them with **Cinebye**.*
 
-![Create Account](../images/9.1.png)
+![Create Account](images/9.1.png)
 
 ## Addon Management
 
@@ -67,7 +67,7 @@ AIOManager has a lot of options to manage addons: install, configure, order, rem
 
 Here's a screenshot of how an account with installed addons looks like (*see Autopilot below for the double addons*):
 
-![Addon Management](../images/9.2.png)
+![Addon Management](images/9.2.png)
 
 * The **Saved Addons** tab contains your personal addon library.
    * Here you can add the URLs of any addon manifest/configuration you want and keep it stored regardless of a Stremio account.
@@ -95,7 +95,7 @@ The best use of this feature would be for the **AIOStreams** and **AIOMetadata**
    * *The main and backup addon always need to be in pairs in the order, always next to each other, no other addons in-between.*
 6. Disable the *backup* addon through the toggle near the title.
 
-   ![Order Addons](../images/9.3.png)
+   ![Order Addons](images/9.3.png)
 
 7. Go to "**Failover Rules**" (*below the name of the opened account*), then "**Autopilot Rules**", then click on "**+ New Rule**".
 8. In the "**Create New Autopilot Rule**" page, select the *main* addon on the first dropdown marked "**Tier 1**" and the *backup* addon on the second dropdown marked "**Tier 2**".
@@ -104,7 +104,7 @@ The best use of this feature would be for the **AIOStreams** and **AIOMetadata**
 10. The rule will be stored and shown further down. Make sure it shows as **Enabled** on the toggle.
    * *You can delete the rule you created if you don't want it anymore later by pressing the trash can button.*
 
-   ![Autopilot](../images/9.4.png)
+   ![Autopilot](images/9.4.png)
 
 
 That's it! Now you have a robust Stremio setup with backup addons that automatically take over in case the primaries fail, ensuring a continuous stable and smooth experience. **Enjoy!**

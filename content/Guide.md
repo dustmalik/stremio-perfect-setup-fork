@@ -118,7 +118,7 @@ Select an **AIOStreams** instance from [**this**](https://uptime.ibbylabs.dev/ai
 >* *You can keep the monitoring links above for later to check the instance online status, if it happens that it's not working and might be temporarily down.*
 
 1. Select "**Advanced**" on the welcome screen if it shows up.
-2. Copy [**this**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams.json) link (right-click and "*Copy link address*").
+2. Copy [**this**](https://numb3rs.stream/templates/AIOStreams.json) link (right-click and "*Copy link address*").
 3. Go to the "**Save & Install**" tab on AIOStreams (sidebar menu on the left), click "**Import**", "**Import Template**", paste the link you copied and click on "**Go**".
 4. Click "**Use this Template Now**".
 5. On the "**Select Services**" page that is shown, enable the services you want to use and click "**Next**". If you're not using any services and want to proceed with the **P2P/HTTP** setup, click "**Skip**".
@@ -184,7 +184,7 @@ Select an **AIOMetadata** instance from [**this**](https://uptime.ibbylabs.dev/#
 >* *Choose one of the instances and stick with it, you will store your configuration here, and if you change to the other instance, you'll need to transfer your configuration because it's not automatically transferred.*
 >* *You can keep the monitoring links above for later to check the instance online status, if it happens that it's not working and might be temporarily down.*
 
-1. Download my configuration file [**here**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata.json) (right-click, "*Save As*", and save it as `.json`, not `.txt`).
+1. Download my configuration file [**here**](https://numb3rs.stream/templates/AIOMetadata.json) (right-click, "*Save As*", and save it as `.json`, not `.txt`).
 2. Go to the "**Configuration**" tab, click on "**Import Configuration**", and load my configuration file.
 3. Go to the "**Integrations**" tab, and enter the API keys for Gemini, TMDB, TheTVDB, RPDB.
    * For **RPDB** enter "*t0-free-rpdb*".
@@ -312,4 +312,4 @@ Go to [**🔔 Updates**](https://numb3rs.stream/guide/Updates) on the extended g
 
 # 📜 Changelog
 
-Go to [**📜 Changelog**](https://numb3rs.stream/guide/Changelog) on the extended guide to see the change history.
+Go to [**📜 Changelog**](https://numb3rs.stream/CHANGELOG/) on the extended guide to see the change history.

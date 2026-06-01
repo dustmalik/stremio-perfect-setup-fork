@@ -29,8 +29,8 @@ TORRENTIO_URL_VALUE=https://torrentio.stremio.ru/
 LOCAL_STREMTHRU_URL=http://stremthru:8080
 FEATURED_TEMPLATE_IDS_VALUE=stremio.perfect.setup
 REQUESTED_TEMPLATE_URLS=(
-  "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams.json"
-  "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams-Formatter.json"
+  "https://numb3rs.stream/templates/AIOStreams.json"
+  "https://numb3rs.stream/templates/AIOStreams-Formatter.json"
 )
 
 if [[ "${1:-}" == "--metadata" ]]; then

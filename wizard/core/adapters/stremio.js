@@ -1,6 +1,5 @@
 // Stremio account adapter: talks to api.strem.io (CORS-friendly, browser-callable).
-// Contract confirmed from Stremio/stremio-api-client
-// (see docs/superpowers/plans/API-NOTES.md §1).
+// Contract confirmed from Stremio/stremio-api-client and internal API notes (§1).
 
 const DEFAULT_ENDPOINT = 'https://api.strem.io';
 export const OFFICIAL_CINEMETA_URL = 'https://v3-cinemeta.strem.io/manifest.json';
@@ -83,7 +82,7 @@ export function buildAddonCollection(existing, manifests, opts = {}) {
   const localFiles = findLocalFilesAddon(existing);
 
   // Optionally patch Cinemeta (remove search/catalogs/metadata)
-  // See docs/superpowers/plans/API-NOTES.md §1 for the verified shape.
+  // See the internal API notes (§1) for the verified shape.
   const patchedCinemeta = opts.cleanCinemeta && cinemeta
     ? patchCinemeta(cinemeta, opts.cleanCinemeta)
     : cinemeta;

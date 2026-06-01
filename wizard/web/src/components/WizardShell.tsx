@@ -23,7 +23,7 @@ export function WizardShell({ children, showBack = true }: Props) {
   const { theme, toggle } = useTheme();
   const [navOpen, setNavOpen] = useState(false);
 
-  const spsLogo = resolveLogoUrl('assets/logos/sps-logo.svg');
+  const spsLogo = resolveLogoUrl('assets/logos/logo.svg');
   const guideUrl = getGuideUrl();
 
   function closeNav() { setNavOpen(false); }

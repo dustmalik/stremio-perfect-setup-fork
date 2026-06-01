@@ -179,10 +179,20 @@ code, pre {
   background: color-mix(in srgb, var(--mode-wizard-bg) 88%, var(--panel) 12%);
   transform: translateY(-1px);
 }
+.topbar-wizard-btn:hover,
+.topbar-wizard-btn:focus-visible {
+  text-decoration: none;
+}
 .topbar-wizard-btn--guide:hover {
   background: color-mix(in srgb, var(--panel-2) 78%, var(--accent) 22%);
   color: var(--accent);
   transform: translateY(-1px);
+}
+.topbar-wizard-btn--wizard:focus-visible {
+  color: var(--mode-wizard-text);
+}
+.topbar-wizard-btn--guide:focus-visible {
+  color: var(--accent);
 }
 
 /* ── Sidebar ─────────────────────────────────────────────────────────── */

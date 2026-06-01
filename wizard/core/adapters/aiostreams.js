@@ -1,6 +1,5 @@
 // AIOStreams adapter: creates a stored user config on an instance and returns the manifest URL.
-// Contract confirmed from Viren070/AIOStreams
-// (see docs/superpowers/plans/API-NOTES.md §2).
+// Contract confirmed from Viren070/AIOStreams and internal API notes (§2).
 //
 // CORS note: all known community instances respond to OPTIONS /api/v1/user without
 // Access-Control-Allow-Origin headers, causing browsers to block the preflight.

@@ -5,7 +5,7 @@ title: "🚀 Nuvio"
 
 # 🚀 Nuvio
 
-![Nuvio Collections](../images/collections.webp)
+![Nuvio Collections](../../assets/images/collections.webp)
 
 **Nuvio** is a new alternative streaming platform that supports the same Stremio addon ecosystem, but is more feature-rich and offers many additional customization options. It has its own account, profiles, collections, layout settings, and app experience. As such, you can configure **AIOStreams**, **AIOMetadata**, and optionally **Watchly** like before, but instead of installing those addons on **Stremio**, you will copy their **Manifest URL** and install them directly on **Nuvio**.
 
@@ -41,21 +41,20 @@ This works best if you use my **AIOMetadata Catalogs** catalogs and my **Nuvio C
 
 Here are the main files and resources:
 
-* [**Collections Assets**](https://github.com/luckynumb3rs/stremio-perfect-setup/tree/main/collections)
+* [**Collections Assets**](https://numb3rs.stream/collections/)
    * This contains all collection assets, title logos, cover, focused, backdrops, SVG files, and related resources.
    * Use this if you want to browse, download, modify, or reuse individual assets.
-* [**AIOMetadata Catalogs**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All-Catalogs.json) (*JSON*)
+* [**AIOMetadata Catalogs**](https://numb3rs.stream/templates/AIOMetadata-All-Catalogs.json) (*JSON*)
    * Use this if you already have your own AIOMetadata setup and only want to import the catalogs in the *Catalogs* tab.
    * This is useful if you don't want to overwrite your full AIOMetadata configuration.
-* [**AIOMetadata Full Configuration**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All.json) (*JSON*)
+* [**AIOMetadata Full Configuration**](https://numb3rs.stream/templates/AIOMetadata-All.json) (*JSON*)
    * Use this if you want the complete AIOMetadata configuration from this guide, import it in the *Configuration* tab.
    * This is the easiest option if you are starting fresh or want the closest match to the setup described here.
 * [**Nuvio Community Collections Pack**](https://nuvioapp.space/community-collections/nuvio-perfect-collections-incl-dynamic-backdrops-2)
    * This is the easiest way to add the collections pack directly through Nuvio.
    * If you already followed the setup steps above, this is usually the simplest option.
-* [**Nuvio Collections**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Collections.json) (*JSON*)
+* [**Nuvio Collections**](https://numb3rs.stream/templates/Nuvio-Collections.json) (*JSON*)
    * This is the pre-configured collections file for Nuvio, the same used in the community pack above.
    * You can import it manually into your Nuvio account, especially if you are using the matching AIOMetadata catalogs.
 
 To give credit where it's due, I used [Tomato's Cover Pack](https://www.reddit.com/r/Nuvio/comments/1sk3ks6/transparent_covers_pack/) for the streaming services logos, and was inspired by user **bramstone**'s (from Discord) original script for generating the wonderful backdrops.
-
