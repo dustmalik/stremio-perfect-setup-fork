@@ -34,7 +34,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Jekyll dependencies
-        run: gem install github-pages -v 232
+        run: gem install jekyll -v 4.4.1
 
       - name: Install Python dependencies
         run: |
@@ -82,19 +82,15 @@ jobs:
           mkdir -p .pages-publish
           cp -R _site/. .pages-publish/
 
-      - name: Create Pages artifact archive
+      - name: Verify rendered guide output
         run: |
-          rm -f github-pages.tar github-pages.tar.gz
-          tar -cf github-pages.tar -C .pages-publish .
-          gzip -9 github-pages.tar
+          test -s .pages-publish/index.html
+          test -s .pages-publish/guide/0-Beginner-Concepts/index.html
 
       - name: Upload Pages artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages
-          path: ./github-pages.tar.gz
-          retention-days: 1
-          compression-level: 0
+          path: ./.pages-publish
 
   deploy:
     environment:
