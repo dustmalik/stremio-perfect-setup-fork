@@ -41,7 +41,8 @@ jobs:
 
       - name: Prepare staged site source
         run: |
-          scripts/prepare-site-source.sh "${{ runner.temp }}/site-source"
+          rm -rf .pages-source
+          scripts/prepare-site-source.sh .pages-source
 
       - name: Set up GitHub Pages
         uses: actions/configure-pages@v5
@@ -49,7 +50,7 @@ jobs:
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ${{ runner.temp }}/site-source
+          source: ./.pages-source
           destination: ./_site
 
       - name: Set up Node.js

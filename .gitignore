@@ -1,4 +1,5 @@
 .jekyll-cache/
+.pages-source/
 assets/data/guide-stats.json
 hosting/.work
 .vscode
