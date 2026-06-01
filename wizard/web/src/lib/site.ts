@@ -1,15 +1,24 @@
-function resolveGuideRoot(): URL {
+function resolveSiteRoot(): URL {
   return new URL('../', window.location.href);
 }
 
-export function getGuideUrl(): string {
-  return resolveGuideRoot().toString();
+function hasUrlScheme(value: string) {
+  return /^[a-z][a-z\d+.-]*:/i.test(value);
 }
 
-export function getGuideAccountsUrl(): string {
-  return new URL('guide/1-Accounts', resolveGuideRoot()).toString();
+export function resolveSiteUrl(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  if (trimmed.startsWith('#') || trimmed.startsWith('?') || trimmed.startsWith('//') || hasUrlScheme(trimmed)) {
+    return trimmed;
+  }
+  return new URL(trimmed, resolveSiteRoot()).toString();
+}
+
+export function getGuideUrl(): string {
+  return resolveSiteRoot().toString();
 }
 
 export function getGuideStatsUrl(): string {
-  return new URL('assets/data/guide-stats.json', resolveGuideRoot()).toString();
+  return resolveSiteUrl('assets/data/guide-stats.json');
 }

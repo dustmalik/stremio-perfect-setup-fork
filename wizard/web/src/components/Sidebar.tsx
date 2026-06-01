@@ -104,7 +104,7 @@ export function Sidebar({ onClose }: Props) {
           return (
             <button key={screen.id} className={`${cls(stepIndex)} is-sub`} onClick={() => goTo(stepIndex)}>
               <StepIcon s={stepIndex} />
-              <span>{screen.navLabel}</span>
+              <span>{screen.label}</span>
             </button>
           );
         })}

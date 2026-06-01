@@ -100,6 +100,8 @@ export function WizardShell({ children, showBack = true }: Props) {
 
             {showBack && step > 0 && (
               <button
+                type="button"
+                className="wizard-secondary-btn"
                 onClick={prevStep}
                 style={{
                   marginTop: '0.875rem',
@@ -107,15 +109,8 @@ export function WizardShell({ children, showBack = true }: Props) {
                   alignItems: 'center',
                   gap: '0.45rem',
                   fontSize: '0.875rem',
-                  color: 'var(--muted)',
-                  background: 'var(--panel-2)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '10px',
-                  cursor: 'pointer',
                   padding: '0.55rem 0.8rem',
                 }}
-                onMouseOver={e => (e.currentTarget.style.color = 'var(--accent)')}
-                onMouseOut={e => (e.currentTarget.style.color = 'var(--muted)')}
               >
                 <ArrowLeft size={14} /> Back
               </button>

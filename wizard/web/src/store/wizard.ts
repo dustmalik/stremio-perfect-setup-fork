@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { INSTANCES, RPDB_FREE_KEY, type WizardConfig } from '../lib/constants';
+import { type WizardConfig, type WizardTarget } from '../lib/constants';
 import type { AioSection } from '../lib/aioSections';
 
-export type Target = 'stremio' | 'nuvio';
+export type Target = WizardTarget;
 export type AccountMode = 'create' | 'signin';
 
 export interface NuvioProfileOption {
@@ -89,7 +89,7 @@ interface WizardState {
   setTemplates: (t: WizardState['templates']) => void;
   setAioSections: (sections: AioSection[]) => void;
   setInstallResult: (r: Partial<InstallResult>) => void;
-  setWizardConfig: (cfg: WizardConfig) => void;
+  setWizardConfig: (cfg: WizardConfig | null) => void;
 }
 
 export const useWizard = create<WizardState>((set) => ({
@@ -101,11 +101,11 @@ export const useWizard = create<WizardState>((set) => ({
   credentials: {
     debridServices: [],
     tmdbApiKey: '', tmdbAccessToken: '', tvdbApiKey: '',
-    geminiApiKey: '', rpdbApiKey: RPDB_FREE_KEY,
+    geminiApiKey: '', rpdbApiKey: '',
   },
-  aioStreamsInstance: INSTANCES.aiostreams[0],
+  aioStreamsInstance: '',
   aioStreamsInputs: {},
-  aiometadataInstance: INSTANCES.aiometadata[0],
+  aiometadataInstance: '',
   catalogSelection: { enabledCategories: new Set(), enabledDiscoverFolderIds: new Set() },
   installResult: { aiostreams: null, aiometadata: null, addonPasswordSource: null, warnings: [], error: null },
   templates: null,
@@ -156,16 +156,9 @@ export const useWizard = create<WizardState>((set) => ({
   setTemplates: (templates) => set({ templates }),
   setAioSections: (aioSections) => set({ aioSections }),
   setInstallResult: (r) => set(s => ({ installResult: { ...s.installResult, ...r } })),
-  setWizardConfig: (cfg) => set(s => ({
+  setWizardConfig: (cfg) => set({
     wizardConfig: cfg,
-    // Apply config defaults, only override values still at their initial state
-    aioStreamsInstance: cfg.instances?.aiostreams?.[0] ?? s.aioStreamsInstance,
-    aiometadataInstance: cfg.instances?.aiometadata?.[0] ?? s.aiometadataInstance,
-    stremioAccount: cfg.account?.mode
-      ? { ...s.stremioAccount, mode: cfg.account.mode }
-      : s.stremioAccount,
-    nuvioAccount: cfg.account?.mode
-      ? { ...s.nuvioAccount, mode: cfg.account.mode }
-      : s.nuvioAccount,
-  })),
+    aioStreamsInstance: cfg?.instances.aiostreams[0] ?? '',
+    aiometadataInstance: cfg?.instances.aiometadata[0] ?? '',
+  }),
 }));

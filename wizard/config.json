@@ -1,28 +1,56 @@
 {
-  "$comment": "Parameterized config for the Perfect Setup wizard. API keys/passwords are never stored here, they are collected at runtime in the wizard.",
-  "target": "stremio",
-  "account": { "mode": "create" },
-  "addonDetailsFilename": "MyPerfectSetupAddons.txt",
-
-  "instances": {
-    "aiostreams": [
-      "https://aiostreamsfortheweebsstable.midnightignite.me",
-      "https://aiostreams.fortheweak.cloud"
-    ],
-    "aiometadata": [
-      "https://aiometadata.viren070.me",
-      "https://aiometadatafortheweebs.midnightignite.me"
-    ],
-    "watchly": []
-  },
-
-  "templates": {
-    "aiostreams": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams.json",
-    "aiometadata_stremio": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata.json",
-    "aiometadata_nuvio": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All.json",
-    "collections": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Collections.json",
-    "nuvio_settings": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Settings.json"
-  },
-
-  "proxyBase": "https://proxy.numb3rs.stream"
+  "$comment": "Parameterized config for the Perfect Setup Wizard. Shared service keys live here only in obfuscated form. The config block name is also used internally as the decryption passphrase. This is obfuscation for convenience, not real secret storage.",
+  "configurations": [
+    {
+      "name": "main",
+      "targets": ["stremio", "nuvio"],
+      "addonDetailsFilename": "MyPerfectSetupAddons.txt",
+      "proxyBase": "https://proxy.numb3rs.stream",
+      "keys": {
+        "tmdbApiKeys": [],
+        "tmdbReadAccessTokens": [],
+        "tvdbApiKeys": [],
+        "geminiApiKeys": [],
+        "rpdbApiKeys": [
+          "eyJ2IjoxLCJpIjoyNTAwMDAsInMiOiJaMjRtdHUxbVBYMXNPU3RIblNyK0lnPT0iLCJuIjoieHJDNGlFbi9CY3VrNVl4YyIsImMiOiJWRkRQT3ZnaVg1TWQ3TUpBN2pXRENUb0Jhd2FiSFo2dzRGY0VNdz09In0="
+        ]
+      },
+      "limits": {
+        "stremioMaxCatalogs": 120
+      },
+      "instances": {
+        "aiostreams": [
+          "https://aiostreamsfortheweebsstable.midnightignite.me",
+          "https://aiostreams.fortheweak.cloud"
+        ],
+        "aiometadata": [
+          "https://aiometadata.viren070.me",
+          "https://aiometadatafortheweebs.midnightignite.me"
+        ],
+        "watchly": []
+      },
+      "templates": {
+        "aiostreams": "templates/AIOStreams.json",
+        "aiometadata_stremio": "templates/AIOMetadata.json",
+        "aiometadata_nuvio": "templates/AIOMetadata-All.json",
+        "collections": "templates/Nuvio-Collections.json",
+        "nuvio_settings": "templates/Nuvio-Settings.json"
+      },
+      "doneStepNotifications": [
+        {
+          "markdown": "🤖 **Watchly** (Netflix-like recommendations) coming soon!"
+        },
+        {
+          "markdown": "🎯 **Trakt** is completely optional, but if you want it, this part needs to be connected manually because it cannot be automated here.\n\n- **AIOMetadata**: click on **Customize More** above, open the **Catalogs** tab, press the **Trakt** logo, and follow the setup steps.\n- **Stremio**: open **Settings** and enable **Trakt Scrobbling** there.\n- **Nuvio**: open **Settings** and connect **Trakt** there using the QR code.",
+          "targets": ["stremio", "nuvio"],
+          "style": {
+            "background": "rgba(95, 24, 43, 0.68)",
+            "borderColor": "rgba(255, 230, 236, 0.2)",
+            "textColor": "rgba(255, 255, 255, 0.96)",
+            "boxShadow": "0 10px 24px rgba(57, 7, 21, 0.22)"
+          }
+        }
+      ]
+    }
+  ]
 }

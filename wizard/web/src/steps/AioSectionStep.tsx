@@ -137,6 +137,7 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
       <div style={{ marginBottom: '1.25rem' }}>
         <button
           type="button"
+          className="wizard-hover-lift"
           onClick={() => onChange(!value)}
           aria-pressed={isEnabled}
           style={{
@@ -190,7 +191,6 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
                   height: '1.2rem',
                   borderRadius: '999px',
                   background: '#fff',
-                  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.18)',
                   display: 'block',
                 }}
               />
@@ -222,7 +222,7 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
       {field.type === 'select' && field.options && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
           {field.options.map(opt => (
-            <button key={opt.value} style={selectedBtn(value === opt.value)} onClick={() => onChange(opt.value)}>
+            <button key={opt.value} type="button" className="wizard-hover-lift" style={selectedBtn(value === opt.value)} onClick={() => onChange(opt.value)}>
               <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{opt.label}</span>
             </button>
           ))}
@@ -239,6 +239,8 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
             return (
               <button
                 key={opt.value}
+                type="button"
+                className="wizard-hover-lift"
                 style={{ ...selectedBtn(sel), fontSize: '0.8125rem', padding: '0.45rem 0.6rem' }}
                 onClick={() => {
                   const current = Array.isArray(value) ? (value as string[]) : [];

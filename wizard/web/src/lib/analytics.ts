@@ -121,7 +121,7 @@ export function getStepMeta(step: number, aioSections: AioSection[]): StepMeta |
   if (step >= KEY_SCREEN_START_STEP && step < KEY_SCREEN_START_STEP + ACTIVE_KEY_SCREENS.length) {
     const screen = ACTIVE_KEY_SCREENS[step - KEY_SCREEN_START_STEP];
     if (!screen) return null;
-    return { index: step, slug: screen.slug, name: screen.analyticsName };
+    return { index: step, slug: screen.slug, name: screen.label };
   }
 
   const sectionIndex = step - AIO_SECTION_START_STEP;

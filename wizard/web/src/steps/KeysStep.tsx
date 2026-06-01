@@ -1,15 +1,167 @@
 import type { CSSProperties } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { MarkdownText } from '../components/MarkdownText';
 import { useWizard } from '../store/wizard';
-import { RPDB_FREE_KEY } from '../lib/constants';
-import { getGuideAccountsUrl } from '../lib/site';
-import { ACTIVE_KEY_SCREENS } from '../lib/keyScreens';
+import { ACTIVE_KEY_SCREENS, type KeyScreenId } from '../lib/keyScreens';
 import { DEBRID_SERVICES, resolveLogoUrl } from '../lib/services';
+import { hasConfiguredKeyArray, hasConfiguredTmdbFallback } from '../lib/sharedKeys';
 
 interface Props { keyIndex: number; }
+
+type ServiceScreenId = Exclude<KeyScreenId, 'debrid'>;
+type CredentialFieldId = 'tmdbApiKey' | 'tmdbAccessToken' | 'tvdbApiKey' | 'geminiApiKey' | 'rpdbApiKey';
+
+const SHARED_INSTRUCTIONS_WALKTHROUGH = 'For a longer walkthrough with screenshots and service-specific notes, open [📝 Accounts Preparation](guide/1-Accounts).';
+
+const SHARED_INSTRUCTIONS_KEY_DISCLAIMER = 'Using your own API key is usually the most reliable option for long-term use. If you leave a field empty, the wizard will use a shared fallback key when one is available for that service, but shared keys can reach their limits sooner and are not guaranteed on every screen.';
+
+interface CredentialField {
+  id: CredentialFieldId;
+  label: string;
+  placeholder: string;
+  type?: 'password' | 'text';
+  required?: boolean;
+  monospace?: boolean;
+}
+
+const SCREEN_FIELDS: Record<ServiceScreenId, CredentialField[]> = {
+  tmdb: [
+    {
+      id: 'tmdbApiKey',
+      label: 'API Key',
+      placeholder: 'Paste your short API key here...',
+      required: true,
+      type: 'password',
+    },
+    {
+      id: 'tmdbAccessToken',
+      label: 'API Read Access Token',
+      placeholder: 'Paste your long Read Access Token here...',
+      required: true,
+      type: 'password',
+    },
+  ],
+  tvdb: [
+    {
+      id: 'tvdbApiKey',
+      label: 'API Key',
+      placeholder: 'Paste your TVDB API key...',
+      required: true,
+      type: 'password',
+    },
+  ],
+  gemini: [
+    {
+      id: 'geminiApiKey',
+      label: 'API Key',
+      placeholder: 'Paste your Gemini API key...',
+      type: 'password',
+    },
+  ],
+  rpdb: [
+    {
+      id: 'rpdbApiKey',
+      label: 'API Key',
+      placeholder: 'Paste your RPDB API key...',
+      type: 'text',
+      monospace: true,
+    },
+  ],
+};
+
+function getScreenFallbackAvailability(
+  screenId: ServiceScreenId,
+  hasTmdbFallback: boolean,
+  hasTvdbFallback: boolean,
+  hasGeminiFallback: boolean,
+  hasRpdbFallback: boolean,
+) {
+  if (screenId === 'tmdb') return hasTmdbFallback;
+  if (screenId === 'tvdb') return hasTvdbFallback;
+  if (screenId === 'gemini') return hasGeminiFallback;
+  if (screenId === 'rpdb') return hasRpdbFallback;
+  return false;
+}
+
+function getContinueState(screenId: ServiceScreenId, values: Record<CredentialFieldId, string>, hasConfiguredFallback: boolean) {
+  if (screenId === 'tmdb') {
+    const apiKey = values.tmdbApiKey.trim();
+    const accessToken = values.tmdbAccessToken.trim();
+    const hasAnyInput = apiKey.length > 0 || accessToken.length > 0;
+    const hasCompleteInput = apiKey.length > 0 && accessToken.length > 0;
+
+    if (!hasAnyInput) {
+      return {
+        canContinue: hasConfiguredFallback,
+        label: hasConfiguredFallback ? 'Continue with pre-configured TMDB keys' : 'Enter your TMDB keys to continue',
+      };
+    }
+
+    return {
+      canContinue: hasCompleteInput,
+      label: hasCompleteInput ? 'Continue' : 'Enter both TMDB keys to continue',
+    };
+  }
+
+  if (screenId === 'tvdb') {
+    const hasInput = values.tvdbApiKey.trim().length > 0;
+    if (!hasInput) {
+      return {
+        canContinue: hasConfiguredFallback,
+        label: hasConfiguredFallback ? 'Continue with pre-configured TVDB key' : 'Enter your TVDB key to continue',
+      };
+    }
+    return { canContinue: true, label: 'Continue' };
+  }
+
+  if (screenId === 'gemini') {
+    if (!values.geminiApiKey.trim().length) {
+      return {
+        canContinue: true,
+        label: hasConfiguredFallback ? 'Continue with pre-configured Gemini key' : 'Continue without AI-powered search',
+      };
+    }
+
+    return {
+      canContinue: true,
+      label: 'Continue',
+    };
+  }
+
+  if (values.rpdbApiKey.trim().length > 0) {
+    return { canContinue: true, label: 'Continue' };
+  }
+
+  return {
+    canContinue: true,
+    label: hasConfiguredFallback ? 'Continue with pre-configured RPDB key' : 'Continue with default RPDB key',
+  };
+}
+
+function getDebridContinueState(debridServices: Array<{ id: string; apiKey: string }>) {
+  if (debridServices.length === 0) {
+    return {
+      canContinue: true,
+      label: 'Continue with P2P / HTTP only',
+    };
+  }
+
+  const missingKeyCount = debridServices.filter((service) => service.apiKey.trim().length === 0).length;
+  if (missingKeyCount === 0) {
+    return {
+      canContinue: true,
+      label: 'Continue',
+    };
+  }
+
+  return {
+    canContinue: false,
+    label: missingKeyCount === debridServices.length
+      ? 'Enter an API key or deselect the service(s)'
+      : 'Enter an API key for each selected service',
+  };
+}
 
 export function KeysStep({ keyIndex }: Props) {
   const screen = ACTIVE_KEY_SCREENS[keyIndex];
@@ -19,57 +171,69 @@ export function KeysStep({ keyIndex }: Props) {
     toggleDebridService,
     setDebridApiKey,
     nextStep,
+    wizardConfig,
   } = useWizard();
-  const guideAccountsUrl = getGuideAccountsUrl();
 
   if (!screen) { nextStep(); return null; }
 
-  const isRequired = !screen.optional;
-  const canContinue = !isRequired || (
-    screen.id === 'tmdb'
-      ? credentials.tmdbApiKey.trim().length > 10 && credentials.tmdbAccessToken.trim().length > 20
-      : screen.id === 'tvdb'
-        ? credentials.tvdbApiKey.trim().length > 0
-        : true
-  );
-  const nextLabel = screen.id === 'debrid' && credentials.debridServices.length === 0
-    ? 'Skip - Use P2P/HTTP only'
-    : undefined;
-  const showSkipButton = screen.optional && screen.id !== 'debrid';
-
   const inputStyle: CSSProperties = {
-    width: '100%', border: '1px solid var(--border)', borderRadius: '8px',
-    padding: '0.5rem 0.75rem', fontSize: '0.875rem',
-    background: 'var(--panel)', color: 'var(--text)', outline: 'none', boxSizing: 'border-box',
+    width: '100%',
+    border: '1px solid var(--border)',
+    borderRadius: '8px',
+    padding: '0.5rem 0.75rem',
+    fontSize: '0.875rem',
+    background: 'var(--panel)',
+    color: 'var(--text)',
+    outline: 'none',
+    boxSizing: 'border-box',
   };
+
+  const hasTmdbFallback = hasConfiguredTmdbFallback(wizardConfig);
+  const hasTvdbFallback = hasConfiguredKeyArray(wizardConfig, 'tvdbApiKeys');
+  const hasGeminiFallback = hasConfiguredKeyArray(wizardConfig, 'geminiApiKeys');
+  const hasRpdbFallback = hasConfiguredKeyArray(wizardConfig, 'rpdbApiKeys');
+  const fallbackAvailable = screen.id === 'debrid'
+    ? false
+    : getScreenFallbackAvailability(screen.id, hasTmdbFallback, hasTvdbFallback, hasGeminiFallback, hasRpdbFallback);
+
+  const fieldValues: Record<CredentialFieldId, string> = {
+    tmdbApiKey: credentials.tmdbApiKey,
+    tmdbAccessToken: credentials.tmdbAccessToken,
+    tvdbApiKey: credentials.tvdbApiKey,
+    geminiApiKey: credentials.geminiApiKey,
+    rpdbApiKey: credentials.rpdbApiKey,
+  };
+
+  const continueState = screen.id === 'debrid'
+    ? getDebridContinueState(credentials.debridServices)
+    : getContinueState(screen.id, fieldValues, fallbackAvailable);
+  const credentialFields = screen.id === 'debrid' ? [] : SCREEN_FIELDS[screen.id];
+  const sharedInstructionParts = [
+    SHARED_INSTRUCTIONS_WALKTHROUGH,
+    screen.id === 'debrid' ? '' : SHARED_INSTRUCTIONS_KEY_DISCLAIMER,
+  ].filter(Boolean);
+  const instructionsText = `${screen.instruction}\n\n${sharedInstructionParts.join('\n\n')}`;
 
   return (
     <WizardShell>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.35rem' }}>
-        {screen.title}
+      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text)', marginBottom: '0.35rem', textAlign: 'center' }}>
+        {screen.label}
       </h2>
       <MarkdownText
         text={screen.description}
-        style={{ color: 'var(--muted)', fontSize: '0.875rem', marginBottom: '1rem', lineHeight: 1.65 }}
+        style={{
+          color: 'var(--muted)',
+          fontSize: '0.875rem',
+          margin: '0 auto 1rem',
+          lineHeight: 1.65,
+          textAlign: 'center',
+          maxWidth: '44rem',
+        }}
       />
 
-      <div style={{
-        background: 'var(--panel-2)', border: '1px solid var(--border)',
-        borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.25rem', fontSize: '0.875rem',
-      }}>
-        <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '0.35rem' }}>👉 How to get it:</div>
-        <MarkdownText text={screen.instruction} style={{ color: 'var(--muted)' }} />
-      </div>
-
       <div className="wizard-notice" style={{ marginBottom: '1rem' }}>
-        <div className="wizard-notice__title">ℹ️ Detailed Instructions</div>
-        <div>
-          For a longer walkthrough with screenshots and service-specific notes, go to
-          {' '}
-          <a href={guideAccountsUrl} target="_blank" rel="noopener noreferrer" className="guide-pill-link">
-            📝 Accounts Preparation
-          </a>
-        </div>
+        <div className="wizard-notice__title">ℹ️ Instructions</div>
+        <MarkdownText text={instructionsText} style={{ margin: 0, color: 'var(--text)', lineHeight: 1.6 }} />
       </div>
 
       {screen.id === 'debrid' && (
@@ -85,6 +249,7 @@ export function KeysStep({ keyIndex }: Props) {
                 <button
                   key={service.id}
                   type="button"
+                  className="wizard-hover-lift"
                   onClick={() => toggleDebridService(service.id)}
                   style={{
                     padding: '0.6rem 0.4rem',
@@ -134,109 +299,37 @@ export function KeysStep({ keyIndex }: Props) {
                   </label>
                 );
               })}
+              {!continueState.canContinue && (
+                <p style={{ margin: 0, fontSize: '0.8rem', color: '#dc2626', lineHeight: 1.5 }}>
+                  Enter an API key for every selected debrid service, or deselect them to continue with P2P / HTTP only.
+                </p>
+              )}
             </div>
           )}
         </>
       )}
 
-      {screen.id === 'tmdb' && (
-        <>
-          <label style={{ display: 'block', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-              API Key <span style={{ color: '#e53e3e' }}>*</span>
-            </span>
-            <input
-              type="password"
-              value={credentials.tmdbApiKey}
-              onChange={e => setCredentials({ tmdbApiKey: e.target.value })}
-              placeholder="Paste your short API key here..."
-              style={{ ...inputStyle, marginTop: '0.35rem' }}
-            />
-          </label>
-          <label style={{ display: 'block' }}>
-            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-              API Read Access Token <span style={{ color: '#e53e3e' }}>*</span>
-            </span>
-            <input
-              type="password"
-              value={credentials.tmdbAccessToken}
-              onChange={e => setCredentials({ tmdbAccessToken: e.target.value })}
-              placeholder="Paste your long Read Access Token here..."
-              style={{ ...inputStyle, marginTop: '0.35rem' }}
-            />
-          </label>
-        </>
-      )}
-
-      {screen.id === 'tvdb' && (
-        <label style={{ display: 'block' }}>
+      {screen.id !== 'debrid' && credentialFields.map((field, index) => (
+        <label key={field.id} style={{ display: 'block', marginBottom: index < credentialFields.length - 1 ? '0.75rem' : 0 }}>
           <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-            API Key <span style={{ color: '#e53e3e' }}>*</span>
+            {field.label}
+            {field.required && <span style={{ color: '#e53e3e' }}> *</span>}
           </span>
           <input
-            type="password"
-            value={credentials.tvdbApiKey}
-            onChange={e => setCredentials({ tvdbApiKey: e.target.value })}
-            placeholder="Paste your TVDB API key..."
-            style={{ ...inputStyle, marginTop: '0.35rem' }}
+            type={field.type ?? 'password'}
+            value={fieldValues[field.id]}
+            onChange={(event) => setCredentials({ [field.id]: event.target.value } as Partial<typeof credentials>)}
+            placeholder={field.placeholder}
+            style={{
+              ...inputStyle,
+              marginTop: '0.35rem',
+              fontFamily: field.monospace ? "'IBM Plex Mono', monospace" : inputStyle.fontFamily,
+            }}
           />
         </label>
-      )}
+      ))}
 
-      {screen.id === 'gemini' && (
-        <label style={{ display: 'block' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-            API Key
-          </span>
-          <input
-            type="password"
-            value={credentials.geminiApiKey}
-            onChange={e => setCredentials({ geminiApiKey: e.target.value })}
-            placeholder="Paste your Gemini API key..."
-            style={{ ...inputStyle, marginTop: '0.35rem' }}
-          />
-        </label>
-      )}
-
-      {screen.id === 'rpdb' && (
-        <label style={{ display: 'block' }}>
-          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-            API Key
-          </span>
-          <input
-            type="text"
-            value={credentials.rpdbApiKey}
-            onChange={e => setCredentials({ rpdbApiKey: e.target.value })}
-            placeholder={RPDB_FREE_KEY}
-            style={{ ...inputStyle, marginTop: '0.35rem', fontFamily: "'IBM Plex Mono', monospace" }}
-          />
-        </label>
-      )}
-
-      <NextButton onClick={nextStep} disabled={!canContinue} label={nextLabel} />
-      {showSkipButton && (
-        <button
-          type="button"
-          onClick={nextStep}
-          style={{
-            width: '100%',
-            marginTop: '0.5rem',
-            fontSize: '0.875rem',
-            color: 'var(--muted)',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '0.35rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.35rem',
-          }}
-        >
-          <ArrowRight size={14} />
-          Skip for now
-        </button>
-      )}
+      <NextButton onClick={nextStep} disabled={!continueState.canContinue} label={continueState.label} />
     </WizardShell>
   );
 }

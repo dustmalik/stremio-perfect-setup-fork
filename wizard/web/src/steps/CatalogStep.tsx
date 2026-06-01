@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { useWizard } from '../store/wizard';
-import { STREMIO_MAX_CATALOGS } from '../lib/constants';
 
 // @ts-ignore
 import { deriveCategories, deriveDiscoverFolders, defaultEnabledCategories, countEnabledCatalogs } from '@core/catalog-config.js';
@@ -11,9 +10,10 @@ interface Category { key: string; label: string; count: number; }
 interface DiscoverFolder { id: string; label: string; }
 
 export function CatalogStep() {
-  const { target, templates, catalogSelection, setCatalogSelection, nextStep } = useWizard();
+  const { target, templates, catalogSelection, setCatalogSelection, nextStep, wizardConfig } = useWizard();
   const template = templates?.aiometadata as { config?: { catalogs?: object[] } } | null;
   const collectionsRaw = (templates?.collections ?? []) as object[];
+  const stremioMaxCatalogs = wizardConfig?.limits.stremioMaxCatalogs ?? null;
 
   if (!template?.config?.catalogs) {
     return <WizardShell><p className="text-gray-400 text-sm">Loading catalogs…</p></WizardShell>;
@@ -36,7 +36,7 @@ export function CatalogStep() {
   }, []);
 
   const enabledCount: number = countEnabledCatalogs(catalogs, enabledCategories, enabledDiscoverFolderIds);
-  const overLimit = target === 'stremio' && enabledCount > STREMIO_MAX_CATALOGS;
+  const overLimit = target === 'stremio' && stremioMaxCatalogs !== null && enabledCount > stremioMaxCatalogs;
 
   function tileStyle(selected: boolean): React.CSSProperties {
     return {
@@ -65,12 +65,12 @@ export function CatalogStep() {
       <h2 className="text-xl font-bold mb-1">Choose your catalogs</h2>
       <p className="text-gray-500 text-sm mb-4 leading-relaxed">
         Pick which catalog sections you want. Each group adds browsable rows to your app.
-        {target === 'stremio' && ` Stremio supports up to ${STREMIO_MAX_CATALOGS} catalogs.`}
+        {target === 'stremio' && stremioMaxCatalogs !== null && ` Stremio supports up to ${stremioMaxCatalogs} catalogs.`}
       </p>
 
       {overLimit && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-sm text-red-700">
-          ⚠️ <strong>Too many catalogs!</strong> Stremio supports up to ~{STREMIO_MAX_CATALOGS}.
+          ⚠️ <strong>Too many catalogs!</strong> Stremio supports up to ~{stremioMaxCatalogs}.
           You have {enabledCount} enabled. Please disable some categories below.
         </div>
       )}

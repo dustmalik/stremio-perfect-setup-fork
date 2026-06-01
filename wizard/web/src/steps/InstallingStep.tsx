@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { RotateCcw } from 'lucide-react';
 import { WizardShell } from '../components/WizardShell';
 import { useWizard } from '../store/wizard';
-import { INSTANCES, TEMPLATE_URLS } from '../lib/constants';
+import { resolveSharedKeySelection, hasConfiguredKeyArray } from '../lib/sharedKeys';
 
 // @ts-ignore
 import { runStremioSetup, runNuvioSetup } from '@core/orchestrator.js';
@@ -53,10 +53,49 @@ export function InstallingStep() {
       if (!templates) {
         throw new Error('Template data has not finished loading yet. Please go back to the previous step and wait a moment before trying again.');
       }
+      if (!wizardConfig) {
+        throw new Error(`No active config.json block is available for the selected target "${target ?? 'unknown'}".`);
+      }
 
-      // Resolve effective instances from config.json (or defaults)
-      const effectiveInstances = wizardConfig?.instances ?? INSTANCES;
-      const proxyBase = wizardConfig?.proxyBase ?? '';
+      const userTmdbApiKey = credentials.tmdbApiKey.trim();
+      const userTmdbAccessToken = credentials.tmdbAccessToken.trim();
+      const hasAnyUserTmdbInput = userTmdbApiKey.length > 0 || userTmdbAccessToken.length > 0;
+      const hasCompleteUserTmdbInput = userTmdbApiKey.length > 0 && userTmdbAccessToken.length > 0;
+
+      if (hasAnyUserTmdbInput && !hasCompleteUserTmdbInput) {
+        throw new Error('TMDB requires both the API Key and the Read Access Token when you provide your own credentials.');
+      }
+
+      const requestedSharedKeyIds = [
+        !hasCompleteUserTmdbInput ? 'tmdbApiKeys' : null,
+        !hasCompleteUserTmdbInput ? 'tmdbReadAccessTokens' : null,
+        !credentials.tvdbApiKey.trim() ? 'tvdbApiKeys' : null,
+        !credentials.geminiApiKey.trim() && hasConfiguredKeyArray(wizardConfig, 'geminiApiKeys') ? 'geminiApiKeys' : null,
+        !credentials.rpdbApiKey.trim() && hasConfiguredKeyArray(wizardConfig, 'rpdbApiKeys') ? 'rpdbApiKeys' : null,
+      ].filter((keyId): keyId is 'tmdbApiKeys' | 'tmdbReadAccessTokens' | 'tvdbApiKeys' | 'geminiApiKeys' | 'rpdbApiKeys' => Boolean(keyId));
+
+      const sharedKeys = requestedSharedKeyIds.length
+        ? await resolveSharedKeySelection(wizardConfig, requestedSharedKeyIds)
+        : { tmdbApiKey: '', tmdbAccessToken: '', tvdbApiKey: '', geminiApiKey: '', rpdbApiKey: '' };
+
+      const effectiveCredentials = {
+        tmdbApiKey: hasCompleteUserTmdbInput ? userTmdbApiKey : sharedKeys.tmdbApiKey,
+        tmdbAccessToken: hasCompleteUserTmdbInput ? userTmdbAccessToken : sharedKeys.tmdbAccessToken,
+        tvdbApiKey: credentials.tvdbApiKey.trim() || sharedKeys.tvdbApiKey,
+        geminiApiKey: credentials.geminiApiKey.trim() || sharedKeys.geminiApiKey,
+        rpdbApiKey: credentials.rpdbApiKey.trim() || sharedKeys.rpdbApiKey,
+      };
+
+      if (!effectiveCredentials.tmdbApiKey || !effectiveCredentials.tmdbAccessToken) {
+        throw new Error('TMDB keys are required. Enter your own keys or add shared TMDB keys to config.json.');
+      }
+
+      if (!effectiveCredentials.tvdbApiKey) {
+        throw new Error('A TVDB API key is required. Enter your own key or add a shared TVDB key to config.json.');
+      }
+
+      const effectiveInstances = wizardConfig.instances;
+      const proxyBase = wizardConfig.proxyBase ?? '';
 
       push('Building your personalised AIOStreams configuration…');
 
@@ -65,46 +104,30 @@ export function InstallingStep() {
         inputs: aioStreamsInputs,
         services: credentials.debridServices.map((d: { id: string }) => d.id),
         credentials: {
-          tmdbApiKey: credentials.tmdbApiKey,
-          tmdbAccessToken: credentials.tmdbAccessToken,
-          tvdbApiKey: credentials.tvdbApiKey,
-          geminiApiKey: credentials.geminiApiKey,
+          tmdbApiKey: effectiveCredentials.tmdbApiKey,
+          tmdbAccessToken: effectiveCredentials.tmdbAccessToken,
+          tvdbApiKey: effectiveCredentials.tvdbApiKey,
+          geminiApiKey: effectiveCredentials.geminiApiKey,
+          rpdbApiKey: effectiveCredentials.rpdbApiKey,
         },
         serviceCredentials: Object.fromEntries(
           credentials.debridServices.map((d: { id: string; apiKey: string }) => [d.id, { apiKey: d.apiKey }])
         ),
       };
 
-      // Fetch the correct AIOMetadata base template for this target (Stremio vs Nuvio)
       push('Loading the AIOMetadata template for your setup…');
-      const metaTemplateKey = target === 'nuvio' ? 'aiometadata_nuvio' : 'aiometadata_stremio';
-      const metaUrl = wizardConfig?.templates?.[metaTemplateKey]
-        ?? (target === 'nuvio' ? TEMPLATE_URLS.aiometadataNuvio : TEMPLATE_URLS.aiometadataStremio);
-
-      let aiometadataBaseTemplate: Record<string, unknown>;
-      try {
-        aiometadataBaseTemplate = await fetch(metaUrl).then(r => {
-          if (!r.ok) throw new Error(`HTTP ${r.status}`);
-          return r.json();
-        });
-      } catch (e: unknown) {
-        throw new Error(
-          `Could not load the AIOMetadata template from GitHub. ` +
-          `Please check your internet connection and try again. ` +
-          `(${e instanceof Error ? e.message : String(e)})`
-        );
-      }
+      const aiometadataBaseTemplate = templates.aiometadata as Record<string, unknown>;
 
       const aiometadataParams = {
         baseTemplate: aiometadataBaseTemplate,
         enabledCategories: catalogSelection.enabledCategories,
         enabledDiscoverFolderIds: catalogSelection.enabledDiscoverFolderIds,
         apiKeys: {
-          tmdb:       credentials.tmdbApiKey,
-          tmdbAccess: credentials.tmdbAccessToken,
-          tvdb:       credentials.tvdbApiKey,
-          gemini:     credentials.geminiApiKey,
-          rpdb:       credentials.rpdbApiKey,
+          tmdb:       effectiveCredentials.tmdbApiKey,
+          tmdbAccess: effectiveCredentials.tmdbAccessToken,
+          tvdb:       effectiveCredentials.tvdbApiKey,
+          gemini:     effectiveCredentials.geminiApiKey,
+          rpdb:       effectiveCredentials.rpdbApiKey,
         },
         language: (aiometadataBaseTemplate as { config?: { language?: string } }).config?.language ?? 'en-US',
       };

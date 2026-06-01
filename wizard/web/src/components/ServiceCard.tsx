@@ -11,6 +11,7 @@ export function ServiceCard({ service, selected, onToggle }: Props) {
   const logoUrl = resolveLogoUrl(service.logo);
   return (
     <button
+      className="wizard-hover-lift"
       onClick={onToggle}
       style={{
         padding: '0.75rem 0.5rem',
@@ -19,7 +20,6 @@ export function ServiceCard({ service, selected, onToggle }: Props) {
         background: selected ? 'var(--panel-2)' : 'var(--panel)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem',
         cursor: 'pointer', transition: 'all 0.15s', color: 'var(--text)',
-        boxShadow: selected ? '0 0 0 3px rgba(109,58,242,0.15)' : 'none',
       }}
     >
       {logoUrl ? (

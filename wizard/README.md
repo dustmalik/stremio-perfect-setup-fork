@@ -28,7 +28,7 @@ wizard/
   web/                     Vite + React wizard (npm run dev / npm run build)
   web/public/assets/logos/ Canonical service logos served directly by the web app
   test/                    Node offline tests (no network needed)
-  config.json              Instance URLs and default preferences
+  config.json              Target-scoped runtime configuration blocks
 ```
 
 ## Local Use
@@ -53,7 +53,9 @@ output, and serves both from one local static server.
 
 ## Privacy and Behavior
 
-- API keys and passwords are intended to be provided at runtime, not committed to the repo.
+- User-entered API keys and passwords are intended to be provided at runtime, not committed to the repo.
+- Shared fallback keys in `wizard/config.json` must be stored only as base64-encoded AES-GCM payload strings under `configurations[].keys`. Use `scripts/encode-wizard-key.sh <config-name> <secret>` to generate one.
+- Shared fallback keys are never shown in the UI. If the user leaves a supported field empty, the wizard can pick a random configured fallback key in the background for that install run.
 - The wizard is built around the templates in this repo, so template changes can affect the wizard
   flow.
 - Some integrations still depend on live third-party API behavior and are not fully implemented.

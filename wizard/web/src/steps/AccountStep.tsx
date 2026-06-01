@@ -10,6 +10,16 @@ import { createStremioAdapter } from '@core/adapters/stremio.js';
 import { createNuvioAdapter } from '@core/adapters/nuvio.js';
 
 export function AccountStep() {
+  const MIN_PASSWORD_LENGTHS = {
+    stremio: {
+      signin: 4,
+      create: 8,
+    },
+    nuvio: {
+      signin: 6,
+      create: 8,
+    },
+  } as const;
   const { target, stremioAccount, nuvioAccount, setStremioAccount, setNuvioAccount, nextStep } = useWizard();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,9 +32,10 @@ export function AccountStep() {
     && account.mode === 'signin'
     && !!account.authToken
     && nuvioProfiles.length > 0;
+  const minPasswordLength = MIN_PASSWORD_LENGTHS[target ?? 'stremio'][account.mode];
 
   const isValidEmail    = account.email.includes('@');
-  const isValidPassword = account.password.length >= 8;
+  const isValidPassword = account.password.length >= minPasswordLength;
   const isValidProfileName = !isNuvio || account.mode !== 'create' || !!account.profileName?.trim();
   const hasSelectedProfile = !hasLoadedNuvioProfiles || Number.isFinite(account.profileId);
   const canAttempt = isValidEmail && isValidPassword && isValidProfileName && hasSelectedProfile && !loading;
@@ -147,16 +158,17 @@ export function AccountStep() {
         {(['create', 'signin'] as const).map(m => (
           <button
             key={m}
+            type="button"
+            className="wizard-hover-lift"
             onClick={() => { updateAccount({ mode: m }); setError(''); }}
             style={{
               padding: '0.7rem 1rem', borderRadius: '10px', fontSize: '0.875rem',
-              fontWeight: 600, border: `1px solid ${account.mode === m ? 'transparent' : 'var(--border)'}`,
+              fontWeight: 600, border: `1px solid ${account.mode === m ? 'var(--accent)' : 'var(--border)'}`,
               cursor: 'pointer', transition: 'all 0.15s',
               background: account.mode === m ? 'var(--accent)' : 'var(--panel-2)',
               color: account.mode === m ? '#fff' : 'var(--muted)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
               flex: 1,
-              boxShadow: account.mode === m ? '0 4px 14px rgba(109, 58, 242, 0.22)' : 'none',
             }}
           >
             {m === 'create' ? <UserPlus size={15} /> : <LogIn size={15} />}
@@ -179,7 +191,7 @@ export function AccountStep() {
       <label style={{ display: 'block', marginBottom: '0.5rem' }}>
         <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
           Password
-          <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '0.8rem', marginLeft: '0.4rem' }}>(min. 8 characters)</span>
+          <span style={{ fontWeight: 400, color: 'var(--muted)', fontSize: '0.8rem', marginLeft: '0.4rem' }}>(min. {minPasswordLength} characters)</span>
         </span>
         <input
           type="password"
@@ -233,20 +245,18 @@ export function AccountStep() {
       )}
 
       <button
+        type="button"
+        className="wizard-primary-btn"
         onClick={handleContinue}
         disabled={!canAttempt}
         style={{
-          width: '100%', marginTop: '1.25rem', padding: '0.75rem 1.5rem',
-          background: !canAttempt
-            ? 'var(--border)'
-            : 'linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%)',
-          color: !canAttempt ? 'var(--muted)' : '#fff',
-          fontWeight: 600, fontSize: '0.95rem', borderRadius: '10px', border: 'none',
-          cursor: !canAttempt ? 'not-allowed' : 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
-          boxShadow: !canAttempt ? 'none' : '0 4px 14px rgba(109, 58, 242, 0.3)',
-          transition: 'opacity 0.15s',
-          opacity: !canAttempt ? 0.55 : 1,
+          width: '100%',
+          marginTop: '1.25rem',
+          padding: '0.75rem 1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem',
         }}
       >
         {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}

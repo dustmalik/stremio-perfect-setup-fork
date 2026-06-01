@@ -1,4 +1,4 @@
-// Template directive engine for the Stremio/Nuvio Perfect Setup wizard.
+// Template directive engine for the Stremio/Nuvio Perfect Setup Wizard.
 //
 // Ports the client-side resolution that the AIOStreams import wizard performs, so we can turn a
 // repo template (e.g. templates/AIOStreams.json) + collected `inputs` + `credentials` into a
@@ -182,6 +182,7 @@ const PLACEHOLDER_KEYS = {
   tmdbAccessToken: 'tmdbAccessToken',
   tvdbApiKey: 'tvdbApiKey',
   geminiApiKey: 'geminiApiKey',
+  rpdbApiKey: 'rpdbApiKey',
 };
 
 // ---------------------------------------------------------------------------
@@ -317,6 +318,14 @@ function resolveTemplate(template, { inputs = {}, services = [], credentials = {
         }))
       : resolved.services.map((s) => ({ ...s, enabled: false }));
   }
+
+  // Some templates intentionally ship with a built-in RPDB default. When the wizard
+  // collected an explicit RPDB key, override that default here without exposing the
+  // shared or user-entered key in the UI.
+  if (credentials.rpdbApiKey) {
+    resolved.rpdbApiKey = credentials.rpdbApiKey;
+  }
+
   return resolved;
 }
 

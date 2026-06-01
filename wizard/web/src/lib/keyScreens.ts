@@ -2,9 +2,7 @@ export type KeyScreenId = 'debrid' | 'tmdb' | 'tvdb' | 'gemini' | 'rpdb';
 
 export interface KeyScreen {
   id: KeyScreenId;
-  title: string;
-  navLabel: string;
-  analyticsName: string;
+  label: string;
   slug: string;
   description: string;
   instruction: string;
@@ -17,9 +15,7 @@ export const KEY_SCREEN_START_STEP = 2;
 export const KEY_SCREENS: KeyScreen[] = [
   {
     id: 'debrid',
-    title: '⚡ Debrid Service',
-    navLabel: '⚡ Debrid Service',
-    analyticsName: 'Debrid Service',
+    label: '⚡ Debrid Service',
     slug: 'debrid-service',
     description: 'A **Debrid service** is a paid tool that gives you instant access to fast, cached streams with no P2P throttling or legal risk. It dramatically improves streaming quality and reliability. Select one or more services below and enter your API key for each. You can find your API key in each service\'s account or settings page. **Skip if you prefer free 🧲 P2P / 🌐 HTTP mode.**',
     instruction: 'Select one or more services below, then paste the API key for each selected provider. You can usually find the key in the service\'s account dashboard or API settings page.',
@@ -27,27 +23,21 @@ export const KEY_SCREENS: KeyScreen[] = [
   },
   {
     id: 'tmdb',
-    title: '🎬 TMDB API Keys',
-    navLabel: '🎬 TMDB API Keys',
-    analyticsName: 'TMDB API Keys',
+    label: '🎬 TMDB API Keys',
     slug: 'tmdb-keys',
     description: 'The Movie Database (TMDB) powers the metadata, posters, and catalog content in AIOMetadata, and serves to filter out bad results in AIOStreams. Without these keys, the catalog addon cannot display movie and TV show information. You need **two separate credentials** from your TMDB account.',
     instruction: 'Sign up for a free account at [TMDB](https://www.themoviedb.org) and log in. Navigate to **Settings** (profile icon on the top right) then **API**. Generate a new key, fill the form with whatever info, and click **Subscribe**. Access your API keys and copy both the short **API Key** and the long **API Read Access Token**.',
   },
   {
     id: 'tvdb',
-    title: '📺 TVDB API Key',
-    navLabel: '📺 TVDB API Key',
-    analyticsName: 'TVDB API Key',
+    label: '📺 TVDB API Key',
     slug: 'tvdb-key',
     description: 'TheTVDB provides enhanced metadata for TV series, especially for episodic content. This improves episode data accuracy and series information.',
     instruction: 'Sign up for a free account at [TVDB](https://www.thetvdb.com) and log in. Go to [this](https://www.thetvdb.com/api-information) page, click **Get Started**, fill the form with whatever info but make sure to select **Less than $50k per year** in *Company/Project Revenue*. **Submit**, and copy the **API Key**.',
   },
   {
     id: 'gemini',
-    title: '✨ Gemini API Key (Optional)',
-    navLabel: '✨ Gemini AI Key',
-    analyticsName: 'Gemini AI Key',
+    label: '✨ Gemini API Key',
     slug: 'gemini-key',
     description: 'A Google Gemini API key enables AI-powered search in AIOMetadata. Optional, but recommended for AI searches, to search not only for movie or show names, but also e.g. “movies like Batman” or more complex searches.',
     instruction: 'Go to [Google AI Studio](https://aistudio.google.com), sign in with your Google account, and accept the terms if prompted. If a key doesn\'t get created automatically, click on **Create API Key** and copy the new generated key.',
@@ -55,14 +45,11 @@ export const KEY_SCREENS: KeyScreen[] = [
   },
   {
     id: 'rpdb',
-    title: '⭐ RPDB API Key',
-    navLabel: '⭐ RPDB Ratings',
-    analyticsName: 'RPDB Poster Ratings',
+    label: '⭐ RPDB API Key',
     slug: 'rpdb-key',
-    description: 'Ratings Poster DB (RPDB) adds IMDb and Rotten Tomatoes rating overlays directly onto movie and show posters, making it easy to see review scores at a glance without opening each title.\n\nA **free tier key is already pre-filled**, so no account or sign-up required.',
-    instruction: 'The free key is already pre-filled below. Leave it as-is to use the free tier. Replace it with your premium key from [RPDB](https://www.ratingposterdb.com) if you have one.',
+    description: 'Ratings Poster DB (RPDB) adds IMDb and Rotten Tomatoes rating overlays directly onto movie and show posters, making it easy to see review scores at a glance without opening each title.',
+    instruction: 'Get your own key from [RPDB](https://www.ratingposterdb.com) if you want your own limits. If you leave the field empty, the wizard can keep using a shared or built-in RPDB key in the background.',
     optional: true,
-    enabled: false,
   },
 ];
 

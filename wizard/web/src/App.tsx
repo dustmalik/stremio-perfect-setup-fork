@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useWizard } from './store/wizard';
 import { buildAioSections } from './lib/aioSections';
 import { Welcome } from './steps/Welcome';
@@ -8,7 +8,7 @@ import { AioSectionStep } from './steps/AioSectionStep';
 import { CatalogStep } from './steps/CatalogStep';
 import { InstallingStep } from './steps/InstallingStep';
 import { DoneStep } from './steps/DoneStep';
-import { TEMPLATE_URLS, type WizardConfig } from './lib/constants';
+import { normalizeWizardConfig, resolveWizardConfig } from './lib/constants';
 import {
   ACTIVE_KEY_SCREENS,
   AIO_SECTION_START_STEP,
@@ -18,59 +18,102 @@ import {
 } from './lib/keyScreens';
 import { WizardShell } from './components/WizardShell';
 import { ensureAnalytics, getStepMeta, trackWizardStepView } from './lib/analytics';
+import { resolveSiteUrl } from './lib/site';
 
 // config.json is bundled at build time from the root wizard/config.json.
 import bundledConfig from '../../config.json';
 
+const wizardConfigSource = normalizeWizardConfig(bundledConfig);
+
+async function fetchJson(url: string, label: string) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`${label} failed to load from ${url} (HTTP ${response.status}).`);
+  }
+  return response.json();
+}
+
 function StepRouter() {
-  const { step, target, templates, aioSections, wizardConfig, setTemplates, setAioSections, setWizardConfig } = useWizard();
+  const { step, target, aioSections, wizardConfig, setTemplates, setAioSections, setWizardConfig } = useWizard();
   const lastTrackedKeyRef = useRef('');
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Apply config.json values into the store on first mount.
-    if (!wizardConfig) {
-      setWizardConfig(bundledConfig as WizardConfig);
+    const resolvedConfig = resolveWizardConfig(wizardConfigSource, target);
+    setWizardConfig(resolvedConfig);
+    if (target && !resolvedConfig) {
+      setConfigError(`No valid config.json block matches the selected target "${target}".`);
+      return;
+    }
+    setConfigError(null);
+  }, [target, setWizardConfig]);
+
+  useEffect(() => {
+    if (!target || !wizardConfig) {
+      setTemplates(null);
+      setAioSections([]);
+      return;
     }
 
-    if (templates) return;
-
-    const cfg = bundledConfig as WizardConfig;
     const tplUrls = {
-      aiostreams:         cfg.templates?.aiostreams          ?? TEMPLATE_URLS.aiostreams,
-      aiometadataStremio: cfg.templates?.aiometadata_stremio ?? TEMPLATE_URLS.aiometadataStremio,
-      collections:        cfg.templates?.collections          ?? TEMPLATE_URLS.collections,
-      nuvioSettings:      cfg.templates?.nuvio_settings       ?? TEMPLATE_URLS.nuvioSettings,
+      aiostreams: resolveSiteUrl(wizardConfig.templates.aiostreams),
+      aiometadata: target === 'nuvio'
+        ? resolveSiteUrl(wizardConfig.templates.aiometadata_nuvio)
+        : resolveSiteUrl(wizardConfig.templates.aiometadata_stremio),
+      collections: resolveSiteUrl(wizardConfig.templates.collections),
+      nuvioSettings: resolveSiteUrl(wizardConfig.templates.nuvio_settings),
     };
 
+    let cancelled = false;
+    setConfigError(null);
+    setTemplates(null);
+    setAioSections([]);
+
     Promise.all([
-      fetch(tplUrls.aiostreams).then(r => r.json()),
-      fetch(tplUrls.aiometadataStremio).then(r => r.json()),
-      fetch(tplUrls.collections).then(r => r.json()),
-      fetch(tplUrls.nuvioSettings).then(r => r.json()),
+      fetchJson(tplUrls.aiostreams, 'AIOStreams template'),
+      fetchJson(tplUrls.aiometadata, 'AIOMetadata template'),
+      fetchJson(tplUrls.collections, 'Nuvio collections template'),
+      fetchJson(tplUrls.nuvioSettings, 'Nuvio settings template'),
     ]).then(([aiostreams, aiometadata, collections, nuvioSettings]) => {
+      if (cancelled) return;
       setTemplates({ aiostreams, aiometadata, collections, nuvioSettings });
       setAioSections(buildAioSections(aiostreams));
-    }).catch(console.error);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    }).catch((error: unknown) => {
+      if (cancelled) return;
+      setConfigError(error instanceof Error ? error.message : String(error));
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [target, wizardConfig, setAioSections, setTemplates]);
 
   useEffect(() => {
-    const effectiveTarget = target ?? wizardConfig?.target ?? null;
     const meta = getStepMeta(step, aioSections);
     if (!meta) return;
 
-    const trackingKey = `${step}:${effectiveTarget ?? 'unknown'}:${meta.slug}`;
+    const trackingKey = `${step}:${target ?? 'unknown'}:${meta.slug}`;
     if (lastTrackedKeyRef.current === trackingKey) return;
 
     lastTrackedKeyRef.current = trackingKey;
     ensureAnalytics();
-    trackWizardStepView(step, effectiveTarget, aioSections);
-  }, [aioSections, step, target, wizardConfig?.target]);
+    trackWizardStepView(step, target, aioSections);
+  }, [aioSections, step, target]);
 
   const n = aioSections.length;
   const KEY_SCREEN_END_STEP = KEY_SCREEN_START_STEP + ACTIVE_KEY_SCREENS.length;
   const CATALOGS_STEP = getCatalogStep(n);
   const INSTALL_STEP = getInstallStep(n);
+
+  if (step > 0 && target && configError) {
+    return (
+      <WizardShell>
+        <p style={{ color: '#dc2626', fontSize: '0.9rem', lineHeight: 1.6 }}>
+          {configError}
+        </p>
+      </WizardShell>
+    );
+  }
 
   // Fixed steps
   if (step === 0) return <Welcome />;

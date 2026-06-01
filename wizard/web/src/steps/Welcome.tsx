@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { useWizard, type Target } from '../store/wizard';
@@ -50,10 +49,9 @@ export function Welcome() {
           const logoUrl = resolveLogoUrl(`assets/logos/${t.logoFile}`);
           const isSelected = target === t.id;
           return (
-            <motion.button
+            <button
               key={t.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              className="wizard-hover-lift"
               onClick={() => setTarget(t.id)}
               style={{
                 padding: '1.1rem',
@@ -61,7 +59,6 @@ export function Welcome() {
                 borderRadius: '12px',
                 background: isSelected ? 'var(--panel-2)' : 'var(--panel)',
                 textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s',
-                boxShadow: isSelected ? '0 0 0 4px rgba(109,58,242,0.1)' : 'none',
               }}
             >
               {logoUrl ? (
@@ -77,7 +74,7 @@ export function Welcome() {
               )}
               <div style={{ fontWeight: 700, color: 'var(--text)', fontSize: '0.95rem', marginBottom: '0.2rem' }}>{t.name}</div>
               <div style={{ fontSize: '0.78rem', color: 'var(--muted)', lineHeight: 1.45 }}>{t.desc}</div>
-            </motion.button>
+            </button>
           );
         })}
       </div>

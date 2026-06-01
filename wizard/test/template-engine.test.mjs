@@ -91,5 +91,22 @@ console.log('\n# formatter retain removes formatter');
   ok('formatter removed on retain', cfg.formatter === undefined);
 }
 
+console.log('\n# RPDB override keeps template default unless a key is supplied');
+{
+  const defaultCfg = resolveTemplate(template, {
+    inputs: {},
+    services: [],
+    credentials: {},
+  });
+  ok('default RPDB key remains when none is supplied', defaultCfg.rpdbApiKey === 't0-free-rpdb');
+
+  const overriddenCfg = resolveTemplate(template, {
+    inputs: {},
+    services: [],
+    credentials: { rpdbApiKey: 'RPDB-PREMIUM-KEY' },
+  });
+  ok('supplied RPDB key overrides template default', overriddenCfg.rpdbApiKey === 'RPDB-PREMIUM-KEY');
+}
+
 console.log(`\n${failed === 0 ? '✅' : '❌'} ${passed} passed, ${failed} failed\n`);
 process.exit(failed === 0 ? 0 : 1);
