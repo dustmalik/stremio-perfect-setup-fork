@@ -54,7 +54,7 @@ output, and serves both from one local static server.
 ## Privacy and Behavior
 
 - User-entered API keys and passwords are intended to be provided at runtime, not committed to the repo.
-- Shared fallback keys in `wizard/config.json` must be stored only as base64-encoded AES-GCM payload strings under `configurations[].keys`. Use `scripts/encode-wizard-key.sh <config-name> <secret>` to generate one.
+- Shared fallback keys in `wizard/config.json` must be stored only as base64-encoded AES-GCM payload strings under `configurations[].keys`. Use `scripts/encode-wizard-key.sh <passphrase> <secret>` to generate one.
 - Shared fallback keys are never shown in the UI. If the user leaves a supported field empty, the wizard can pick a random configured fallback key in the background for that install run.
 - The wizard is built around the templates in this repo, so template changes can affect the wizard
   flow.

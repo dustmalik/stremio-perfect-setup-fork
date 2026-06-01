@@ -56,15 +56,15 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: scripts/encode-wizard-key.sh <config-name> <secret>" >&2
+  echo "Usage: scripts/encode-wizard-key.sh <passphrase> <secret>" >&2
   exit 1
 fi
 
-config_name=$1
+passphrase=$1
 shift
 secret="$*"
 
-node - "$config_name" "$secret" <<'NODE'
+node - "$passphrase" "$secret" <<'NODE'
 const crypto = require('node:crypto');
 
 const [, , passphrase, value] = process.argv;
