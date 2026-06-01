@@ -53,7 +53,7 @@ Here are the main files and resources:
 * [**Nuvio Community Collections Pack**](https://nuvioapp.space/community-collections/nuvio-perfect-collections-incl-dynamic-backdrops-2)
    * This is the easiest way to add the collections pack directly through Nuvio.
    * If you already followed the setup steps above, this is usually the simplest option.
-* [**Nuvio Collections**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/collections/nuvio-collections.json) (*JSON*)
+* [**Nuvio Collections**](https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Collections.json) (*JSON*)
    * This is the pre-configured collections file for Nuvio, the same used in the community pack above.
    * You can import it manually into your Nuvio account, especially if you are using the matching AIOMetadata catalogs.
 

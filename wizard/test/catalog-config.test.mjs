@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..', '..');
 const stremioTemplate = JSON.parse(readFileSync(join(root, 'templates', 'AIOMetadata.json'), 'utf8'));
 const nuvioTemplate = JSON.parse(readFileSync(join(root, 'templates', 'AIOMetadata-All.json'), 'utf8'));
-const collections = JSON.parse(readFileSync(join(root, 'collections', 'nuvio-collections.json'), 'utf8'));
+const collections = JSON.parse(readFileSync(join(root, 'templates', 'Nuvio-Collections.json'), 'utf8'));
 const catalogs = stremioTemplate.config.catalogs;
 
 let passed = 0, failed = 0;
@@ -69,6 +69,18 @@ ok('Stremio: 🌍 World NOT enabled by default', !stremioDefaults.categories.has
 const nuvioDefaults = defaultEnabledCategories(nuvioTemplate.config.catalogs, 'nuvio', collections);
 ok('Nuvio: 🏰 Studios enabled by default', nuvioDefaults.categories.has('🏰'));
 ok('Nuvio: 🌍 World enabled by default', nuvioDefaults.categories.has('world'));
+ok(
+  'Nuvio: all selectable catalogs enabled by default',
+  countEnabledCatalogs(
+    nuvioTemplate.config.catalogs,
+    nuvioDefaults.categories,
+    nuvioDefaults.discoverFolderIds
+  ) === countEnabledCatalogs(
+    nuvioTemplate.config.catalogs,
+    new Set(deriveCategories(nuvioTemplate.config.catalogs, collections).map(c => c.key)),
+    new Set(deriveDiscoverFolders(nuvioTemplate.config.catalogs).map(d => d.id))
+  )
+);
 
 console.log('\n# countEnabledCatalogs: Stremio 120-catalog cap enforcement');
 const allEnabledCategories = new Set(cats.map(c => c.key));

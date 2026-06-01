@@ -1,4 +1,4 @@
-// Filter a nuvio-collections.json array to only include groups/folders
+// Filter a Nuvio-Collections.json array to only include groups/folders
 // whose content belongs to the user's enabled catalog categories.
 // Anime folders nested inside the Genres group are filtered per-folder.
 
@@ -42,7 +42,7 @@ function isFolderEnabled(folder, catalogIndex, enabledCategories, enabledDiscove
  * Filter a collections JSON array to match the user's enabled categories.
  * Groups with no remaining folders are removed entirely.
  *
- * @param {object[]} collections              nuvio-collections.json top-level array
+ * @param {object[]} collections              Nuvio-Collections.json top-level array
  * @param {object[]} catalogs                 AIOMetadata catalog array (for id→name lookup)
  * @param {object}   opts
  * @param {Set}      opts.enabledCategories

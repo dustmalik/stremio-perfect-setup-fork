@@ -21,7 +21,7 @@ title: Home
 
 <div class="home-wizard-card">
   <div class="home-wizard-card__text">
-    <strong>🔮 New! Automated Setup</strong>
+    <strong>🔮 New! Quick Automated Setup</strong>
     <span>Skip the manual steps, let the wizard configure everything for you in seconds.</span>
   </div>
   <a class="home-wizard-card__btn" href="/wizard/">Launch Wizard →</a>

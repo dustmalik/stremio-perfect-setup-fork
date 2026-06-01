@@ -87,6 +87,10 @@ function parseExpression(tokens) {
 // Resolve an operand token to a JS value given the context.
 function resolveOperand(token, ctx) {
   if (token === 'services') return ctx.services; // array of selected service ids
+  if (token.startsWith('services.')) {
+    const serviceId = token.slice('services.'.length);
+    return Array.isArray(ctx.services) ? ctx.services.includes(serviceId) : false;
+  }
   if (token === 'true') return true;
   if (token === 'false') return false;
   if (/^-?\d+(\.\d+)?$/.test(token)) return Number(token);

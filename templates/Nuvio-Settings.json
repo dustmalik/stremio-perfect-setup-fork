@@ -1,0 +1,47 @@
+{
+  "tv": {
+    "version": 1,
+    "features": {
+      "layout_settings": {
+        "follow_addons_order": { "type": "boolean", "value": true },
+        "prefer_external_meta_addon_detail": { "type": "boolean", "value": true }
+      },
+      "tmdb_settings": {
+        "tmdb_enabled": { "type": "boolean", "value": true },
+        "tmdb_modern_home_enabled": { "type": "boolean", "value": true },
+        "tmdb_enrich_continue_watching": { "type": "boolean", "value": true },
+        "tmdb_use_artwork": { "type": "boolean", "value": true },
+        "tmdb_use_basic_info": { "type": "boolean", "value": true },
+        "tmdb_use_details": { "type": "boolean", "value": true },
+        "tmdb_use_release_dates": { "type": "boolean", "value": true },
+        "tmdb_use_credits": { "type": "boolean", "value": true },
+        "tmdb_use_productions": { "type": "boolean", "value": true },
+        "tmdb_use_networks": { "type": "boolean", "value": true },
+        "tmdb_use_episodes": { "type": "boolean", "value": true },
+        "tmdb_use_trailers": { "type": "boolean", "value": true },
+        "tmdb_use_more_like_this": { "type": "boolean", "value": true },
+        "tmdb_use_collections": { "type": "boolean", "value": true }
+      }
+    }
+  },
+  "mobile": {
+    "version": 3,
+    "features": {
+      "tmdb_settings": {
+        "tmdb_api_key": { "type": "string", "value": "{{TMDB_API_KEY}}" },
+        "tmdb_enabled": { "type": "boolean", "value": true },
+        "tmdb_use_trailers": { "type": "boolean", "value": true },
+        "tmdb_use_artwork": { "type": "boolean", "value": true },
+        "tmdb_use_basic_info": { "type": "boolean", "value": true },
+        "tmdb_use_details": { "type": "boolean", "value": true },
+        "tmdb_use_credits": { "type": "boolean", "value": true },
+        "tmdb_use_productions": { "type": "boolean", "value": true },
+        "tmdb_use_networks": { "type": "boolean", "value": true },
+        "tmdb_use_episodes": { "type": "boolean", "value": true },
+        "tmdb_use_season_posters": { "type": "boolean", "value": true },
+        "tmdb_use_more_like_this": { "type": "boolean", "value": true },
+        "tmdb_use_collections": { "type": "boolean", "value": true }
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-// NOTE: This component is no longer used in routing (replaced by DebridStep). Kept for reference.
+// NOTE: This component is no longer used in routing (replaced by the unified key-screen flow). Kept for reference.
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { ServiceCard } from '../components/ServiceCard';

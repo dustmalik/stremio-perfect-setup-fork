@@ -2,14 +2,13 @@ import { useEffect, useRef } from 'react';
 import { ChevronRight, Check } from 'lucide-react';
 import { useWizard } from '../store/wizard';
 import { getGuideStatsUrl } from '../lib/site';
-
-const KEY_STEP_LABELS: Record<number, string> = {
-  2: '⚡ Debrid Service',
-  3: '🎬 TMDB API Keys',
-  4: '📺 TVDB API Key',
-  5: '✨ Gemini AI Key',
-  6: '⭐ RPDB Ratings',
-};
+import {
+  ACTIVE_KEY_SCREENS,
+  AIO_SECTION_START_STEP,
+  KEY_SCREEN_START_STEP,
+  getCatalogStep,
+  getInstallStep,
+} from '../lib/keyScreens';
 
 interface Props {
   onClose: () => void;
@@ -52,8 +51,8 @@ export function Sidebar({ onClose }: Props) {
   }
 
   const n = aioSections.length;
-  const CATALOGS_STEP = 7 + n;
-  const INSTALL_STEP  = 7 + n + 1;
+  const CATALOGS_STEP = getCatalogStep(n);
+  const INSTALL_STEP = getInstallStep(n);
 
   function goTo(s: number) {
     if (s <= maxReachedStep && s !== step) { setStep(s); onClose(); }
@@ -100,12 +99,15 @@ export function Sidebar({ onClose }: Props) {
 
         {/* Services & Keys */}
         <div className="nav-section-label">Services &amp; Keys</div>
-        {[2, 3, 4, 5, 6].map(s => (
-          <button key={s} className={`${cls(s)} is-sub`} onClick={() => goTo(s)}>
-            <StepIcon s={s} />
-            <span>{KEY_STEP_LABELS[s]}</span>
-          </button>
-        ))}
+        {ACTIVE_KEY_SCREENS.map((screen, index) => {
+          const stepIndex = KEY_SCREEN_START_STEP + index;
+          return (
+            <button key={screen.id} className={`${cls(stepIndex)} is-sub`} onClick={() => goTo(stepIndex)}>
+              <StepIcon s={stepIndex} />
+              <span>{screen.navLabel}</span>
+            </button>
+          );
+        })}
 
         {/* AIOStreams Config */}
         <div className="nav-section-label">AIOStreams Configuration</div>
@@ -115,7 +117,7 @@ export function Sidebar({ onClose }: Props) {
           </div>
         ) : (
           aioSections.map((sec, i) => {
-            const s = 7 + i;
+            const s = AIO_SECTION_START_STEP + i;
             return (
               <button key={sec.id} className={`${cls(s)} is-sub`} onClick={() => goTo(s)}>
                 <StepIcon s={s} />
@@ -168,7 +170,6 @@ export function Sidebar({ onClose }: Props) {
           </a>
         </div>
         <section className="sidebar-stat-card" aria-label="Guide and wizard activity">
-          <span className="sidebar-stat-card__eyebrow">Setup activity</span>
           <div className="sidebar-stat-grid">
             <div className="sidebar-stat-item">
               <span className="sidebar-stat-item__label">Guide completed</span>

@@ -16,6 +16,99 @@ function normalizeBase(instanceUrl) {
   return instanceUrl.replace(/\/+$/, '');
 }
 
+function resolveConfigPayload({ template, inputs, services, credentials, serviceCredentials, configOverride }) {
+  let config = resolveTemplate(template, { inputs, services, credentials, serviceCredentials });
+  if (configOverride && typeof configOverride === 'object') {
+    config = { ...config, ...configOverride };
+  }
+  return config;
+}
+
+function normalizeAddonName(value) {
+  return String(value || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+export function extractFailedManifestAddons(message) {
+  const text = String(message || '');
+  const matches = text.matchAll(/Failed to fetch manifest for\s+(.+?)(?=[:.,\n]|$)/gi);
+  const names = [];
+  for (const match of matches) {
+    const name = String(match[1] || '').trim().replace(/^["'`]+|["'`]+$/g, '');
+    if (name) names.push(name);
+  }
+  return [...new Set(names)];
+}
+
+export function disableInternalAddons(config, addonNames) {
+  if (!Array.isArray(config?.presets) || !Array.isArray(addonNames) || addonNames.length === 0) {
+    return { config, disabledAddonNames: [] };
+  }
+
+  const targets = new Set(addonNames.map(normalizeAddonName).filter(Boolean));
+  if (targets.size === 0) return { config, disabledAddonNames: [] };
+
+  const nextConfig = structuredClone(config);
+  const disabledAddonNames = [];
+
+  for (const preset of nextConfig.presets) {
+    const presetNames = [
+      preset?.options?.name,
+      preset?.name,
+      preset?.type,
+      preset?.instanceId,
+    ].map(normalizeAddonName);
+
+    if (!presetNames.some((name) => name && targets.has(name))) continue;
+    if (preset.enabled === false) continue;
+
+    preset.enabled = false;
+    disabledAddonNames.push(preset?.options?.name || preset?.name || preset?.type || preset?.instanceId);
+  }
+
+  return { config: nextConfig, disabledAddonNames: [...new Set(disabledAddonNames)] };
+}
+
+function sharedFailedManifestAddons(results) {
+  const failures = results.filter((result) => !result.ok);
+  if (failures.length === 0) return [];
+
+  let intersection = null;
+  for (const failure of failures) {
+    const names = extractFailedManifestAddons(failure.error);
+    if (names.length === 0) return [];
+    const current = new Set(names.map(normalizeAddonName).filter(Boolean));
+    if (current.size === 0) return [];
+    intersection = intersection === null
+      ? current
+      : new Set([...intersection].filter((name) => current.has(name)));
+    if (intersection.size === 0) return [];
+  }
+
+  const canonical = new Map();
+  for (const failure of failures) {
+    for (const name of extractFailedManifestAddons(failure.error)) {
+      const normalized = normalizeAddonName(name);
+      if (normalized && !canonical.has(normalized)) canonical.set(normalized, name);
+    }
+  }
+
+  return [...intersection].map((name) => canonical.get(name) || name);
+}
+
+async function tryCreateUntilSuccess(instances, createAttempt) {
+  const results = [];
+  for (const instanceUrl of instances) {
+    try {
+      const success = { instanceUrl, ok: true, ...(await createAttempt(instanceUrl)) };
+      results.push(success);
+      return { primary: success, results };
+    } catch (err) {
+      results.push({ instanceUrl, ok: false, error: String(err.message || err) });
+    }
+  }
+  return { primary: null, results };
+}
+
 /**
  * Build the final fetch URL, optionally routing through a CORS proxy.
  * proxyBase examples:
@@ -47,16 +140,7 @@ export function createAioStreamsAdapter(instanceUrl, { proxyBase = '' } = {}) {
   const base = normalizeBase(instanceUrl);
   return {
     base,
-    /**
-     * Resolve the repo template with the user's inputs + credentials, store it, return identifiers.
-     * @returns {Promise<{uuid, encryptedPassword, manifestUrl, password}>}
-     */
-    async createConfig({ template, inputs, services, credentials, serviceCredentials, password, addonPassword, configOverride }) {
-      let config = resolveTemplate(template, { inputs, services, credentials, serviceCredentials });
-      // configOverride allows shallow-merging top-level keys after resolution (e.g. disabling TMDB features in tests).
-      if (configOverride && typeof configOverride === 'object') {
-        config = { ...config, ...configOverride };
-      }
+    async saveConfig({ config, password, addonPassword }) {
       const headers = { 'content-type': 'application/json' };
       if (addonPassword) headers['x-aiostreams-addon-password'] = addonPassword;
 
@@ -103,6 +187,14 @@ export function createAioStreamsAdapter(instanceUrl, { proxyBase = '' } = {}) {
         manifestUrl: `${base}/stremio/${uuid}/${encryptedPassword}/manifest.json`,
       };
     },
+    /**
+     * Resolve the repo template with the user's inputs + credentials, store it, return identifiers.
+     * @returns {Promise<{uuid, encryptedPassword, manifestUrl, password}>}
+     */
+    async createConfig({ template, inputs, services, credentials, serviceCredentials, password, addonPassword, configOverride }) {
+      const config = resolveConfigPayload({ template, inputs, services, credentials, serviceCredentials, configOverride });
+      return this.saveConfig({ config, password, addonPassword });
+    },
 
     /** Verify an instance is reachable + lists templates (health probe). */
     async health() {
@@ -112,22 +204,46 @@ export function createAioStreamsAdapter(instanceUrl, { proxyBase = '' } = {}) {
   };
 }
 
-// Create the same config across multiple instances in order (AIOManager-style redundancy).
-// params may include `proxyBase` for CORS proxy support and `_postResolveOverride` to patch
-// the resolved config before POSTing (useful for testing without a TMDB key).
+// Try instances in order until one accepts the config. Later entries are fallbacks that are
+// only attempted if earlier instances fail. params may include `proxyBase` for CORS proxy
+// support and `_postResolveOverride` to patch the resolved config before POSTing
+// (useful for testing without a TMDB key).
 export async function createWithFallbacks(instances, params) {
   const { proxyBase, _postResolveOverride, ...createParams } = params;
   const configOverride = _postResolveOverride || undefined;
-  const results = [];
-  for (const instanceUrl of instances) {
-    try {
-      const adapter = createAioStreamsAdapter(instanceUrl, { proxyBase });
-      results.push({ instanceUrl, ok: true, ...(await adapter.createConfig({ ...createParams, configOverride })) });
-    } catch (err) {
-      results.push({ instanceUrl, ok: false, error: String(err.message || err) });
+  const baseConfig = resolveConfigPayload({ ...createParams, configOverride });
+
+  const createAttempt = async (instanceUrl, config) => {
+    const adapter = createAioStreamsAdapter(instanceUrl, { proxyBase });
+    return adapter.saveConfig({
+      config,
+      password: createParams.password,
+      addonPassword: createParams.addonPassword,
+    });
+  };
+
+  let retryWarnings = [];
+  let disabledInternalAddons = [];
+  let { primary, results } = await tryCreateUntilSuccess(instances, (instanceUrl) => createAttempt(instanceUrl, baseConfig));
+  const allResults = [...results];
+
+  if (!primary) {
+    const manifestAddons = sharedFailedManifestAddons(results);
+    if (manifestAddons.length > 0) {
+      const retryConfigResult = disableInternalAddons(baseConfig, manifestAddons);
+      if (retryConfigResult.disabledAddonNames.length > 0) {
+        disabledInternalAddons = retryConfigResult.disabledAddonNames;
+        retryWarnings = [
+          `AIOStreams temporarily disabled ${disabledInternalAddons.join(', ')} because all configured instances reported "Failed to fetch manifest". You can try re-enabling ${disabledInternalAddons.length === 1 ? 'it' : 'them'} later from the add-on configuration page.`,
+        ];
+        const retried = await tryCreateUntilSuccess(instances, (instanceUrl) => createAttempt(instanceUrl, retryConfigResult.config));
+        primary = retried.primary;
+        results = retried.results;
+        allResults.push(...retried.results);
+      }
     }
   }
-  const primary = results.find((r) => r.ok);
+
   if (!primary) {
     const allCors = results.every((r) => r.error?.includes('[CORS]'));
     const errors = results.map((r) => r.error?.replace('[CORS] ', '')).join('\n\n');
@@ -145,5 +261,5 @@ export async function createWithFallbacks(instances, params) {
     }
     throw new Error(`All AIOStreams instances failed:\n\n${errors}`);
   }
-  return { primary, all: results };
+  return { primary, all: allResults, disabledInternalAddons, retryWarnings };
 }

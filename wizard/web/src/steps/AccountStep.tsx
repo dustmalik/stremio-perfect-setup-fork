@@ -14,25 +14,48 @@ export function AccountStep() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const account    = target === 'stremio' ? stremioAccount : nuvioAccount;
-  const setAccount = target === 'stremio' ? setStremioAccount : setNuvioAccount;
-  const appName    = target === 'stremio' ? 'Stremio' : 'Nuvio';
+  const account = target === 'stremio' ? stremioAccount : nuvioAccount;
+  const appName = target === 'stremio' ? 'Stremio' : 'Nuvio';
+  const isNuvio = target === 'nuvio';
+  const nuvioProfiles = isNuvio ? (account.profiles ?? []) : [];
+  const hasLoadedNuvioProfiles = isNuvio
+    && account.mode === 'signin'
+    && !!account.authToken
+    && nuvioProfiles.length > 0;
 
   const isValidEmail    = account.email.includes('@');
   const isValidPassword = account.password.length >= 8;
-  const canAttempt      = isValidEmail && isValidPassword && !loading;
+  const isValidProfileName = !isNuvio || account.mode !== 'create' || !!account.profileName?.trim();
+  const hasSelectedProfile = !hasLoadedNuvioProfiles || Number.isFinite(account.profileId);
+  const canAttempt = isValidEmail && isValidPassword && isValidProfileName && hasSelectedProfile && !loading;
 
   function updateAccount(next: Partial<typeof account>) {
-    setAccount({
+    if (target === 'stremio') {
+      setStremioAccount({
+        ...next,
+        authKey: undefined,
+        authError: undefined,
+      });
+      return;
+    }
+
+    setNuvioAccount({
       ...next,
-      authKey: undefined,
       authToken: undefined,
       authError: undefined,
+      profileId: undefined,
+      profiles: [],
     });
   }
 
   async function handleContinue() {
     if (!canAttempt) return;
+
+    if (isNuvio && account.mode === 'signin' && hasLoadedNuvioProfiles) {
+      nextStep();
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
@@ -43,22 +66,37 @@ export function AccountStep() {
           : await adapter.login(account.email, account.password);
         setStremioAccount({ authKey: auth.authKey });
       } else {
-        // Nuvio: attempt; gracefully handle placeholder anon key
-        try {
-          const adapter = createNuvioAdapter();
-          const auth = account.mode === 'create'
-            ? await adapter.signup(account.email, account.password)
-            : await adapter.login(account.email, account.password);
-          setNuvioAccount({ authToken: auth.token });
-        } catch (nuvioErr: unknown) {
-          const msg = nuvioErr instanceof Error ? nuvioErr.message : String(nuvioErr);
-          // Placeholder anon key = not yet configured; skip auth, let install handle it
-          if (msg.includes('401') || msg.includes('apikey') || msg.includes('REPLACE_WITH')) {
-            setNuvioAccount({ authToken: '' });
-            nextStep();
-            return;
+        const adapter = createNuvioAdapter();
+        if (account.mode === 'create') {
+          const auth = await adapter.signup(account.email, account.password);
+          const profile = await adapter.createProfile(auth.token, {
+            name: account.profileName?.trim() || 'Profile 1',
+          });
+          if (!profile) {
+            throw new Error('Nuvio account was created, but the initial profile could not be created.');
           }
-          throw nuvioErr;
+          setNuvioAccount({
+            authToken: auth.token,
+            profileId: profile.profile_index,
+            profiles: [profile],
+          });
+        } else {
+          const auth = await adapter.login(account.email, account.password);
+          const profiles = await adapter.getProfiles(auth.token);
+          if (!profiles.length) {
+            throw new Error('Nuvio: no profiles found on this account. Create one in Nuvio first, then try again.');
+          }
+
+          const selectedProfileId = profiles.some(profile => profile.profile_index === account.profileId)
+            ? account.profileId
+            : profiles[0].profile_index;
+
+          setNuvioAccount({
+            authToken: auth.token,
+            profiles,
+            profileId: selectedProfileId,
+          });
+          return;
         }
       }
       nextStep();
@@ -72,10 +110,10 @@ export function AccountStep() {
 
   const descKey = `${target ?? 'stremio'}-${account.mode}`;
   const descriptions: Record<string, string> = {
-    'stremio-create': 'We will create a new Stremio account and install your addons automatically. You can log in later at [web.stremio.com](https://web.stremio.com).',
-    'stremio-signin': 'We will sign into your existing Stremio account and install your addons. Make sure to use the same credentials you use on the Stremio app.',
-    'nuvio-create':   'We will create a new Nuvio account. After setup, open the Nuvio app and sign in with these credentials to see your addons and collections.',
-    'nuvio-signin':   'We will sign into your existing Nuvio account to sync your addons and collections.',
+    'stremio-create': 'We will create a new Stremio account and install your addons automatically.',
+    'stremio-signin': 'We will sign into your existing Stremio account and install your addons.',
+    'nuvio-create':   'We will create a new Nuvio account, create its first profile, and install your addons automatically.',
+    'nuvio-signin':   'We will sign into your existing Nuvio account, load its profiles, and install your addons and collections into the profile you choose.',
   };
 
   const inputStyle: React.CSSProperties = {
@@ -96,15 +134,13 @@ export function AccountStep() {
         style={{ color: 'var(--muted)', fontSize: '0.875rem', marginBottom: '1.25rem', lineHeight: 1.6 }}
       />
 
-      {account.mode === 'signin' && (
-        <div className="wizard-notice" style={{ marginBottom: '1.25rem' }}>
-          <div className="wizard-notice__title">Privacy</div>
-          <div>
-            No login credentials, API keys, or setup values are collected or stored by the wizard during this process.
-            Everything runs locally in your browser.
-          </div>
+      <div className="wizard-notice" style={{ marginBottom: '1.25rem' }}>
+        <div className="wizard-notice__title">🔒 Privacy</div>
+        <div>
+          No login credentials, API keys, or setup values are collected or stored by the wizard during this process.
+          Everything runs locally in your browser.
         </div>
-      )}
+      </div>
 
       {/* Mode toggle */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
@@ -154,6 +190,39 @@ export function AccountStep() {
         />
       </label>
 
+      {isNuvio && account.mode === 'create' && (
+        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>Profile name</span>
+          <input
+            type="text"
+            value={account.profileName ?? ''}
+            onChange={e => { updateAccount({ profileName: e.target.value }); setError(''); }}
+            placeholder="Profile 1"
+            style={inputStyle}
+          />
+        </label>
+      )}
+
+      {hasLoadedNuvioProfiles && (
+        <label style={{ display: 'block', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>Profile</span>
+          <select
+            value={account.profileId ?? ''}
+            onChange={e => { setNuvioAccount({ profileId: Number(e.target.value) }); setError(''); }}
+            style={inputStyle}
+          >
+            {nuvioProfiles.map((profile) => (
+              <option key={profile.profile_index} value={profile.profile_index}>
+                {profile.name || `Profile ${profile.profile_index}`}
+              </option>
+            ))}
+          </select>
+          <p style={{ marginTop: '0.45rem', color: 'var(--muted)', fontSize: '0.78rem', lineHeight: 1.45 }}>
+            The selected Nuvio profile will have its current addons replaced and its collections updated by the wizard.
+          </p>
+        </label>
+      )}
+
       {error && (
         <div style={{
           background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px',
@@ -183,7 +252,17 @@ export function AccountStep() {
         {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
         {!loading && <ArrowRight size={16} />}
         {loading
-          ? (account.mode === 'create' ? 'Creating account...' : 'Signing in...')
+          ? (
+            account.mode === 'create'
+              ? 'Creating account...'
+              : hasLoadedNuvioProfiles
+              ? 'Continuing...'
+              : isNuvio
+              ? 'Loading profiles...'
+              : 'Signing in...'
+          )
+          : hasLoadedNuvioProfiles
+          ? 'Continue with profile'
           : 'Continue'
         }
       </button>

@@ -37,19 +37,21 @@ export function DoneStep() {
     nuvioAccount,
     stremioAccount,
     target,
+    wizardConfig,
   } = useWizard();
   const { aiostreams, aiometadata, addonPasswordSource, warnings, error } = installResult;
   const guideUrl = getGuideUrl();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const isUsingAccountPassword = addonPasswordSource === 'account';
   const accountMode = target === 'nuvio' ? nuvioAccount.mode : stremioAccount.mode;
+  const addonDetailsFilename = wizardConfig?.addonDetailsFilename ?? 'perfect-setup-addon-details.txt';
 
   const addons = useMemo(() => (
     [
       aiostreams
         ? {
             id: 'aiostreams',
-            name: 'AIOStreams',
+            name: '📚 AIOStreams',
             uuid: aiostreams.uuid,
             password: aiostreams.password,
             manifestUrl: aiostreams.manifestUrl,
@@ -59,7 +61,7 @@ export function DoneStep() {
       aiometadata
         ? {
             id: 'aiometadata',
-            name: 'AIOMetadata',
+            name: '🔎 AIOMetadata',
             uuid: aiometadata.uuid,
             password: aiometadata.password,
             manifestUrl: aiometadata.manifestUrl,
@@ -120,7 +122,7 @@ export function DoneStep() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'perfect-setup-addon-details.txt';
+    anchor.download = addonDetailsFilename;
     document.body.appendChild(anchor);
     anchor.click();
     document.body.removeChild(anchor);
@@ -162,11 +164,12 @@ export function DoneStep() {
                   color: 'var(--text)',
                   fontSize: '0.85rem',
                   lineHeight: 1.55,
+                  textAlign: 'center',
                 }}
               >
                 {isUsingAccountPassword
-                  ? `These add-ons use your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password. You can change each add-on password later from its configure page if you want.`
-                  : `Your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password was not accepted by the add-on config save, so a stronger shared add-on password was generated and used for all add-ons below.`}
+                  ? `These add-ons use your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password. You can change each add-on password later from its configuration page if you want.`
+                  : `Your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password was not accepted by the add-on configurations, so a stronger shared add-on password was generated and used for all add-ons below.`}
               </div>
 
               <button
@@ -205,41 +208,38 @@ export function DoneStep() {
                         Password: <span className="text-gray-800 select-all">{addon.password}</span>
                       </p>
                     )}
-                    <p className="text-gray-500 break-all">
-                      Configure:{' '}
-                      <a href={addon.configureUrl} target="_blank" rel="noopener noreferrer" className="guide-pill-link">
-                        <span>Open configure page</span>
+                    <p className="text-gray-500" style={{ fontFamily: "'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif" }}>
+                      <a
+                        href={addon.configureUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="guide-pill-link"
+                      >
+                        <span>Customize Addon</span>
                         <ExternalLink size={12} />
                       </a>
                     </p>
                     <p className="text-gray-500 break-all" style={{ marginTop: '0.35rem' }}>
-                      URL:{' '}
-                      <span style={{ color: 'var(--text)', fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.76rem' }}>
-                        {addon.configureUrl}
-                      </span>
-                    </p>
-                    <p className="text-gray-500 break-all" style={{ marginTop: '0.35rem' }}>
-                      Manifest:{' '}
+                      <span>Manifest: </span>
+                      <span className="text-accent select-all">{addon.manifestUrl}</span>
                       <button
                         onClick={() => handleManifestCopy(addon.id, addon.manifestUrl)}
                         type="button"
                         className="text-accent"
+                        aria-label={`Copy ${addon.name} manifest URL`}
                         style={{
                           background: 'none',
                           border: 'none',
                           padding: 0,
+                          marginLeft: '0.35rem',
                           cursor: 'pointer',
                           font: 'inherit',
-                          textAlign: 'left',
                           display: 'inline-flex',
                           alignItems: 'center',
-                          flexWrap: 'wrap',
-                          gap: '0.35rem',
-                          wordBreak: 'break-all',
+                          verticalAlign: 'middle',
                         }}
                       >
-                        <span>{addon.manifestUrl}</span>
-                        {copiedKey === addon.id ? 'Copied' : <Copy size={12} />}
+                        {copiedKey === addon.id ? <span>Copied</span> : <Copy size={12} />}
                       </button>
                     </p>
                   </div>

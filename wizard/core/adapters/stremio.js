@@ -3,6 +3,7 @@
 // (see docs/superpowers/plans/API-NOTES.md §1).
 
 const DEFAULT_ENDPOINT = 'https://api.strem.io';
+export const OFFICIAL_CINEMETA_URL = 'https://v3-cinemeta.strem.io/manifest.json';
 
 async function rpc(endpoint, method, params, authKey) {
   let res;
@@ -52,15 +53,34 @@ export function createStremioAdapter(endpoint = DEFAULT_ENDPOINT) {
   };
 }
 
+function inferTransportName(transportUrl) {
+  return /^https?:\/\//i.test(String(transportUrl || '')) ? 'http' : '';
+}
+
+function findAddon(existing, matcher) {
+  return existing.find((addon) => matcher(addon?.transportUrl || '', addon?.manifest?.id || '', addon?.manifest?.name || ''));
+}
+
+function findCinemetaAddon(existing) {
+  return findAddon(existing, (transportUrl, manifestId, manifestName) =>
+    transportUrl.includes('cinemeta')
+    || manifestId.includes('cinemeta')
+    || manifestName.toLowerCase() === 'cinemeta'
+  );
+}
+
+function findLocalFilesAddon(existing) {
+  return findAddon(existing, (transportUrl, manifestId) =>
+    transportUrl.includes('local') || manifestId.includes('org.stremio.local')
+  );
+}
+
 // Build an ordered addon descriptor list for the Perfect Setup.
 // `existing` is the current collection (to preserve Cinemeta/Local Files manifests + apply patches).
 // `manifests` = { aiometadata, aiostreams, watchly? } -> resolved manifest objects or URLs.
 export function buildAddonCollection(existing, manifests, opts = {}) {
-  const find = (idOrUrl) =>
-    existing.find((a) => a.transportUrl?.includes(idOrUrl) || a.manifest?.id?.includes(idOrUrl));
-
-  const cinemeta = find('cinemeta') || find('com.linvo.cinemeta');
-  const localFiles = find('local') || find('org.stremio.local');
+  const cinemeta = opts.cinemetaDescriptor || findCinemetaAddon(existing);
+  const localFiles = findLocalFilesAddon(existing);
 
   // Optionally patch Cinemeta (remove search/catalogs/metadata)
   // See docs/superpowers/plans/API-NOTES.md §1 for the verified shape.
@@ -78,8 +98,63 @@ export function buildAddonCollection(existing, manifests, opts = {}) {
 }
 
 function toDescriptor(m) {
-  if (typeof m === 'string') return { transportUrl: m, transportName: '', manifest: undefined, flags: {} };
+  if (typeof m === 'string') {
+    return {
+      transportUrl: m,
+      transportName: inferTransportName(m),
+      manifest: undefined,
+      flags: {},
+    };
+  }
   return m; // already a descriptor
+}
+
+export async function fetchAddonDescriptor(transportUrl, fetchImpl = fetch, baseDescriptor = {}) {
+  let res;
+  try {
+    res = await fetchImpl(transportUrl);
+  } catch (err) {
+    throw new Error(`Could not fetch add-on manifest from ${transportUrl}: ${err?.message || err}`);
+  }
+
+  if (!res.ok) {
+    throw new Error(`Could not fetch add-on manifest from ${transportUrl}: HTTP ${res.status}`);
+  }
+
+  let manifest;
+  try {
+    manifest = await res.json();
+  } catch (err) {
+    throw new Error(`Add-on manifest at ${transportUrl} did not return valid JSON: ${err?.message || err}`);
+  }
+
+  return {
+    transportUrl,
+    transportName: inferTransportName(transportUrl),
+    flags: {},
+    ...baseDescriptor,
+    manifest,
+  };
+}
+
+export async function hydrateAddonCollection(addons, fetchImpl = fetch) {
+  return Promise.all(addons.map(async (addon) => {
+    if (!addon?.transportUrl || addon.manifest) return addon;
+    return fetchAddonDescriptor(addon.transportUrl, fetchImpl, addon);
+  }));
+}
+
+export async function resolveCinemetaDescriptor(existing = [], fetchImpl = fetch) {
+  const existingCinemeta = findCinemetaAddon(existing);
+
+  try {
+    return await fetchAddonDescriptor(OFFICIAL_CINEMETA_URL, fetchImpl, {
+      flags: existingCinemeta?.flags || { official: true, protected: true },
+    });
+  } catch (err) {
+    if (existingCinemeta) return structuredClone(existingCinemeta);
+    throw new Error(`Could not fetch the official Cinemeta manifest to apply the built-in patches: ${err?.message || err}`);
+  }
 }
 
 // Reproduce Cinebye's three patches by trimming Cinemeta's advertised resources.

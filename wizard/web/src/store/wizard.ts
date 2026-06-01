@@ -5,10 +5,21 @@ import type { AioSection } from '../lib/aioSections';
 export type Target = 'stremio' | 'nuvio';
 export type AccountMode = 'create' | 'signin';
 
+export interface NuvioProfileOption {
+  profile_index: number;
+  name: string;
+  avatar_color_hex?: string | null;
+  uses_primary_addons?: boolean;
+  uses_primary_plugins?: boolean;
+}
+
 export interface AccountInfo {
   mode: AccountMode;
   email: string;
   password: string;
+  profileName?: string;
+  profileId?: number;
+  profiles?: NuvioProfileOption[];
   /** Set after successful early auth on AccountStep */
   authKey?: string;   // Stremio authKey
   authToken?: string; // Nuvio access_token
@@ -56,7 +67,7 @@ interface WizardState {
   aiometadataInstance: string;
   catalogSelection: CatalogSelection;
   installResult: InstallResult;
-  templates: { aiostreams: unknown; aiometadata: unknown; collections: unknown[] } | null;
+  templates: { aiostreams: unknown; aiometadata: unknown; collections: unknown[]; nuvioSettings: unknown } | null;
   /** Computed from template when loaded; drives dynamic step count */
   aioSections: AioSection[];
   /** Runtime config loaded from config.json at startup */
@@ -86,7 +97,7 @@ export const useWizard = create<WizardState>((set) => ({
   maxReachedStep: 0,
   target: null,
   stremioAccount: { mode: 'create', email: '', password: '' },
-  nuvioAccount:   { mode: 'create', email: '', password: '' },
+  nuvioAccount:   { mode: 'create', email: '', password: '', profileName: 'Profile 1', profiles: [] },
   credentials: {
     debridServices: [],
     tmdbApiKey: '', tmdbAccessToken: '', tvdbApiKey: '',

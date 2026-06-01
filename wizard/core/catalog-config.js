@@ -39,7 +39,7 @@ export function deriveCategoryKey(name) {
  * Each entry: { key, label, count, catalogs: catalog[] }
  * Labels sourced from nuvio-collections group titles where possible.
  * @param {object[]} catalogs    AIOMetadata catalog array
- * @param {object[]} collections nuvio-collections.json groups array
+ * @param {object[]} collections Nuvio-Collections.json groups array
  */
 export function deriveCategories(catalogs, collections) {
   // Build emoji → human label from nuvio-collections group titles

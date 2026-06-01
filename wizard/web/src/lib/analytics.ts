@@ -1,4 +1,12 @@
 import type { AioSection } from './aioSections';
+import {
+  ACTIVE_KEY_SCREENS,
+  AIO_SECTION_START_STEP,
+  KEY_SCREEN_START_STEP,
+  getCatalogStep,
+  getDoneStep,
+  getInstallStep,
+} from './keyScreens';
 
 const MEASUREMENT_ID = (typeof __GUIDE_GA4_ID__ === 'string' ? __GUIDE_GA4_ID__ : '').trim();
 
@@ -110,13 +118,13 @@ export function trackWizardCompletion(payload: CompletionPayload) {
 export function getStepMeta(step: number, aioSections: AioSection[]): StepMeta | null {
   if (step === 0) return { index: 0, slug: 'welcome', name: 'Welcome' };
   if (step === 1) return { index: 1, slug: 'account', name: 'Account Setup' };
-  if (step === 2) return { index: 2, slug: 'debrid-service', name: 'Debrid Service' };
-  if (step === 3) return { index: 3, slug: 'tmdb-keys', name: 'TMDB API Keys' };
-  if (step === 4) return { index: 4, slug: 'tvdb-key', name: 'TVDB API Key' };
-  if (step === 5) return { index: 5, slug: 'gemini-key', name: 'Gemini AI Key' };
-  if (step === 6) return { index: 6, slug: 'rpdb-key', name: 'RPDB Poster Ratings' };
+  if (step >= KEY_SCREEN_START_STEP && step < KEY_SCREEN_START_STEP + ACTIVE_KEY_SCREENS.length) {
+    const screen = ACTIVE_KEY_SCREENS[step - KEY_SCREEN_START_STEP];
+    if (!screen) return null;
+    return { index: step, slug: screen.slug, name: screen.analyticsName };
+  }
 
-  const sectionIndex = step - 7;
+  const sectionIndex = step - AIO_SECTION_START_STEP;
   if (sectionIndex >= 0 && sectionIndex < aioSections.length) {
     const section = aioSections[sectionIndex];
     return {
@@ -126,13 +134,13 @@ export function getStepMeta(step: number, aioSections: AioSection[]): StepMeta |
     };
   }
 
-  if (step === 7 + aioSections.length) {
+  if (step === getCatalogStep(aioSections.length)) {
     return { index: step, slug: 'catalogs', name: 'Catalogs' };
   }
-  if (step === 8 + aioSections.length) {
+  if (step === getInstallStep(aioSections.length)) {
     return { index: step, slug: 'install', name: 'Install' };
   }
-  if (step === 9 + aioSections.length) {
+  if (step === getDoneStep(aioSections.length)) {
     return { index: step, slug: 'done', name: 'Done' };
   }
 

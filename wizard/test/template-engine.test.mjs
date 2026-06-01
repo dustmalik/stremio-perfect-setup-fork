@@ -26,6 +26,8 @@ console.log('\n# expression evaluator');
   ok('inputs.anime bool', evalExpr('inputs.anime', c({ anime: true }, [])) === true);
   ok('and/!= combo', evalExpr('services and inputs.httpAddons != only', c({ httpAddons: 'add' }, ['rd'])) === true);
   ok('and/!= combo false', evalExpr('services and inputs.httpAddons != only', c({ httpAddons: 'only' }, ['rd'])) === false);
+  ok('services.torbox matches selected service', evalExpr('services.torbox', c({}, ['torbox', 'rd'])) === true);
+  ok('services.torbox false when not selected', evalExpr('services.torbox', c({}, ['rd'])) === false);
   ok('or with ==', evalExpr('services or inputs.httpAddons == only', c({ httpAddons: 'only' }, [])) === true);
   ok('parentheses', evalExpr('(services or inputs.anime) and !inputs.debridio', c({ anime: true, debridio: false }, [])) === true);
   eq('switchKey services empty -> ""', switchKey('services', c({}, [])), '');
@@ -62,6 +64,7 @@ console.log('\n# full template resolution: P2P (no services)');
   ok('requiredLanguages flattened English + appendices', Array.isArray(rl) && rl.includes('English') && rl.includes('Original') && rl.includes('Unknown'));
   ok('timeout substituted as number somewhere', JSON.stringify(cfg).includes('5000') && !JSON.stringify(cfg).includes('"{{inputs.timeout}}"'));
   ok('services all disabled when none selected', Array.isArray(cfg.services) && cfg.services.every((s) => s.enabled === false));
+  ok('TB Search omitted when TorBox is not selected', !cfg.presets.some((preset) => preset.type === 'torbox-search'));
 }
 
 console.log('\n# full template resolution: Debrid (torbox) + formatter color + filename');
@@ -72,6 +75,7 @@ console.log('\n# full template resolution: Debrid (torbox) + formatter color + f
     credentials: { tmdbApiKey: 'K', tmdbAccessToken: 'A', tvdbApiKey: 'V' },
   });
   ok('torbox enabled', cfg.services.some((s) => s.id === 'torbox' && s.enabled === true));
+  ok('TB Search included when TorBox is selected', cfg.presets.some((preset) => preset.type === 'torbox-search'));
   ok('formatter color chosen', cfg.formatter && cfg.formatter.id === 'custom');
   ok('requiredLanguages dropped when languagesRequired=false', cfg.requiredLanguages === undefined || cfg.requiredLanguages === null);
   ok('formatter retain would remove, not here', cfg.formatter !== undefined);

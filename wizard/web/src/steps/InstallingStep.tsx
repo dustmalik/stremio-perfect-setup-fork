@@ -21,6 +21,7 @@ const STEP_LABELS: Record<string, string> = {
   aiometadata: 'AIOMetadata configuration saved',
   addons:      'Add-ons installed',
   collections: 'Collections installed',
+  settings:    'Settings updated',
   install:     'Add-ons applied to your account',
 };
 
@@ -119,11 +120,14 @@ export function InstallingStep() {
           detail = d?.created
             ? `New account created for ${d.email ?? ''}.`
             : `Signed in as ${d.email ?? ''}.`;
+        } else if (name === 'profile') {
+          const d = data as { profileIndex?: number; profileName?: string };
+          detail = d?.profileName
+            ? `${d.profileName} (Profile ${d.profileIndex ?? ''}).`
+            : `Profile ${d?.profileIndex ?? ''}.`;
         } else if (name === 'aiostreams') {
-          const d = data as { instance?: string; fallbacks?: string[] };
-          detail = `Saved on ${d?.instance ?? ''}`;
-          if (d?.fallbacks?.length) detail += ` (+ ${d.fallbacks.length} backup instance${d.fallbacks.length > 1 ? 's' : ''})`;
-          detail += '.';
+          const d = data as { instance?: string };
+          detail = `Saved on ${d?.instance ?? ''}.`;
         } else if (name === 'aiometadata') {
           const d = data as { instance?: string };
           detail = `Saved on ${d?.instance ?? ''}.`;
@@ -131,11 +135,21 @@ export function InstallingStep() {
           const d = data as { count?: number };
           detail = `${d?.count ?? 0} add-on${(d?.count ?? 0) !== 1 ? 's' : ''} in your collection.`;
         } else if (name === 'addons') {
-          const d = data as { count?: number };
-          detail = `${d?.count ?? 0} add-on${(d?.count ?? 0) !== 1 ? 's' : ''} pushed to your Nuvio account.`;
+          const d = data as { count?: number; profileName?: string; profileIndex?: number };
+          const profileLabel = d?.profileName
+            ? ` for ${d.profileName} (Profile ${d.profileIndex ?? ''})`
+            : '';
+          detail = `${d?.count ?? 0} add-on${(d?.count ?? 0) !== 1 ? 's' : ''} pushed to your Nuvio account${profileLabel}.`;
         } else if (name === 'collections') {
           const d = data as { groupCount?: number };
           detail = `${d?.groupCount ?? 0} collection group${(d?.groupCount ?? 0) !== 1 ? 's' : ''} configured.`;
+        } else if (name === 'settings') {
+          const d = data as { appliedPlatforms?: string[]; skippedPlatforms?: string[] };
+          const applied = Array.isArray(d?.appliedPlatforms) ? d.appliedPlatforms.join(', ') : '';
+          const skipped = Array.isArray(d?.skippedPlatforms) && d.skippedPlatforms.length
+            ? ` Skipped: ${d.skippedPlatforms.join(', ')}.`
+            : '';
+          detail = applied ? `Applied to ${applied}.${skipped}` : skipped.trim();
         }
 
         push(`${label}${detail ? ': ' + detail : ''}`, 'success');
@@ -155,7 +169,10 @@ export function InstallingStep() {
       const account = target === 'stremio' ? stremioAccount : nuvioAccount;
       const setupFn = target === 'stremio' ? runStremioSetup : runNuvioSetup;
       const extraParams = target === 'nuvio'
-        ? { collectionsJson: templates.collections as object[] }
+        ? {
+            collectionsJson: templates.collections as object[],
+            nuvioSettingsTemplate: templates.nuvioSettings as Record<string, unknown>,
+          }
         : {};
 
       push(`Connecting to your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account…`);

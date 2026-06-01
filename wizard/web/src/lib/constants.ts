@@ -2,6 +2,7 @@
 export interface WizardConfig {
   target?: 'stremio' | 'nuvio';
   account?: { mode: 'create' | 'signin' };
+  addonDetailsFilename?: string;
   instances: {
     aiostreams: string[];
     aiometadata: string[];
@@ -12,6 +13,7 @@ export interface WizardConfig {
     aiometadata_stremio?: string;
     aiometadata_nuvio?: string;
     collections?: string;
+    nuvio_settings?: string;
   };
   /** Optional CORS proxy base URL (e.g. "https://proxy.numb3rs.stream"). Prefixed to AIOStreams API calls. */
   proxyBase?: string;
@@ -28,7 +30,8 @@ export const TEMPLATE_URLS = {
   aiostreams:           'https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams.json',
   aiometadataStremio:   'https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata.json',
   aiometadataNuvio:     'https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All.json',
-  collections:          'https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/collections/nuvio-collections.json',
+  collections:          'https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Collections.json',
+  nuvioSettings:        'https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Settings.json',
 } as const;
 
 export const RPDB_FREE_KEY = 't0-free-rpdb';

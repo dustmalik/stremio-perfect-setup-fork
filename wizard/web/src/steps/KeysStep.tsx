@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
@@ -5,50 +6,20 @@ import { MarkdownText } from '../components/MarkdownText';
 import { useWizard } from '../store/wizard';
 import { RPDB_FREE_KEY } from '../lib/constants';
 import { getGuideAccountsUrl } from '../lib/site';
-
-interface KeyScreen {
-  id: 'tmdb' | 'tvdb' | 'gemini' | 'rpdb';
-  title: string;
-  description: string;
-  instruction: string;
-  optional?: boolean;
-}
-
-const KEY_SCREENS: KeyScreen[] = [
-  {
-    id: 'tmdb',
-    title: '🎬 TMDB API Keys',
-    description: 'The Movie Database (TMDB) powers the metadata, posters, and catalog content in AIOMetadata. Without these keys, the catalog addon cannot display movie and TV show information.\n\nYou need **two separate credentials** from your TMDB account.',
-    instruction: 'Go to [themoviedb.org](https://www.themoviedb.org) and log in. Navigate to **Settings** (profile icon top-right) then **API**. Copy both the short **API Key** and the long **API Read Access Token**.',
-  },
-  {
-    id: 'tvdb',
-    title: '📺 TVDB API Key (Optional)',
-    description: 'TheTVDB provides enhanced metadata for TV series, especially for episodic content. This is optional but recommended if you watch a lot of TV shows, as it improves episode data accuracy and series information.',
-    instruction: 'Go to [thetvdb.com](https://www.thetvdb.com) and log in. Navigate to your **Dashboard** (profile menu), then **API Keys**, and create a new key.',
-    optional: true,
-  },
-  {
-    id: 'gemini',
-    title: '✨ Gemini AI Key (Optional)',
-    description: 'A Google Gemini API key enables AI-powered plot descriptions and summaries in AIOMetadata. This is entirely optional - without it, standard TMDB descriptions are used instead.\n\nGemini has a generous free tier so you can use it at no cost.',
-    instruction: 'Go to [aistudio.google.com](https://aistudio.google.com) and sign in with your Google account. Click **Get API Key**, then **Create API key in new project**. Copy the generated key.',
-    optional: true,
-  },
-  {
-    id: 'rpdb',
-    title: '⭐ RPDB Poster Ratings',
-    description: 'Rating Poster DB (RPDB) adds IMDb and Rotten Tomatoes rating overlays directly onto movie and show posters, making it easy to see review scores at a glance without opening each title.\n\nA **free tier key is already pre-filled** - no account or sign-up required. You can upgrade to a premium key at [ratingposterdb.com](https://www.ratingposterdb.com) for higher resolution overlays.',
-    instruction: 'The free key is already pre-filled below. Leave it as-is to use the free tier. Replace it with your premium key from [ratingposterdb.com](https://www.ratingposterdb.com) if you have one.',
-    optional: true,
-  },
-];
+import { ACTIVE_KEY_SCREENS } from '../lib/keyScreens';
+import { DEBRID_SERVICES, resolveLogoUrl } from '../lib/services';
 
 interface Props { keyIndex: number; }
 
 export function KeysStep({ keyIndex }: Props) {
-  const screen = KEY_SCREENS[keyIndex];
-  const { credentials, setCredentials, nextStep } = useWizard();
+  const screen = ACTIVE_KEY_SCREENS[keyIndex];
+  const {
+    credentials,
+    setCredentials,
+    toggleDebridService,
+    setDebridApiKey,
+    nextStep,
+  } = useWizard();
   const guideAccountsUrl = getGuideAccountsUrl();
 
   if (!screen) { nextStep(); return null; }
@@ -56,11 +27,17 @@ export function KeysStep({ keyIndex }: Props) {
   const isRequired = !screen.optional;
   const canContinue = !isRequired || (
     screen.id === 'tmdb'
-      ? credentials.tmdbApiKey.length > 10 && credentials.tmdbAccessToken.length > 20
-      : true
+      ? credentials.tmdbApiKey.trim().length > 10 && credentials.tmdbAccessToken.trim().length > 20
+      : screen.id === 'tvdb'
+        ? credentials.tvdbApiKey.trim().length > 0
+        : true
   );
+  const nextLabel = screen.id === 'debrid' && credentials.debridServices.length === 0
+    ? 'Skip - Use P2P/HTTP only'
+    : undefined;
+  const showSkipButton = screen.optional && screen.id !== 'debrid';
 
-  const inputStyle: React.CSSProperties = {
+  const inputStyle: CSSProperties = {
     width: '100%', border: '1px solid var(--border)', borderRadius: '8px',
     padding: '0.5rem 0.75rem', fontSize: '0.875rem',
     background: 'var(--panel)', color: 'var(--text)', outline: 'none', boxSizing: 'border-box',
@@ -76,17 +53,6 @@ export function KeysStep({ keyIndex }: Props) {
         style={{ color: 'var(--muted)', fontSize: '0.875rem', marginBottom: '1rem', lineHeight: 1.65 }}
       />
 
-      <div className="wizard-notice" style={{ marginBottom: '1rem' }}>
-        <div className="wizard-notice__title">Detailed instructions</div>
-        <div>
-          If you want the longer walkthrough with screenshots and service-specific notes, use the guide’s account setup chapter.
-          {' '}
-          <a href={guideAccountsUrl} target="_blank" rel="noopener noreferrer" className="guide-pill-link">
-            Open guide account setup
-          </a>
-        </div>
-      </div>
-
       <div style={{
         background: 'var(--panel-2)', border: '1px solid var(--border)',
         borderRadius: '10px', padding: '0.75rem 1rem', marginBottom: '1.25rem', fontSize: '0.875rem',
@@ -94,6 +60,84 @@ export function KeysStep({ keyIndex }: Props) {
         <div style={{ fontWeight: 600, color: 'var(--text)', marginBottom: '0.35rem' }}>👉 How to get it:</div>
         <MarkdownText text={screen.instruction} style={{ color: 'var(--muted)' }} />
       </div>
+
+      <div className="wizard-notice" style={{ marginBottom: '1rem' }}>
+        <div className="wizard-notice__title">ℹ️ Detailed Instructions</div>
+        <div>
+          For a longer walkthrough with screenshots and service-specific notes, go to
+          {' '}
+          <a href={guideAccountsUrl} target="_blank" rel="noopener noreferrer" className="guide-pill-link">
+            📝 Accounts Preparation
+          </a>
+        </div>
+      </div>
+
+      {screen.id === 'debrid' && (
+        <>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
+            Select services (you can pick multiple)
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(118px, 1fr))', gap: '0.5rem', marginBottom: '1rem' }}>
+            {DEBRID_SERVICES.map((service) => {
+              const selected = credentials.debridServices.some(d => d.id === service.id);
+              const logoUrl = resolveLogoUrl(service.logo);
+              return (
+                <button
+                  key={service.id}
+                  type="button"
+                  onClick={() => toggleDebridService(service.id)}
+                  style={{
+                    padding: '0.6rem 0.4rem',
+                    border: `2px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
+                    borderRadius: '10px',
+                    background: selected ? 'var(--panel-2)' : 'var(--panel)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  {logoUrl ? (
+                    <img src={logoUrl} alt={service.name} style={{ height: '24px', width: '100%', objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ fontWeight: 700, fontSize: '0.75rem', color: 'var(--muted)' }}>{service.name[0]}</span>
+                  )}
+                  <span style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--text)', textAlign: 'center', lineHeight: 1.2 }}>
+                    {service.name}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {credentials.debridServices.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '0.5rem' }}>
+              <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                API Keys
+              </p>
+              {credentials.debridServices.map((debridService) => {
+                const service = DEBRID_SERVICES.find(candidate => candidate.id === debridService.id);
+                return (
+                  <label key={debridService.id} style={{ display: 'block' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
+                      {service?.name} API Key
+                    </span>
+                    <input
+                      type="password"
+                      value={debridService.apiKey}
+                      onChange={e => setDebridApiKey(debridService.id, e.target.value)}
+                      placeholder={`Paste your ${service?.name} API key...`}
+                      style={{ ...inputStyle, marginTop: '0.35rem' }}
+                    />
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
 
       {screen.id === 'tmdb' && (
         <>
@@ -117,7 +161,7 @@ export function KeysStep({ keyIndex }: Props) {
               type="password"
               value={credentials.tmdbAccessToken}
               onChange={e => setCredentials({ tmdbAccessToken: e.target.value })}
-              placeholder="Paste your long JWT token (eyJh...) here..."
+              placeholder="Paste your long Read Access Token here..."
               style={{ ...inputStyle, marginTop: '0.35rem' }}
             />
           </label>
@@ -125,38 +169,54 @@ export function KeysStep({ keyIndex }: Props) {
       )}
 
       {screen.id === 'tvdb' && (
-        <input
-          type="password"
-          value={credentials.tvdbApiKey}
-          onChange={e => setCredentials({ tvdbApiKey: e.target.value })}
-          placeholder="Paste your TVDB API key..."
-          style={inputStyle}
-        />
+        <label style={{ display: 'block' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
+            API Key <span style={{ color: '#e53e3e' }}>*</span>
+          </span>
+          <input
+            type="password"
+            value={credentials.tvdbApiKey}
+            onChange={e => setCredentials({ tvdbApiKey: e.target.value })}
+            placeholder="Paste your TVDB API key..."
+            style={{ ...inputStyle, marginTop: '0.35rem' }}
+          />
+        </label>
       )}
 
       {screen.id === 'gemini' && (
-        <input
-          type="password"
-          value={credentials.geminiApiKey}
-          onChange={e => setCredentials({ geminiApiKey: e.target.value })}
-          placeholder="Paste your Gemini API key..."
-          style={inputStyle}
-        />
+        <label style={{ display: 'block' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
+            API Key
+          </span>
+          <input
+            type="password"
+            value={credentials.geminiApiKey}
+            onChange={e => setCredentials({ geminiApiKey: e.target.value })}
+            placeholder="Paste your Gemini API key..."
+            style={{ ...inputStyle, marginTop: '0.35rem' }}
+          />
+        </label>
       )}
 
       {screen.id === 'rpdb' && (
-        <input
-          type="text"
-          value={credentials.rpdbApiKey}
-          onChange={e => setCredentials({ rpdbApiKey: e.target.value })}
-          placeholder={RPDB_FREE_KEY}
-          style={{ ...inputStyle, fontFamily: "'IBM Plex Mono', monospace" }}
-        />
+        <label style={{ display: 'block' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
+            API Key
+          </span>
+          <input
+            type="text"
+            value={credentials.rpdbApiKey}
+            onChange={e => setCredentials({ rpdbApiKey: e.target.value })}
+            placeholder={RPDB_FREE_KEY}
+            style={{ ...inputStyle, marginTop: '0.35rem', fontFamily: "'IBM Plex Mono', monospace" }}
+          />
+        </label>
       )}
 
-      <NextButton onClick={nextStep} disabled={!canContinue} />
-      {screen.optional && (
+      <NextButton onClick={nextStep} disabled={!canContinue} label={nextLabel} />
+      {showSkipButton && (
         <button
+          type="button"
           onClick={nextStep}
           style={{
             width: '100%',

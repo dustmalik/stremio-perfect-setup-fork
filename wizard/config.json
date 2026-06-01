@@ -2,6 +2,7 @@
   "$comment": "Parameterized config for the Perfect Setup wizard. API keys/passwords are never stored here, they are collected at runtime in the wizard.",
   "target": "stremio",
   "account": { "mode": "create" },
+  "addonDetailsFilename": "MyPerfectSetupAddons.txt",
 
   "instances": {
     "aiostreams": [
@@ -19,7 +20,8 @@
     "aiostreams": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOStreams.json",
     "aiometadata_stremio": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata.json",
     "aiometadata_nuvio": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/AIOMetadata-All.json",
-    "collections": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/collections/nuvio-collections.json"
+    "collections": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Collections.json",
+    "nuvio_settings": "https://raw.githubusercontent.com/luckynumb3rs/stremio-perfect-setup/refs/heads/main/templates/Nuvio-Settings.json"
   },
 
   "proxyBase": "https://proxy.numb3rs.stream"
