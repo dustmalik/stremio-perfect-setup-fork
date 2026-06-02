@@ -15,11 +15,11 @@ No tracked wizard-specific releases yet.
 
 ## 🖥️ Hosting
 
-No tracked wizard-specific releases yet.
+No tracked hosting-specific releases yet.
 
 ## 🍿 Collections
 
-No tracked wizard-specific releases yet.
+No tracked collections-specific releases yet.
 
 ## 📚 AIOStreams
 
