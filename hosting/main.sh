@@ -493,6 +493,11 @@ run_module_hooks() {
   local hook_modules=()
   local hook_title="" hook_target=""
   local hooks_file=""
+  local hooks_interactive=0
+
+  if is_interactive && tty_device_available; then
+    hooks_interactive=1
+  fi
 
   hooks_file="$(mktemp "${WORK_ROOT_ABS}/hook-order.XXXXXX")"
 
@@ -532,7 +537,7 @@ run_module_hooks() {
     section "${hook_title}"
     log "Running $(basename "${script_path}") for ${hook_target}"
 
-    run_module_hook_script "${script_path}" env \
+    run_module_hook_script "${script_path}" "${hooks_interactive}" env \
       HOSTING_TEMPLATE_DIR="${TEMPLATE_DIR_ABS}" \
       HOSTING_CONFIG_DIR="${CONFIG_DIR_ABS}" \
       HOSTING_MANIFEST_FILE="${MANIFEST_FILE}" \
@@ -549,10 +554,11 @@ run_module_hooks() {
 
 run_module_hook_script() {
   local script_path="$1"
+  local interactive_mode="${2:-0}"
 
-  shift
+  shift 2
 
-  if is_interactive && tty_device_available; then
+  if [[ "${interactive_mode}" == "1" ]] && tty_device_available; then
     "$@" "${script_path}" </dev/tty
   else
     "$@" "${script_path}"
