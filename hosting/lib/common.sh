@@ -27,6 +27,7 @@ fi
 HOSTING_COMMON_LOADED=1
 
 declare -a HOSTING_CLEANUP_PATHS=()
+declare -a HOSTING_WHIPTAIL_ARGS=()
 HOSTING_COLOR_ENABLED=0
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   HOSTING_COLOR_ENABLED=1
@@ -133,12 +134,294 @@ dialog_ui_available() {
   is_interactive && tty_device_available && command -v whiptail >/dev/null 2>&1
 }
 
+dialog_text_has_prefix_icon() {
+  local value="${1:-}"
+
+  [[ -n "${value}" && "${value}" != [[:alnum:]]* ]]
+}
+
+dialog_title_icon() {
+  local title="${1:-}"
+  local lower_title="${title,,}"
+
+  case "${lower_title}" in
+    *validation*|*invalid*|*error*|*warning*)
+      printf '⚠️'
+      ;;
+    *confirm*|*question*)
+      printf '❓'
+      ;;
+    *secret*|*password*)
+      printf '🔐'
+      ;;
+    *input*)
+      printf '✍️'
+      ;;
+    *ssh*|*key*)
+      printf '🔑'
+      ;;
+    *docker*)
+      printf '🐳'
+      ;;
+    *module*)
+      printf '🧩'
+      ;;
+    *authelia*|*auth*)
+      printf '🛡️'
+      ;;
+    *cloudflare*)
+      printf '☁️'
+      ;;
+    *supabase*|*database*)
+      printf '🗄️'
+      ;;
+    *domain*|*hostname*|*dns*)
+      printf '🌐'
+      ;;
+    *environment*|*config*)
+      printf '⚙️'
+      ;;
+    *backup*)
+      printf '💾'
+      ;;
+    *deploy*)
+      printf '🚀'
+      ;;
+    *)
+      printf '🖥️'
+      ;;
+  esac
+}
+
+dialog_decorate_title() {
+  local title="${1:-}"
+
+  [[ -n "${title}" ]] || {
+    printf '🖥️  Hosting Perfect Setup'
+    return 0
+  }
+
+  if dialog_text_has_prefix_icon "${title}"; then
+    printf '%s' "${title}"
+    return 0
+  fi
+
+  printf '%s  %s' "$(dialog_title_icon "${title}")" "${title}"
+}
+
+dialog_default_title() {
+  local dialog_type="${1:-}"
+
+  case "${dialog_type}" in
+    --yesno)
+      printf 'Confirmation'
+      ;;
+    --inputbox)
+      printf 'Input Required'
+      ;;
+    --passwordbox)
+      printf 'Secret Required'
+      ;;
+    --menu|--radiolist)
+      printf 'Selection Required'
+      ;;
+    --checklist)
+      printf 'Module Selection'
+      ;;
+    --msgbox|--textbox|--infobox)
+      printf 'Information'
+      ;;
+    *)
+      printf 'Hosting Perfect Setup'
+      ;;
+  esac
+}
+
+dialog_button_icon() {
+  local button_kind="${1:-}"
+
+  case "${button_kind}" in
+    yes|ok)
+      printf '✅'
+      ;;
+    no|cancel)
+      printf '❌'
+      ;;
+    *)
+      printf '✨'
+      ;;
+  esac
+}
+
+dialog_default_button_label() {
+  local button_kind="${1:-}"
+  local dialog_type="${2:-}"
+
+  case "${button_kind}" in
+    yes)
+      printf 'Yes'
+      ;;
+    no)
+      printf 'No'
+      ;;
+    cancel)
+      printf 'Cancel'
+      ;;
+    ok)
+      case "${dialog_type}" in
+        --inputbox|--passwordbox)
+          printf 'Continue'
+          ;;
+        --menu|--radiolist)
+          printf 'Select'
+          ;;
+        --checklist)
+          printf 'Confirm'
+          ;;
+        *)
+          printf 'OK'
+          ;;
+      esac
+      ;;
+    *)
+      printf 'OK'
+      ;;
+  esac
+}
+
+dialog_decorate_button_label() {
+  local button_kind="${1:-}"
+  local label="${2:-}"
+  local dialog_type="${3:-}"
+
+  if [[ -z "${label}" ]]; then
+    label="$(dialog_default_button_label "${button_kind}" "${dialog_type}")"
+  fi
+
+  if dialog_text_has_prefix_icon "${label}"; then
+    printf '%s' "${label}"
+    return 0
+  fi
+
+  printf '%s %s' "$(dialog_button_icon "${button_kind}")" "${label}"
+}
+
+prepare_whiptail_args() {
+  local dialog_type=""
+  local arg=""
+  local value=""
+  local seen_dialog=0
+  local have_title=0
+  local have_ok_button=0
+  local have_cancel_button=0
+  local have_yes_button=0
+  local have_no_button=0
+  local disable_cancel=0
+  local before_dialog=()
+  local after_dialog=()
+
+  while (( $# > 0 )); do
+    arg="$1"
+    shift
+
+    case "${arg}" in
+      --title|--ok-button|--cancel-button|--yes-button|--no-button)
+        (( $# > 0 )) || die "Missing value for ${arg}"
+        value="$1"
+        shift
+        case "${arg}" in
+          --title)
+            have_title=1
+            value="$(dialog_decorate_title "${value}")"
+            ;;
+          --ok-button)
+            have_ok_button=1
+            value="$(dialog_decorate_button_label ok "${value}" "${dialog_type}")"
+            ;;
+          --cancel-button)
+            have_cancel_button=1
+            value="$(dialog_decorate_button_label cancel "${value}" "${dialog_type}")"
+            ;;
+          --yes-button)
+            have_yes_button=1
+            value="$(dialog_decorate_button_label yes "${value}" "${dialog_type}")"
+            ;;
+          --no-button)
+            have_no_button=1
+            value="$(dialog_decorate_button_label no "${value}" "${dialog_type}")"
+            ;;
+        esac
+
+        if (( seen_dialog )); then
+          after_dialog+=("${arg}" "${value}")
+        else
+          before_dialog+=("${arg}" "${value}")
+        fi
+        ;;
+      --nocancel)
+        disable_cancel=1
+        if (( seen_dialog )); then
+          after_dialog+=("${arg}")
+        else
+          before_dialog+=("${arg}")
+        fi
+        ;;
+      --yesno|--msgbox|--inputbox|--passwordbox|--menu|--checklist|--radiolist|--textbox|--infobox)
+        [[ -n "${dialog_type}" ]] || dialog_type="${arg}"
+        seen_dialog=1
+        after_dialog+=("${arg}")
+        ;;
+      *)
+        if (( seen_dialog )); then
+          after_dialog+=("${arg}")
+        else
+          before_dialog+=("${arg}")
+        fi
+        ;;
+    esac
+  done
+
+  if [[ -n "${dialog_type}" ]]; then
+    if (( ! have_title )); then
+      before_dialog+=(--title "$(dialog_decorate_title "$(dialog_default_title "${dialog_type}")")")
+    fi
+
+    case "${dialog_type}" in
+      --yesno)
+        if (( ! have_yes_button )); then
+          before_dialog+=(--yes-button "$(dialog_decorate_button_label yes "" "${dialog_type}")")
+        fi
+        if (( ! have_no_button )); then
+          before_dialog+=(--no-button "$(dialog_decorate_button_label no "" "${dialog_type}")")
+        fi
+        ;;
+      --msgbox)
+        if (( ! have_ok_button )); then
+          before_dialog+=(--ok-button "$(dialog_decorate_button_label ok "" "${dialog_type}")")
+        fi
+        ;;
+      --inputbox|--passwordbox|--menu|--checklist|--radiolist)
+        if (( ! have_ok_button )); then
+          before_dialog+=(--ok-button "$(dialog_decorate_button_label ok "" "${dialog_type}")")
+        fi
+        if (( ! have_cancel_button && ! disable_cancel )); then
+          before_dialog+=(--cancel-button "$(dialog_decorate_button_label cancel "" "${dialog_type}")")
+        fi
+        ;;
+    esac
+  fi
+
+  HOSTING_WHIPTAIL_ARGS=("${before_dialog[@]}" "${after_dialog[@]}")
+}
+
 whiptail_on_tty() {
-  whiptail "$@" </dev/tty >/dev/tty 2>&1
+  prepare_whiptail_args "$@"
+  whiptail "${HOSTING_WHIPTAIL_ARGS[@]}" </dev/tty >/dev/tty 2>&1
 }
 
 whiptail_capture_on_tty() {
-  whiptail "$@" 3>&1 1>/dev/tty 2>&3 </dev/tty
+  prepare_whiptail_args "$@"
+  whiptail "${HOSTING_WHIPTAIL_ARGS[@]}" 3>&1 1>/dev/tty 2>&3 </dev/tty
 }
 
 ensure_dialog_ui() {
@@ -510,6 +793,93 @@ print(value, end="")
 PY
 }
 
+env_write_value() {
+  local mode="$1"
+  local file="$2"
+  local key="$3"
+  local value="$4"
+  local tmp_file
+
+  tmp_file="$(temp_file_next_to "${file}")"
+  HOSTING_ENV_WRITE_MODE="${mode}" \
+  HOSTING_ENV_WRITE_FILE="${file}" \
+  HOSTING_ENV_WRITE_KEY="${key}" \
+  HOSTING_ENV_WRITE_VALUE="${value}" \
+  HOSTING_ENV_WRITE_TMP_FILE="${tmp_file}" \
+  python3 - <<'PY'
+import os
+import re
+
+mode = os.environ["HOSTING_ENV_WRITE_MODE"]
+file_path = os.environ["HOSTING_ENV_WRITE_FILE"]
+key = os.environ["HOSTING_ENV_WRITE_KEY"]
+value = os.environ["HOSTING_ENV_WRITE_VALUE"]
+tmp_file = os.environ["HOSTING_ENV_WRITE_TMP_FILE"]
+
+if os.path.exists(file_path):
+  with open(file_path, "r", encoding="utf-8") as handle:
+    lines = handle.readlines()
+else:
+  lines = []
+
+entry = f"{key}={value}\n"
+
+if mode == "upsert":
+  new_lines = []
+  done = False
+  for line in lines:
+    if line.startswith(f"{key}="):
+      new_lines.append(entry)
+      done = True
+      continue
+    new_lines.append(line)
+  if not done:
+    new_lines.append(entry)
+elif mode == "near_hostnames":
+  existing = -1
+  last_hostname = -1
+  for index, line in enumerate(lines):
+    if line.startswith(f"{key}="):
+      existing = index
+    if "_HOSTNAME=" in line:
+      last_hostname = index
+
+  new_lines = []
+  if existing >= 0:
+    for index, line in enumerate(lines):
+      if index == existing:
+        new_lines.append(entry)
+      else:
+        new_lines.append(line)
+  elif last_hostname >= 0:
+    for index, line in enumerate(lines):
+      new_lines.append(line)
+      if index == last_hostname:
+        new_lines.append(entry)
+  else:
+    new_lines = list(lines)
+    new_lines.append(entry)
+elif mode == "uncomment":
+  pattern = re.compile(rf'^[ \t]*#?[ \t]*{re.escape(key)}=')
+  new_lines = []
+  done = False
+  for line in lines:
+    if pattern.match(line) and not done:
+      new_lines.append(entry)
+      done = True
+      continue
+    new_lines.append(line)
+  if not done:
+    new_lines.append(entry)
+else:
+  raise SystemExit(f"Unsupported env write mode: {mode}")
+
+with open(tmp_file, "w", encoding="utf-8") as handle:
+  handle.writelines(new_lines)
+PY
+  mv "${tmp_file}" "${file}"
+}
+
 extract_connection_string_password() {
   local connection_string="$1"
 
@@ -537,82 +907,24 @@ env_upsert() {
   local file="$1"
   local key="$2"
   local value="$3"
-  local tmp_file
 
-  tmp_file="$(temp_file_next_to "${file}")"
-  awk -v key="${key}" -v value="${value}" '
-    BEGIN { done = 0 }
-    $0 ~ ("^" key "=") {
-      print key "=" value
-      done = 1
-      next
-    }
-    { print }
-    END {
-      if (!done) {
-        print key "=" value
-      }
-    }
-  ' "${file}" > "${tmp_file}"
-  mv "${tmp_file}" "${file}"
+  env_write_value upsert "${file}" "${key}" "${value}"
 }
 
 env_upsert_near_hostnames() {
   local file="$1"
   local key="$2"
   local value="$3"
-  local tmp_file
 
-  tmp_file="$(temp_file_next_to "${file}")"
-  awk -v key="${key}" -v value="${value}" '
-    BEGIN { n = 0; existing = -1; last_hostname = -1 }
-    {
-      lines[n] = $0
-      if ($0 ~ ("^" key "=")) { existing = n }
-      if ($0 ~ /_HOSTNAME=/) { last_hostname = n }
-      n++
-    }
-    END {
-      if (existing >= 0) {
-        for (i = 0; i < n; i++) {
-          if (i == existing) { print key "=" value } else { print lines[i] }
-        }
-      } else if (last_hostname >= 0) {
-        for (i = 0; i < n; i++) {
-          print lines[i]
-          if (i == last_hostname) { print key "=" value }
-        }
-      } else {
-        for (i = 0; i < n; i++) { print lines[i] }
-        print key "=" value
-      }
-    }
-  ' "${file}" > "${tmp_file}"
-  mv "${tmp_file}" "${file}"
+  env_write_value near_hostnames "${file}" "${key}" "${value}"
 }
 
 env_upsert_uncomment() {
   local file="$1"
   local key="$2"
   local value="$3"
-  local tmp_file
 
-  tmp_file="$(temp_file_next_to "${file}")"
-  awk -v key="${key}" -v value="${value}" '
-    BEGIN { done = 0 }
-    $0 ~ ("^[[:space:]]*#?[[:space:]]*" key "=") && !done {
-      print key "=" value
-      done = 1
-      next
-    }
-    { print }
-    END {
-      if (!done) {
-        print key "=" value
-      }
-    }
-  ' "${file}" > "${tmp_file}"
-  mv "${tmp_file}" "${file}"
+  env_write_value uncomment "${file}" "${key}" "${value}"
 }
 
 env_remove() {

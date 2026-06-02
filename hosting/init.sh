@@ -4,6 +4,7 @@
 # Make the script executable with `chmod +x init.sh` and run it with `./init.sh`.
 # Begin here and after the scripts are downloaded, execute `./hosting/main.sh` to start the setup.
 
+rm -rf hosting/
 git clone --filter=blob:none --sparse https://github.com/luckynumb3rs/stremio-perfect-setup.git temp-repo
 cd temp-repo
 git sparse-checkout set hosting
