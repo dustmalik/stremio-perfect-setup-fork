@@ -33,6 +33,10 @@
 #   --cloudflare-proxied          Cloudflare DDNS proxy mode when that module is enabled.
 #   --supabase-connection-string  Supabase direct session pooler IPv4 URL.
 #   --supabase-db-password        Password replacing [YOUR-PASSWORD].
+#   --authelia-username           Authelia initial username (letters, digits, hyphens, underscores).
+#   --authelia-displayname        Authelia initial user display name.
+#   --authelia-email              Authelia initial user email address.
+#   --authelia-password           Authelia initial user password (will be argon2-hashed via Docker).
 #   --backup-zip                  Resume from a previously generated config backup ZIP.
 #   --backup-dir                  Folder where the config ZIP backup is written.
 #   --template-source             upstream or local.
@@ -81,6 +85,10 @@ CLOUDFLARE_API_TOKEN_VALUE=""
 CLOUDFLARE_PROXIED_VALUE=""
 SUPABASE_CONNECTION_STRING_VALUE=""
 SUPABASE_DB_PASSWORD_VALUE=""
+AUTHELIA_USERNAME_VALUE=""
+AUTHELIA_DISPLAYNAME_VALUE=""
+AUTHELIA_EMAIL_VALUE=""
+AUTHELIA_PASSWORD_VALUE=""
 BACKUP_DIR_VALUE="${BACKUP_OUTPUT_DIR:-$HOME}"
 TEMPLATE_SOURCE_VALUE="${TEMPLATE_SOURCE:-upstream}"
 BACKUP_ZIP_INPUT=""
@@ -140,6 +148,22 @@ while (( $# > 0 )); do
       ;;
     --supabase-db-password)
       SUPABASE_DB_PASSWORD_VALUE="$2"
+      shift 2
+      ;;
+    --authelia-username)
+      AUTHELIA_USERNAME_VALUE="$2"
+      shift 2
+      ;;
+    --authelia-displayname)
+      AUTHELIA_DISPLAYNAME_VALUE="$2"
+      shift 2
+      ;;
+    --authelia-email)
+      AUTHELIA_EMAIL_VALUE="$2"
+      shift 2
+      ;;
+    --authelia-password)
+      AUTHELIA_PASSWORD_VALUE="$2"
       shift 2
       ;;
     --backup-dir)
@@ -389,17 +413,10 @@ root_tz_default="$(env_get "${ROOT_ENV}" TZ || true)"
 root_docker_dir_default="$(env_get "${ROOT_ENV}" DOCKER_DIR || true)"
 root_domain_default="$(env_get "${ROOT_ENV}" DOMAIN || true)"
 root_letsencrypt_default="$(env_get "${ROOT_ENV}" LETSENCRYPT_EMAIL || true)"
-root_authelia_session_default="$(env_get "${ROOT_ENV}" AUTHELIA_SESSION_SECRET || true)"
-root_authelia_storage_default="$(env_get "${ROOT_ENV}" AUTHELIA_STORAGE_ENCRYPTION_KEY || true)"
-root_authelia_jwt_default="$(env_get "${ROOT_ENV}" AUTHELIA_JWT_SECRET || true)"
-
 root_tz_default="${DEFAULT_TIMEZONE:-${root_tz_default:-Europe/Berlin}}"
 root_docker_dir_default="${DEFAULT_DOCKER_DIR:-${root_docker_dir_default:-/opt/docker}}"
 env_value_is_placeholder "${root_domain_default}" && root_domain_default=""
 env_value_is_placeholder "${root_letsencrypt_default}" && root_letsencrypt_default=""
-env_value_is_placeholder "${root_authelia_session_default}" && root_authelia_session_default=""
-env_value_is_placeholder "${root_authelia_storage_default}" && root_authelia_storage_default=""
-env_value_is_placeholder "${root_authelia_jwt_default}" && root_authelia_jwt_default=""
 
 if is_interactive; then
   show_message "Environment Details" "Next, enter the core environment values for the stack: timezone, final Docker directory, public base domain, and the email address used for Let's Encrypt notifications. These values are written into the staged root .env and used across multiple services."
@@ -427,10 +444,7 @@ env_upsert "${ROOT_ENV}" PUID "$(id -u)"
 env_upsert "${ROOT_ENV}" PGID "$(id -g)"
 env_upsert "${ROOT_ENV}" DOMAIN "${DOMAIN_VALUE}"
 env_upsert "${ROOT_ENV}" LETSENCRYPT_EMAIL "${LETSENCRYPT_EMAIL_VALUE}"
-env_upsert "${ROOT_ENV}" AUTHELIA_SESSION_SECRET "${HOSTING_AUTHELIA_SESSION_SECRET:-${root_authelia_session_default:-$(generate_secret_base64)}}"
-env_upsert "${ROOT_ENV}" AUTHELIA_STORAGE_ENCRYPTION_KEY "${HOSTING_AUTHELIA_STORAGE_ENCRYPTION_KEY:-${root_authelia_storage_default:-$(generate_secret_base64)}}"
-env_upsert "${ROOT_ENV}" AUTHELIA_JWT_SECRET "${HOSTING_AUTHELIA_JWT_SECRET:-${root_authelia_jwt_default:-$(generate_secret_base64)}}"
-success "Root .env values and generated secrets are staged."
+success "Root .env values are staged."
 
 hostname_vars_missing=()
 hostname_vars_modules=()
@@ -506,6 +520,9 @@ module_hook_title() {
     all.supabase)
       printf 'Supabase setup'
       ;;
+    authelia)
+      printf 'Authelia setup'
+      ;;
     cloudflare-ddns)
       printf 'Cloudflare DDNS setup'
       ;;
@@ -578,7 +595,11 @@ run_module_hooks() {
       HOSTING_CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN_VALUE}" \
       HOSTING_CLOUDFLARE_PROXIED="${CLOUDFLARE_PROXIED_VALUE}" \
       HOSTING_SUPABASE_CONNECTION_STRING="${SUPABASE_CONNECTION_STRING_VALUE}" \
-      HOSTING_SUPABASE_DB_PASSWORD="${SUPABASE_DB_PASSWORD_VALUE}"
+      HOSTING_SUPABASE_DB_PASSWORD="${SUPABASE_DB_PASSWORD_VALUE}" \
+      HOSTING_AUTHELIA_USERNAME="${AUTHELIA_USERNAME_VALUE}" \
+      HOSTING_AUTHELIA_DISPLAYNAME="${AUTHELIA_DISPLAYNAME_VALUE}" \
+      HOSTING_AUTHELIA_EMAIL="${AUTHELIA_EMAIL_VALUE}" \
+      HOSTING_AUTHELIA_PASSWORD="${AUTHELIA_PASSWORD_VALUE}"
   done < <(sort -t "${hook_delim}" -k1,1n -k2,2 "${hooks_file}")
 
   rm -f "${hooks_file}"

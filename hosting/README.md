@@ -94,12 +94,15 @@ rm -rf temp-repo
 cd hosting/
 ```
 
+Otherwise copy `hosting/init.sh` to the working folder you want and execute it with `./init.sh`.
+(You may have to make it executable first with `chmod +x init.sh`)
+
 What this does:
 
 - clones the repository in a lightweight way
 - tells Git to fetch only the `hosting/` folder
 - copies that folder into your current VPS directory as a standalone working folder
-- removes the temporary clone when done and takes you to `hosting\`
+- removes the temporary clone when done and takes you to `hosting/`
 
 ## Step 3: Run the Main Setup Script
 
