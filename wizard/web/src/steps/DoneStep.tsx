@@ -225,8 +225,8 @@ export function DoneStep() {
           <h2 className="text-xl font-bold text-center mb-1">And now you're really done!</h2>
           <p className="text-gray-500 text-sm text-center mb-5">
             {target === 'stremio'
-              ? 'Open Stremio and sign in. Your addons are installed and ready.'
-              : 'Open Nuvio and sign in. Your addons and collections are ready.'}
+              ? 'Open Stremio and sign in. Your account is ready and you can start watching.'
+              : 'Open Nuvio and sign in. Your account is ready and you can start watching.'}
           </p>
 
           {addons.length > 0 && (
