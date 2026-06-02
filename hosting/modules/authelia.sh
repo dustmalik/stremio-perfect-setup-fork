@@ -67,6 +67,95 @@ env_upsert "${HOSTING_ROOT_ENV}" AUTHELIA_STORAGE_ENCRYPTION_KEY \
 env_upsert "${HOSTING_ROOT_ENV}" AUTHELIA_JWT_SECRET \
   "${HOSTING_AUTHELIA_JWT_SECRET:-${root_jwt_default:-$(generate_secret_base64)}}"
 
+# ── patch authelia compose ────────────────────────────────────────────────────
+
+host_vars=()
+while IFS= read -r module; do
+  while IFS= read -r env_var; do
+    [[ -n "${env_var}" ]] || continue
+    host_vars+=("${env_var}")
+  done < <(module_host_env_vars "${HOSTING_TEMPLATE_DIR}" "${module}")
+done < <(read_lines_file "${HOSTING_SELECTED_MODULES_FILE}")
+
+authelia_compose_rel="$(module_compose_relative_path "${HOSTING_TEMPLATE_DIR}" "${MODULE_NAME}")"
+authelia_compose_name="$(basename "${authelia_compose_rel}")"
+stage_item "${MODULE_NAME}" "${authelia_compose_rel}" \
+  "${HOSTING_MANIFEST_FILE}" "${HOSTING_TEMPLATE_DIR}" "${HOSTING_CONFIG_DIR}"
+authelia_compose="${HOSTING_CONFIG_DIR}/$(stage_name_for "${MODULE_NAME}" "${authelia_compose_name}")"
+
+HOSTING_AUTHELIA_HOST_VARS="$(printf '%s\n' "${host_vars[@]}" | dedupe_lines)" python3 - "${authelia_compose}" <<'PY'
+import os
+import re
+import sys
+
+compose_path = sys.argv[1]
+keep_vars    = set(line for line in os.environ.get("HOSTING_AUTHELIA_HOST_VARS", "").splitlines() if line)
+
+with open(compose_path, "r", encoding="utf-8") as fh:
+    lines = fh.readlines()
+
+stremio_key_re   = re.compile(r'^\s+TEMPLATE_STREMIO_ADDON_HOSTNAMES:\s*>-\s*$')
+stremio_value_re = re.compile(r'^\s+\$\{([A-Z0-9_]+_HOSTNAME)\},?')
+individual_re    = re.compile(r'^\s+TEMPLATE_(?!STREMIO_ADDON_HOSTNAMES)[A-Z0-9_]+_HOSTNAME:\s+\$\{([A-Z0-9_]+)\??\}')
+comment_re       = re.compile(r'^\s+#')
+
+new_lines        = []
+pending_comments = []
+index            = 0
+n                = len(lines)
+
+while index < n:
+    line = lines[index]
+
+    if comment_re.match(line):
+        pending_comments.append(line)
+        index += 1
+        continue
+
+    if stremio_key_re.match(line):
+        key_line   = line
+        value_vars = []
+        indent     = "        "
+        index += 1
+        while index < n:
+            vline = lines[index]
+            m = stremio_value_re.match(vline)
+            if m:
+                if m.group(1) in keep_vars:
+                    value_vars.append(m.group(1))
+                index += 1
+            else:
+                break
+        if value_vars:
+            new_lines.extend(pending_comments)
+            new_lines.append(key_line)
+            for i, var in enumerate(value_vars):
+                comma = "" if i == len(value_vars) - 1 else ","
+                new_lines.append(f"{indent}${{{var}}}{comma}\n")
+        pending_comments = []
+        continue
+
+    m = individual_re.match(line)
+    if m:
+        ref_var = m.group(1)
+        if ref_var in keep_vars:
+            new_lines.extend(pending_comments)
+            new_lines.append(line)
+        pending_comments = []
+        index += 1
+        continue
+
+    new_lines.extend(pending_comments)
+    pending_comments = []
+    new_lines.append(line)
+    index += 1
+
+new_lines.extend(pending_comments)
+
+with open(compose_path, "w", encoding="utf-8") as fh:
+    fh.writelines(new_lines)
+PY
+
 # ── users.yml ─────────────────────────────────────────────────────────────────
 
 if [[ ! -f "${HOSTING_TEMPLATE_DIR}/${USERS_YAML_REL}" ]]; then

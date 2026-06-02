@@ -288,7 +288,7 @@ fi
 ensure_dialog_ui "the hosting setup"
 
 if is_interactive; then
-  show_message "Hosting Setup" "This guided setup will prepare SSH access, verify Docker, download the upstream Docker template, let you choose which app modules to deploy, stage editable config files, and then deploy the final stack to your VPS. You will be asked to confirm each major step before the script makes changes."
+  show_message "🖥️  Hosting Perfect Setup" "This guided setup will prepare SSH access, verify Docker, download the upstream Docker template, let you choose which app modules to deploy, stage editable config files, and then deploy the final stack to your VPS. You will be asked to confirm each major step before the script makes changes."
 fi
 
 if (( DRY_RUN )); then
