@@ -29,6 +29,7 @@ SSH_DIR="${HOME}/.ssh"
 SSH_CONFIG="${SSH_DIR}/config"
 KEY_PATH=""
 KEY_NAME="${DEFAULT_SSH_KEY_NAME:-streaming}"
+KEY_NAME_SET=0
 SSH_ALIAS="${DEFAULT_SSH_ALIAS:-streaming}"
 SSH_HOST=""
 SSH_USER=""
@@ -44,6 +45,7 @@ while (( $# > 0 )); do
       ;;
     --key-name)
       KEY_NAME="$2"
+      KEY_NAME_SET=1
       shift 2
       ;;
     --alias)
@@ -72,6 +74,12 @@ while (( $# > 0 )); do
       ;;
   esac
 done
+
+sync_key_name_from_alias() {
+  if (( ! KEY_NAME_SET )); then
+    KEY_NAME="${SSH_ALIAS}"
+  fi
+}
 
 find_default_key() {
   local candidates=()
@@ -185,13 +193,15 @@ ensure_key_exists() {
 
 configure_ssh_alias() {
   if ! is_interactive; then
+    sync_key_name_from_alias
     return 0
   fi
 
   if (( ! ALIAS_SET )); then
-    SSH_ALIAS="$(prompt_value "Choose the short SSH alias name to save in ${SSH_CONFIG}. This lets you connect with a simple `ssh <alias>` command later [SSH_ALIAS]" "${SSH_ALIAS}")"
+    SSH_ALIAS="$(prompt_value "Choose the short SSH alias name to save in ${SSH_CONFIG}. This lets you connect with a simple \`ssh <alias>\` command later [SSH_ALIAS]" "${SSH_ALIAS}")"
   fi
   [[ -n "${SSH_ALIAS}" ]] || die "SSH alias cannot be empty"
+  sync_key_name_from_alias
 }
 
 collect_connection_details() {
@@ -225,7 +235,7 @@ update_ssh_config() {
   fi
 
   if (( alias_exists )) && is_interactive; then
-    prompt_yes_no "SSH alias ${SSH_ALIAS} already exists in ${SSH_CONFIG}. Replace it with the new HostName, User, and key settings so future `ssh ${SSH_ALIAS}` connections use the values from this setup?" yes || die "SSH alias update cancelled."
+    prompt_yes_no "SSH alias ${SSH_ALIAS} already exists in ${SSH_CONFIG}. Replace it with the new HostName, User, and key settings so future \`ssh ${SSH_ALIAS}\` connections use the values from this setup?" yes || die "SSH alias update cancelled."
   fi
 
   tmp_file="$(temp_file_next_to "${SSH_CONFIG}")"
@@ -262,25 +272,22 @@ show_final_instructions() {
     cat <<EOF
 Your local SSH setup is ready.
 
-Next, install the public key on the VPS before you try the alias:
+This step prepared your local key and SSH client config. Next, install the public key on the VPS before you try the alias:
 
 1. Copy the public key:
    ${copy_command}
-2. Add the contents of ${KEY_PATH}.pub to ~/.ssh/authorized_keys on the VPS.
-3. Connect using the alias:
-   ${connect_command}
+2. Connect using the alias: ${connect_command}
 EOF
   )
 
-  show_message "SSH Setup Complete" "${message}
+  show_message "SSH Setup Complete" "${message}"
 
-This step only prepares your local key and SSH client config. You still need to install the public key on the VPS before passwordless login will work."
   log "Next step: install ${KEY_PATH}.pub on the VPS, then connect with ${connect_command}"
 }
 
+configure_ssh_alias
 select_key
 ensure_key_exists
-configure_ssh_alias
 collect_connection_details
 update_ssh_config
 
