@@ -429,6 +429,35 @@ env_upsert "${ROOT_ENV}" AUTHELIA_STORAGE_ENCRYPTION_KEY "${HOSTING_AUTHELIA_STO
 env_upsert "${ROOT_ENV}" AUTHELIA_JWT_SECRET "${HOSTING_AUTHELIA_JWT_SECRET:-${root_authelia_jwt_default:-$(generate_secret_base64)}}"
 success "Root .env values and generated secrets are staged."
 
+hostname_vars_missing=()
+hostname_vars_modules=()
+for module in "${selected_modules[@]}"; do
+  while IFS= read -r env_var; do
+    [[ -n "${env_var}" ]] || continue
+    array_contains "${env_var}" "${hostname_vars_missing[@]}" && continue
+    existing_val="$(env_get "${ROOT_ENV}" "${env_var}" || true)"
+    env_value_is_placeholder "${existing_val}" || continue
+    hostname_vars_missing+=("${env_var}")
+    hostname_vars_modules+=("${module}")
+  done < <(module_host_env_vars "${TEMPLATE_DIR_ABS}" "${module}")
+done
+
+if (( ${#hostname_vars_missing[@]} > 0 )); then
+  section "Hostname configuration"
+  if is_interactive; then
+    show_message "Hostname Configuration" "The following service hostnames are missing from the root .env. For each one, enter the subdomain prefix and the script will store the full hostname as prefix.${DOMAIN_VALUE} in the root .env. Press Enter to accept the suggested prefix."
+  fi
+  for i in "${!hostname_vars_missing[@]}"; do
+    env_var="${hostname_vars_missing[i]}"
+    module="${hostname_vars_modules[i]}"
+    suggested_subdomain="$(printf '%s' "${env_var}" | sed 's/_HOSTNAME$//' | tr '[:upper:]_' '[:lower:]-')"
+    subdomain_prefix="$(prompt_value "Enter the subdomain prefix for the ${module} service so its hostname can be stored as prefix.${DOMAIN_VALUE} in the root .env [${env_var}]" "${suggested_subdomain}")"
+    [[ -n "${subdomain_prefix}" ]] || subdomain_prefix="${suggested_subdomain}"
+    env_upsert "${ROOT_ENV}" "${env_var}" "${subdomain_prefix}.${DOMAIN_VALUE}"
+    success "${env_var}=${subdomain_prefix}.${DOMAIN_VALUE}"
+  done
+fi
+
 sync_staged_configs_to_selected_modules() {
   local selected_modules_now=()
   local manifest_tmp=""

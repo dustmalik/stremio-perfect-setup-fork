@@ -146,9 +146,11 @@ fi
 log "Creating Supabase schemas for: ${addons_csv}"
 connection_string="${connection_string//\[YOUR-PASSWORD\]/${database_password}}"
 if hosting_is_dry_run; then
+  dry_run_log "Simulating Supabase schema deletion for ${addons_csv}."
   dry_run_log "Simulating Supabase schema creation for ${addons_csv}."
   mapfile -t schema_rows < <(simulate_schema_rows "${connection_string}" "${selected_addons[@]}")
 else
+  "${SCRIPT_DIR}/db/delete-addon-schemas.sh" --connection-string "${connection_string}" --addons "${addons_csv}"
   mapfile -t schema_rows < <("${SCRIPT_DIR}/db/create-addon-schemas.sh" --connection-string "${connection_string}" --addons "${addons_csv}" --password "${database_password}")
 fi
 
