@@ -75,9 +75,13 @@ SELECTED_MODULES_FILE="${WORK_ROOT_ABS}/selected-modules.txt"
 BACKUP_AVAILABLE_MODULES_FILE="${WORK_ROOT_ABS}/backup-modules.txt"
 BACKUP_METADATA_MODULES_FILE="${WORK_ROOT_ABS}/backup-selected-modules.txt"
 LIVE_SETUP_MODULES_FILE="${WORK_ROOT_ABS}/live-selected-modules.txt"
+LIVE_PRESENT_MODULES_FILE="${WORK_ROOT_ABS}/live-present-modules.txt"
 MODULE_HOOK_TARGETS_FILE="${WORK_ROOT_ABS}/hook-target-modules.txt"
 MODULE_HOOK_SYNC_ONLY_FILE="${WORK_ROOT_ABS}/hook-sync-only-modules.txt"
+INSTALL_MODULES_FILE="${WORK_ROOT_ABS}/install-modules.txt"
+REMOVED_MODULES_FILE="${WORK_ROOT_ABS}/removed-modules.txt"
 CLOUDFLARE_DDNS_MODULE=cloudflare-ddns
+HOSTNAME_SYNC_MODULES=(authelia cloudflare-ddns honey)
 
 MODULES_CSV=""
 TIMEZONE_VALUE=""
@@ -371,6 +375,7 @@ else
 fi
 
 existing_live_modules=()
+existing_live_present_modules=()
 
 section "Deployment target"
 if is_interactive; then
@@ -427,6 +432,11 @@ if is_interactive; then
   prompt_yes_no "Have you finished adding any custom app folders under ${TEMPLATE_DIR_ABS}/apps so module discovery can continue?" yes || die "Module discovery cancelled."
 fi
 
+base_template_modules=()
+base_required_modules=()
+base_optional_modules=()
+discover_modules "${TEMPLATE_DIR_ABS}" base_template_modules base_required_modules base_optional_modules
+
 backup_available_modules=()
 backup_metadata_modules=()
 backup_default_modules_csv=""
@@ -452,9 +462,13 @@ if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
   "${HOSTING_ROOT}/steps/inspect-live-setup.sh" \
     --docker-dir "${DOCKER_DIR_VALUE}" \
     --template-dir "${TEMPLATE_DIR_ABS}" \
-    --enabled-modules-file "${LIVE_SETUP_MODULES_FILE}"
+    --enabled-modules-file "${LIVE_SETUP_MODULES_FILE}" \
+    --present-modules-file "${LIVE_PRESENT_MODULES_FILE}"
   if [[ -f "${LIVE_SETUP_MODULES_FILE}" ]]; then
     mapfile -t existing_live_modules < <(read_lines_file "${LIVE_SETUP_MODULES_FILE}")
+  fi
+  if [[ -f "${LIVE_PRESENT_MODULES_FILE}" ]]; then
+    mapfile -t existing_live_present_modules < <(read_lines_file "${LIVE_PRESENT_MODULES_FILE}")
   fi
   live_default_modules_csv="$(join_by ',' "${existing_live_modules[@]}")"
 fi
@@ -463,6 +477,18 @@ all_modules=()
 required_modules=()
 optional_modules=()
 discover_modules "${TEMPLATE_DIR_ABS}" all_modules required_modules optional_modules
+if (( ${#base_required_modules[@]} > 0 )); then
+  normalized_optional_modules=()
+  for module in "${base_required_modules[@]}"; do
+    if array_contains "${module}" "${all_modules[@]}" && ! array_contains "${module}" "${required_modules[@]}"; then
+      required_modules+=("${module}")
+    fi
+  done
+  for module in "${optional_modules[@]}"; do
+    array_contains "${module}" "${required_modules[@]}" || normalized_optional_modules+=("${module}")
+  done
+  optional_modules=("${normalized_optional_modules[@]}")
+fi
 success "Discovered ${#all_modules[@]} modules (${#required_modules[@]} required, ${#optional_modules[@]} optional)."
 
 if [[ -n "${BACKUP_ZIP_INPUT}" ]]; then
@@ -534,6 +560,8 @@ fi
 mapfile -t selected_modules < <(read_lines_file "${SELECTED_MODULES_FILE}")
 
 existing_selected_modules=()
+install_modules=()
+reactivated_modules=()
 added_modules=()
 removed_modules=()
 if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
@@ -541,6 +569,11 @@ if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
 
   for module in "${selected_modules[@]}"; do
     array_contains "${module}" "${existing_selected_modules[@]}" || added_modules+=("${module}")
+    if array_contains "${module}" "${existing_live_present_modules[@]}"; then
+      array_contains "${module}" "${existing_selected_modules[@]}" || reactivated_modules+=("${module}")
+    else
+      install_modules+=("${module}")
+    fi
   done
   for module in "${existing_selected_modules[@]}"; do
     array_contains "${module}" "${selected_modules[@]}" || removed_modules+=("${module}")
@@ -552,9 +585,24 @@ if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
   if (( ${#removed_modules[@]} > 0 )); then
     log "Modules to remove: $(join_by ', ' "${removed_modules[@]}")"
   fi
+  if (( ${#reactivated_modules[@]} > 0 )); then
+    log "Modules to reactivate without overwriting existing folders: $(join_by ', ' "${reactivated_modules[@]}")"
+  fi
+  if (( ${#install_modules[@]} > 0 )); then
+    log "Modules to install from template: $(join_by ', ' "${install_modules[@]}")"
+  fi
   if (( ${#added_modules[@]} == 0 && ${#removed_modules[@]} == 0 )); then
     log "Selected modules already match the existing setup."
   fi
+fi
+
+: > "${INSTALL_MODULES_FILE}"
+: > "${REMOVED_MODULES_FILE}"
+if (( ${#install_modules[@]} > 0 )); then
+  write_lines_file "${INSTALL_MODULES_FILE}" "${install_modules[@]}"
+fi
+if (( ${#removed_modules[@]} > 0 )); then
+  write_lines_file "${REMOVED_MODULES_FILE}" "${removed_modules[@]}"
 fi
 
 if [[ -n "${BACKUP_ZIP_INPUT}" ]]; then
@@ -572,7 +620,7 @@ elif [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
     --template-dir "${TEMPLATE_DIR_ABS}" \
     --config-dir "${CONFIG_DIR_ABS}" \
     --manifest-file "${MANIFEST_FILE}" \
-    --modules-file "${SELECTED_MODULES_FILE}"
+    --modules-file "${INSTALL_MODULES_FILE}"
 else
   section "Config staging"
   "${HOSTING_ROOT}/steps/stage-configs.sh" --template-dir "${TEMPLATE_DIR_ABS}" --config-dir "${CONFIG_DIR_ABS}" --modules-file "${SELECTED_MODULES_FILE}" --manifest-file "${MANIFEST_FILE}"
@@ -646,13 +694,15 @@ if (( ${#hostname_vars_missing[@]} > 0 )); then
   done
 fi
 
-sync_staged_configs_to_selected_modules() {
+sync_staged_configs_to_modules() {
+  local modules_file="$1"
+  local strict_existing_guard="${2:-0}"
   local selected_modules_now=()
   local manifest_tmp=""
   local module="" source_rel="" stage_rel="" item_type=""
 
   manifest_tmp="$(mktemp "${WORK_ROOT_ABS}/stage-map.XXXXXX")"
-  mapfile -t selected_modules_now < <(read_lines_file "${SELECTED_MODULES_FILE}")
+  mapfile -t selected_modules_now < <(read_lines_file "${modules_file}")
 
   while IFS=$'\t' read -r module source_rel stage_rel item_type; do
     [[ -n "${source_rel}" ]] || continue
@@ -667,6 +717,10 @@ sync_staged_configs_to_selected_modules() {
       continue
     fi
 
+    if [[ "${strict_existing_guard}" == "1" ]]; then
+      die "Existing-setup mode refuses to modify already-present module '${module}'. Only newly installed modules may be staged for deploy."
+    fi
+
     rm -rf "${CONFIG_DIR_ABS}/${stage_rel}"
   done < "${MANIFEST_FILE}"
 
@@ -678,7 +732,7 @@ sync_staged_configs_to_selected_modules() {
       [[ -n "${entry}" ]] || continue
       stage_item "${module}" "apps/${module}/${entry}" "${MANIFEST_FILE}" "${TEMPLATE_DIR_ABS}" "${CONFIG_DIR_ABS}"
     done < <(module_stageable_entries "${TEMPLATE_DIR_ABS}" "${module}")
-  done < <(read_lines_file "${SELECTED_MODULES_FILE}")
+  done < <(read_lines_file "${modules_file}")
 }
 
 module_hook_title() {
@@ -815,16 +869,22 @@ hook_target_modules=()
 hook_sync_only_modules=()
 if [[ -z "${BACKUP_ZIP_INPUT}" ]]; then
   if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
-    hook_target_modules=("${added_modules[@]}")
+    hook_target_modules=("${install_modules[@]}")
     if (( ${#added_modules[@]} > 0 || ${#removed_modules[@]} > 0 )); then
-      for module in authelia "${CLOUDFLARE_DDNS_MODULE}" honey; do
-        if array_contains "${module}" "${selected_modules[@]}" && array_contains "${module}" "${existing_selected_modules[@]}" && ! array_contains "${module}" "${hook_target_modules[@]}"; then
+      # These hooks derive config from the selected module set and must be
+      # rerun when modules are added, removed, or reactivated.
+      for module in "${HOSTNAME_SYNC_MODULES[@]}"; do
+        if array_contains "${module}" "${selected_modules[@]}" && \
+          ! array_contains "${module}" "${hook_target_modules[@]}"; then
           hook_target_modules+=("${module}")
-          if [[ "${module}" == "authelia" ]]; then
-            hook_sync_only_modules+=("${module}")
-          fi
         fi
       done
+
+      if array_contains authelia "${selected_modules[@]}" && \
+        array_contains authelia "${existing_selected_modules[@]}" && \
+        ! array_contains authelia "${install_modules[@]}"; then
+        hook_sync_only_modules+=(authelia)
+      fi
     fi
   else
     hook_target_modules=("${selected_modules[@]}")
@@ -842,7 +902,11 @@ elif [[ "${EXISTING_SETUP_MODE}" == "modify" && ! -f "${MODULE_HOOK_TARGETS_FILE
 else
   run_module_hooks "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}"
 fi
-sync_staged_configs_to_selected_modules
+if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
+  sync_staged_configs_to_modules "${INSTALL_MODULES_FILE}" 1
+else
+  sync_staged_configs_to_modules "${SELECTED_MODULES_FILE}" 0
+fi
 success "Staged config directory synced to the final selected modules."
 
 mapfile -t final_modules < <(read_lines_file "${SELECTED_MODULES_FILE}")
@@ -900,12 +964,19 @@ if is_interactive; then
 fi
 
 section "Deploy"
-"${HOSTING_ROOT}/steps/deploy-template.sh" \
-  --template-dir "${TEMPLATE_DIR_ABS}" \
-  --config-dir "${CONFIG_DIR_ABS}" \
-  --manifest-file "${MANIFEST_FILE}" \
-  --target-dir "${DOCKER_DIR_VALUE}" \
-  $([[ "${HOSTING_DRY_RUN:-0}" == "1" ]] && printf '%s' '--no-fix-permissions')
+deploy_args=(
+  --template-dir "${TEMPLATE_DIR_ABS}"
+  --config-dir "${CONFIG_DIR_ABS}"
+  --manifest-file "${MANIFEST_FILE}"
+  --target-dir "${DOCKER_DIR_VALUE}"
+)
+if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
+  deploy_args+=(--modify-mode --install-modules-file "${INSTALL_MODULES_FILE}" --removed-modules-file "${REMOVED_MODULES_FILE}")
+fi
+if [[ "${HOSTING_DRY_RUN:-0}" == "1" ]]; then
+  deploy_args+=(--no-fix-permissions)
+fi
+"${HOSTING_ROOT}/steps/deploy-template.sh" "${deploy_args[@]}"
 
 if (( ! SKIP_BACKUP )); then
   if ! is_interactive || prompt_yes_no "Create a backup ZIP of the prepared configuration now? This is recommended because it makes later restores and migrations much easier." yes; then
@@ -963,6 +1034,6 @@ fi
 
 rm -rf "${TEMPLATE_DIR_ABS}" "${CONFIG_DIR_ABS}"
 rm -f "${SELECTED_MODULES_FILE}"
-rm -f "${BACKUP_AVAILABLE_MODULES_FILE}" "${BACKUP_METADATA_MODULES_FILE}" "${LIVE_SETUP_MODULES_FILE}" "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}"
+rm -f "${BACKUP_AVAILABLE_MODULES_FILE}" "${BACKUP_METADATA_MODULES_FILE}" "${LIVE_SETUP_MODULES_FILE}" "${LIVE_PRESENT_MODULES_FILE}" "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}" "${INSTALL_MODULES_FILE}" "${REMOVED_MODULES_FILE}"
 rmdir "${WORK_ROOT_ABS}" 2>/dev/null || true
 success "Temporary work directories cleaned up."

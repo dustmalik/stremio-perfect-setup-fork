@@ -24,12 +24,17 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/../lib/common.sh"
+# shellcheck disable=SC1091
+source "${SCRIPT_DIR}/../lib/template.sh"
 
 TEMPLATE_DIR_ARG=""
 CONFIG_DIR_ARG=""
 MANIFEST_FILE=""
 TARGET_DIR_ARG=""
 FIX_PERMISSIONS=1
+MODIFY_MODE=0
+INSTALL_MODULES_FILE=""
+REMOVED_MODULES_FILE=""
 
 while (( $# > 0 )); do
   case "$1" in
@@ -49,6 +54,18 @@ while (( $# > 0 )); do
       TARGET_DIR_ARG="$2"
       shift 2
       ;;
+    --modify-mode)
+      MODIFY_MODE=1
+      shift
+      ;;
+    --install-modules-file)
+      INSTALL_MODULES_FILE="$2"
+      shift 2
+      ;;
+    --removed-modules-file)
+      REMOVED_MODULES_FILE="$2"
+      shift 2
+      ;;
     --no-fix-permissions)
       FIX_PERMISSIONS=0
       shift
@@ -65,13 +82,99 @@ done
 [[ -d "${TEMPLATE_DIR_ARG}" ]] || die "Template directory does not exist: ${TEMPLATE_DIR_ARG}"
 [[ -d "${CONFIG_DIR_ARG}" ]] || die "Config directory does not exist: ${CONFIG_DIR_ARG}"
 [[ -f "${MANIFEST_FILE}" ]] || die "Manifest file does not exist: ${MANIFEST_FILE}"
+if (( MODIFY_MODE )); then
+  [[ -n "${INSTALL_MODULES_FILE}" ]] || die "--install-modules-file is required in --modify-mode"
+  [[ -f "${INSTALL_MODULES_FILE}" ]] || die "Install modules file does not exist: ${INSTALL_MODULES_FILE}"
+  [[ -n "${REMOVED_MODULES_FILE}" ]] || die "--removed-modules-file is required in --modify-mode"
+fi
 
 TARGET_DIR_ARG="${TARGET_DIR_ARG:-$(env_get "${CONFIG_DIR_ARG}/.env" DOCKER_DIR)}"
 [[ -n "${TARGET_DIR_ARG}" ]] || die "DOCKER_DIR is not set in ${CONFIG_DIR_ARG}/.env"
 TARGET_DIR_ARG="$(absolute_path "${TARGET_DIR_ARG}")"
 
+target_data_dir="$(env_get_resolved "${CONFIG_DIR_ARG}/.env" DOCKER_DATA_DIR || true)"
+target_data_dir="$(absolute_path "${target_data_dir:-}")"
+target_data_rel=""
+target_dir_prefix="${TARGET_DIR_ARG%/}/"
+if [[ -n "${target_data_dir}" && "${target_data_dir}" != "${TARGET_DIR_ARG}" ]]; then
+  case "${target_data_dir}/" in
+    "${target_dir_prefix}"*)
+      target_data_rel="${target_data_dir#${target_dir_prefix}}"
+      target_data_rel="${target_data_rel%/}"
+      ;;
+  esac
+fi
+
+sync_path_into_target() {
+  local source_path="$1"
+  local target_path="$2"
+
+  ensure_directory "$(dirname "${target_path}")"
+  if [[ -w "$(dirname "${target_path}")" && ( ! -e "${target_path}" || -w "${target_path}" ) ]]; then
+    rsync -a --delete "${source_path}" "${target_path}"
+  else
+    run_privileged rsync -a --delete "${source_path}" "${target_path}"
+  fi
+}
+
+copy_seed_data_for_module() {
+  local module="$1"
+  local seed_source=""
+  local seed_target=""
+
+  [[ -n "${target_data_dir}" ]] || return 0
+  seed_source="${TEMPLATE_DIR_ARG}/data/${module}"
+  [[ -e "${seed_source}" ]] || return 0
+
+  seed_target="${target_data_dir}/${module}"
+  if [[ -d "${seed_source}" ]]; then
+    ensure_directory "${seed_target}"
+    if [[ -w "${seed_target}" ]]; then
+      rsync -a "${seed_source}/" "${seed_target}/"
+    else
+      run_privileged mkdir -p "${seed_target}"
+      run_privileged rsync -a "${seed_source}/" "${seed_target}/"
+    fi
+  else
+    ensure_directory "$(dirname "${seed_target}")"
+    if [[ -w "$(dirname "${seed_target}")" ]]; then
+      rsync -a "${seed_source}" "${seed_target}"
+    else
+      run_privileged rsync -a "${seed_source}" "${seed_target}"
+    fi
+  fi
+}
+
+stop_and_remove_module_profile() {
+  local module="$1"
+
+  [[ -n "${module}" ]] || return 0
+  command -v docker >/dev/null 2>&1 || return 0
+  [[ -d "${TARGET_DIR_ARG}" ]] || return 0
+  [[ -f "${TARGET_DIR_ARG}/.env" ]] || return 0
+
+  if [[ -f "${TARGET_DIR_ARG}/compose.yaml" || -f "${TARGET_DIR_ARG}/compose.yml" ]]; then
+    (
+      cd "${TARGET_DIR_ARG}"
+      run_docker_compose --profile "${module}" rm -f -s || true
+    )
+  fi
+}
+
+install_modules=()
+removed_modules=()
+if (( MODIFY_MODE )); then
+  mapfile -t install_modules < <(read_lines_file "${INSTALL_MODULES_FILE}")
+  if [[ -n "${REMOVED_MODULES_FILE}" && -f "${REMOVED_MODULES_FILE}" ]]; then
+    mapfile -t removed_modules < <(read_lines_file "${REMOVED_MODULES_FILE}")
+  fi
+fi
+
 while IFS=$'\t' read -r module source_rel stage_rel item_type; do
   [[ -n "${source_rel}" ]] || continue
+  if (( MODIFY_MODE )) && [[ "${module}" != "root" ]] && ! array_contains "${module}" "${install_modules[@]}"; then
+    continue
+  fi
   local_source="${TEMPLATE_DIR_ARG}/${source_rel}"
   local_stage="${CONFIG_DIR_ARG}/${stage_rel}"
 
@@ -96,7 +199,59 @@ if (( FIX_PERMISSIONS )); then
   fi
 fi
 
-if [[ -w "${TARGET_DIR_ARG}" ]]; then
+if (( MODIFY_MODE )); then
+  for module in "${removed_modules[@]}"; do
+    stop_and_remove_module_profile "${module}"
+  done
+
+  root_compose_source="$(template_root_compose_path "${TEMPLATE_DIR_ARG}")"
+  root_compose_target="${TARGET_DIR_ARG}/$(basename "${root_compose_source}")"
+  if [[ "${root_compose_target}" == *.yaml ]]; then
+    alternate_root_compose="${TARGET_DIR_ARG}/compose.yml"
+  else
+    alternate_root_compose="${TARGET_DIR_ARG}/compose.yaml"
+  fi
+  sync_path_into_target "${CONFIG_DIR_ARG}/.env" "${TARGET_DIR_ARG}/.env"
+  sync_path_into_target "${root_compose_source}" "${root_compose_target}"
+  if [[ -e "${alternate_root_compose}" ]]; then
+    if [[ -w "${alternate_root_compose}" ]]; then
+      rm -f "${alternate_root_compose}"
+    else
+      run_privileged rm -f "${alternate_root_compose}"
+    fi
+  fi
+
+  ensure_directory "${TARGET_DIR_ARG}/apps"
+  for module in "${install_modules[@]}"; do
+    [[ -d "${TEMPLATE_DIR_ARG}/apps/${module}" ]] || die "Install module missing from template: ${module}"
+    sync_path_into_target "${TEMPLATE_DIR_ARG}/apps/${module}/" "${TARGET_DIR_ARG}/apps/${module}/"
+    copy_seed_data_for_module "${module}"
+  done
+
+  for module in "${removed_modules[@]}"; do
+    [[ -e "${TARGET_DIR_ARG}/apps/${module}" ]] || continue
+    if [[ -w "$(dirname "${TARGET_DIR_ARG}/apps/${module}")" ]]; then
+      rm -rf "${TARGET_DIR_ARG}/apps/${module}"
+    else
+      run_privileged rm -rf "${TARGET_DIR_ARG}/apps/${module}"
+    fi
+  done
+elif [[ -n "${target_data_rel}" ]]; then
+  log "Preserving live data directory during deploy: ${target_data_dir}"
+  if [[ -w "${TARGET_DIR_ARG}" ]]; then
+    rsync -a --delete --exclude="/${target_data_rel}/" "${TEMPLATE_DIR_ARG}/" "${TARGET_DIR_ARG}/"
+  else
+    run_privileged rsync -a --delete --exclude="/${target_data_rel}/" "${TEMPLATE_DIR_ARG}/" "${TARGET_DIR_ARG}/"
+  fi
+
+  if [[ -d "${TEMPLATE_DIR_ARG}/${target_data_rel}" ]]; then
+    if [[ -w "${TARGET_DIR_ARG}" && ( ! -e "${TARGET_DIR_ARG}/${target_data_rel}" || -w "${TARGET_DIR_ARG}/${target_data_rel}" ) ]]; then
+      rsync -a "${TEMPLATE_DIR_ARG}/${target_data_rel}/" "${TARGET_DIR_ARG}/${target_data_rel}/"
+    else
+      run_privileged rsync -a "${TEMPLATE_DIR_ARG}/${target_data_rel}/" "${TARGET_DIR_ARG}/${target_data_rel}/"
+    fi
+  fi
+elif [[ -w "${TARGET_DIR_ARG}" ]]; then
   rsync -a --delete "${TEMPLATE_DIR_ARG}/" "${TARGET_DIR_ARG}/"
 else
   run_privileged rsync -a --delete "${TEMPLATE_DIR_ARG}/" "${TARGET_DIR_ARG}/"

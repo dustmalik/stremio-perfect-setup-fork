@@ -386,7 +386,7 @@ select_modules_with_whiptail() {
   for token in "${optional_modules[@]}"; do
     if array_contains "${token}" "${default_selected_optional[@]}"; then
       item_status="ON"
-      item_note="pre-enabled"
+      item_note="enabled"
     else
       item_status="OFF"
       item_note="optional"

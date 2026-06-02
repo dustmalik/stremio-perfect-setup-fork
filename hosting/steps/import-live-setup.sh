@@ -61,7 +61,6 @@ DOCKER_DIR_ARG="$(absolute_path "${DOCKER_DIR_ARG}")"
 [[ -n "${MANIFEST_FILE}" ]] || die "--manifest-file is required"
 [[ -n "${MODULES_FILE}" ]] || die "--modules-file is required"
 [[ -f "${MODULES_FILE}" ]] || die "Modules file does not exist: ${MODULES_FILE}"
-[[ -s "${MODULES_FILE}" ]] || die "Selected modules file is empty: ${MODULES_FILE}"
 
 rm -rf "${CONFIG_DIR_ARG}"
 ensure_directory "${CONFIG_DIR_ARG}"
