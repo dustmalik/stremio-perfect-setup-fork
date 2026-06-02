@@ -1,4 +1,4 @@
-# 🎬 [STREMIO FULL & EASY TOTAL BEGINNER'S GUIDE](https://numb3rs.stream/)
+# 🍿 [STREMIO FULL & EASY TOTAL BEGINNER'S GUIDE](https://numb3rs.stream/)
 **[⚡ DEBRID / 🧲 P2P / 🌐 HTTP]** (*v2.0*)
 
 

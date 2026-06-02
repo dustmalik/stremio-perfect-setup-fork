@@ -232,7 +232,7 @@ I am including this section for anyone who has any additional questions or is en
    2. Save the AIOMetadata configuration.
    3. Copy the **Manifest URL**.
    4. Install that Manifest URL in **Nuvio → Account → Addons → Add Addon**.
-   5. Then add the **🍿 Nuvio Perfect Collections** Pack.
+   5. Then add the **💎 Nuvio Perfect Collections** Pack.
 * The collections need to find the matching *AIOMetadata* catalogs inside Nuvio. If those catalogs are not installed first, there is nothing for the collections to connect to.
 * Also check that both *AIOMetadata* and the collections were added to the correct **Nuvio profile**.
 

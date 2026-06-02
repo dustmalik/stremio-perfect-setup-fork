@@ -17,7 +17,7 @@ No tracked wizard-specific releases yet.
 
 No tracked hosting-specific releases yet.
 
-## 🍿 Collections
+## 💎 Collections
 
 No tracked collections-specific releases yet.
 

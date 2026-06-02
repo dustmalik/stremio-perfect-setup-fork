@@ -1,4 +1,4 @@
-# 🚀 [NUVIO FULL & EASY TOTAL BEGINNER'S GUIDE](https://numb3rs.stream/guide/Nuvio/)
+# 🚀 [NUVIO FULL & EASY TOTAL BEGINNER'S GUIDE](https://numb3rs.stream/)
 **[⚡ DEBRID / 🧲 P2P / 🌐 HTTP]** (*WIP*)
 
 
@@ -6,7 +6,8 @@
 
 Since a few people asked about using my setup with **Nuvio**, and since my previous Nuvio collections post got removed by Reddit filters for whatever reason, I’m posting this again in a cleaner way.
 
-I have now updated my popular [**🎬 Stremio/Nuvio Perfect Setup**](https://numb3rs.stream/) guide with instructions for *Nuvio* too, which is linked in the title above, or directly [**here**](https://numb3rs.stream/guide/Nuvio/). [**READ BEFORE ASKING QUESTIONS**]
+I have now updated my popular [**🍿 Stremio/Nuvio Perfect Setup**](https://numb3rs.stream/) guide with instructions for *Nuvio* too.
+[**READ BEFORE ASKING QUESTIONS**]
 
 **If this guide helps you, PLEASE UPVOTE this post so it remains relevant for others to find it and also benefit from it.** 😊
 
@@ -18,7 +19,7 @@ The guide uses the same core addon structure as my Stremio setup, but adapted fo
 * **AIOMetadata** for metadata, catalogs, search, artwork, and integrations
 * **Watchly** as an optional recommendation and personalized catalogs layer
 
-# 🍿 Nuvio Perfect Collections (incl. Dynamic Backdrops)
+# 💎 Nuvio Perfect Collections (incl. Dynamic Backdrops)
 
 One of the things I’m most excited about is my pack.
 

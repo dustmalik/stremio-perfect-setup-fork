@@ -16,7 +16,7 @@ title: "🚀 Nuvio"
 
 If you are a beginner and want to set up **Nuvio** from scratch, start with [**📝 1. Accounts Preparation**](1-Accounts.md). If you already know what you're doing and only need the *assets* for the collections, check out the chapter below.
 
-## 🍿 Nuvio Perfect Collections
+## 💎 Nuvio Perfect Collections
 
 If you don't want to follow the full setup above and only need the files, images, collections, or ready-made templates, this section is for you.
 

@@ -175,7 +175,7 @@
     var home = document.createElement("a");
     home.className = "nav-link";
     home.href = homeUrl;
-    home.textContent = "🎬 Home";
+    home.textContent = "🍿 Home";
 
     if (normalizePath(currentPath) === "index.md" || normalizePath(currentPath) === "") {
       home.setAttribute("aria-current", "page");
