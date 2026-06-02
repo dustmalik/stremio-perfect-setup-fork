@@ -397,6 +397,9 @@ root_tz_default="${DEFAULT_TIMEZONE:-${root_tz_default:-Europe/Berlin}}"
 root_docker_dir_default="${DEFAULT_DOCKER_DIR:-${root_docker_dir_default:-/opt/docker}}"
 env_value_is_placeholder "${root_domain_default}" && root_domain_default=""
 env_value_is_placeholder "${root_letsencrypt_default}" && root_letsencrypt_default=""
+env_value_is_placeholder "${root_authelia_session_default}" && root_authelia_session_default=""
+env_value_is_placeholder "${root_authelia_storage_default}" && root_authelia_storage_default=""
+env_value_is_placeholder "${root_authelia_jwt_default}" && root_authelia_jwt_default=""
 
 if is_interactive; then
   show_message "Environment Details" "Next, enter the core environment values for the stack: timezone, final Docker directory, public base domain, and the email address used for Let's Encrypt notifications. These values are written into the staged root .env and used across multiple services."
@@ -451,10 +454,10 @@ if (( ${#hostname_vars_missing[@]} > 0 )); then
     env_var="${hostname_vars_missing[i]}"
     module="${hostname_vars_modules[i]}"
     suggested_subdomain="$(printf '%s' "${env_var}" | sed 's/_HOSTNAME$//' | tr '[:upper:]_' '[:lower:]-')"
-    subdomain_prefix="$(prompt_value "Enter the subdomain prefix for the ${module} service so its hostname can be stored as prefix.${DOMAIN_VALUE} in the root .env [${env_var}]" "${suggested_subdomain}")"
+    subdomain_prefix="$(prompt_value "Enter the subdomain prefix for the ${module} service so its hostname can be set as prefix.\${DOMAIN} in the root .env [${env_var}]" "${suggested_subdomain}")"
     [[ -n "${subdomain_prefix}" ]] || subdomain_prefix="${suggested_subdomain}"
-    env_upsert "${ROOT_ENV}" "${env_var}" "${subdomain_prefix}.${DOMAIN_VALUE}"
-    success "${env_var}=${subdomain_prefix}.${DOMAIN_VALUE}"
+    env_upsert_near_hostnames "${ROOT_ENV}" "${env_var}" "${subdomain_prefix}."'${DOMAIN}'
+    success "${env_var}=${subdomain_prefix}."'${DOMAIN}'
   done
 fi
 
@@ -619,14 +622,23 @@ for module in "${pruned_modules[@]}"; do
   array_contains "${module}" "${final_modules[@]}" || die "Template pruning mismatch: unexpected module remained after pruning: ${module}"
 done
 
-compose_profiles=()
+required_profile="${REQUIRED_PROFILE:-required}"
+
+compose_profile_exclude=("all")
+for module in "${pruned_required_modules[@]}"; do
+  while IFS= read -r profile; do
+    [[ -n "${profile}" && "${profile}" != "${required_profile}" ]] || continue
+    array_contains "${profile}" "${compose_profile_exclude[@]}" || compose_profile_exclude+=("${profile}")
+  done < <(module_profile_names "${TEMPLATE_DIR_ABS}" "${module}")
+done
+
+compose_profiles=("${required_profile}")
 while IFS= read -r profile; do
   [[ -n "${profile}" ]] || continue
+  array_contains "${profile}" "${compose_profile_exclude[@]}" && continue
+  array_contains "${profile}" "${compose_profiles[@]}" && continue
   compose_profiles+=("${profile}")
 done < <(template_profile_names "${TEMPLATE_DIR_ABS}" "${final_modules[@]}")
-(( ${#compose_profiles[@]} > 0 )) || die "No compose profiles found in the pruned template"
-required_profile="${REQUIRED_PROFILE:-required}"
-array_contains "${required_profile}" "${compose_profiles[@]}" || compose_profiles=("${required_profile}" "${compose_profiles[@]}")
 
 env_upsert "${ROOT_ENV}" COMPOSE_PROFILES "\"$(join_by ',' "${compose_profiles[@]}")\""
 success "COMPOSE_PROFILES=$(join_by ',' "${compose_profiles[@]}")"

@@ -535,6 +535,40 @@ env_upsert() {
   mv "${tmp_file}" "${file}"
 }
 
+env_upsert_near_hostnames() {
+  local file="$1"
+  local key="$2"
+  local value="$3"
+  local tmp_file
+
+  tmp_file="$(temp_file_next_to "${file}")"
+  awk -v key="${key}" -v value="${value}" '
+    BEGIN { n = 0; existing = -1; last_hostname = -1 }
+    {
+      lines[n] = $0
+      if ($0 ~ ("^" key "=")) { existing = n }
+      if ($0 ~ /_HOSTNAME=/) { last_hostname = n }
+      n++
+    }
+    END {
+      if (existing >= 0) {
+        for (i = 0; i < n; i++) {
+          if (i == existing) { print key "=" value } else { print lines[i] }
+        }
+      } else if (last_hostname >= 0) {
+        for (i = 0; i < n; i++) {
+          print lines[i]
+          if (i == last_hostname) { print key "=" value }
+        }
+      } else {
+        for (i = 0; i < n; i++) { print lines[i] }
+        print key "=" value
+      }
+    }
+  ' "${file}" > "${tmp_file}"
+  mv "${tmp_file}" "${file}"
+}
+
 env_upsert_uncomment() {
   local file="$1"
   local key="$2"
