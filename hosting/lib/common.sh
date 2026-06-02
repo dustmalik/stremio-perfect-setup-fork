@@ -305,10 +305,8 @@ prompt_choice() {
   local args=()
   local default_args=()
   local choice="" token="" description="" index=0
-  local choice_key=""
 
   (( ${#options[@]} > 0 )) || die "prompt_choice requires at least one option"
-  choice_key="$(printf '%s' "${title}" | tr '[:lower:]' '[:upper:]' | tr -c 'A-Z0-9' '_')_CHOICE"
 
   if dialog_ui_available; then
     while (( index < ${#options[@]} )); do
@@ -343,7 +341,7 @@ prompt_choice() {
     index=$((index + 2))
   done
 
-  choice="$(prompt_value "Enter the option token for this setup step so the script can continue (${choice_key})" "${default_value}")"
+  choice="$(prompt_value "Enter the option token for this setup step so the script can continue" "${default_value}")"
   printf '%s' "${choice}"
 }
 

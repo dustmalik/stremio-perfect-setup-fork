@@ -1,0 +1,774 @@
+{
+  "modules": {
+    "actual-budget": [
+      {
+        "slug": "actual-budget",
+        "hostname_env": "ACTUAL_BUDGET_HOSTNAME",
+        "href_template": "https://${ACTUAL_BUDGET_HOSTNAME}",
+        "name": "Actual Budget",
+        "desc": "Self-hosted personal finance and budgeting app.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/actual-budget.svg"
+      }
+    ],
+    "adguard": [
+      {
+        "slug": "adguard-home",
+        "hostname_env": "ADGUARD_HOSTNAME",
+        "href_template": "https://${ADGUARD_HOSTNAME}",
+        "name": "AdGuard Home",
+        "desc": "Network-wide DNS filtering and ad blocking.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/adguard-home.svg"
+      }
+    ],
+    "aiolists": [
+      {
+        "slug": "aiolists",
+        "hostname_env": "AIOLISTS_HOSTNAME",
+        "href_template": "https://${AIOLISTS_HOSTNAME}",
+        "name": "AIOLists",
+        "desc": "Stremio addon for MDBList and Trakt-powered lists.",
+        "icon": "https://i.imgur.com/DigFuAQ.png"
+      }
+    ],
+    "aiomanager": [
+      {
+        "slug": "aiomanager",
+        "hostname_env": "AIOMANAGER_HOSTNAME",
+        "href_template": "https://${AIOMANAGER_HOSTNAME}",
+        "name": "AIOManager",
+        "desc": "Stremio account and addon manager.",
+        "icon": "https://raw.githubusercontent.com/Sonicx161/AIOManager/HEAD/public/logo.png"
+      }
+    ],
+    "aiometadata": [
+      {
+        "slug": "aiometadata",
+        "hostname_env": "AIOMETADATA_HOSTNAME",
+        "href_template": "https://${AIOMETADATA_HOSTNAME}",
+        "name": "AIOMetadata",
+        "desc": "Stremio metadata addon with multi-source catalogs and artwork.",
+        "icon": "https://raw.githubusercontent.com/cedya77/aiometadata/HEAD/public/logo.png"
+      }
+    ],
+    "altmount": [
+      {
+        "slug": "altmount",
+        "hostname_env": "ALTMOUNT_HOSTNAME",
+        "href_template": "https://${ALTMOUNT_HOSTNAME}",
+        "name": "AltMount",
+        "desc": "Mount and manage remote media libraries for local apps.",
+        "icon": "https://raw.githubusercontent.com/javi11/altmount/HEAD/frontend/public/logo.png"
+      }
+    ],
+    "anime-kitsu": [
+      {
+        "slug": "anime-kitsu",
+        "hostname_env": "ANIME_KITSU_HOSTNAME",
+        "href_template": "https://${ANIME_KITSU_HOSTNAME}",
+        "name": "Anime Kitsu",
+        "desc": "Stremio addon for Kitsu-based anime metadata and catalogs.",
+        "icon": "https://raw.githubusercontent.com/TheBeastLT/stremio-kitsu-anime/HEAD/static/images/logo.jpg"
+      }
+    ],
+    "apprise": [
+      {
+        "slug": "apprise",
+        "hostname_env": "APPRISE_HOSTNAME",
+        "href_template": "https://${APPRISE_HOSTNAME}",
+        "name": "Apprise",
+        "desc": "Notification gateway for dozens of messaging services.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/png/apprise.png"
+      }
+    ],
+    "autosync": [
+      {
+        "slug": "autosync",
+        "hostname_env": "AUTOSYNC_HOSTNAME",
+        "href_template": "https://${AUTOSYNC_HOSTNAME}",
+        "name": "AutoSync",
+        "desc": "Automates synchronization tasks for hosted media workflows.",
+        "icon": "https://raw.githubusercontent.com/pukabyte/autosync/HEAD/static/img/logo.png"
+      }
+    ],
+    "bazarr": [
+      {
+        "slug": "bazarr",
+        "hostname_env": "BAZARR_HOSTNAME",
+        "href_template": "https://${BAZARR_HOSTNAME}",
+        "name": "Bazarr",
+        "desc": "Subtitle manager for Radarr and Sonarr.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/bazarr.svg"
+      },
+      {
+        "slug": "bazarr-4k",
+        "hostname_env": "BAZARR4K_HOSTNAME",
+        "href_template": "https://${BAZARR4K_HOSTNAME}",
+        "name": "Bazarr 4K",
+        "desc": "Subtitle manager for the 4K Arr stack.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/bazarr.svg"
+      }
+    ],
+    "beszel": [
+      {
+        "slug": "beszel",
+        "hostname_env": "BESZEL_HOSTNAME",
+        "href_template": "https://${BESZEL_HOSTNAME}",
+        "name": "Beszel",
+        "desc": "Lightweight server monitoring and Docker insights.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/beszel.svg"
+      }
+    ],
+    "bitmagnet": [
+      {
+        "slug": "bitmagnet",
+        "hostname_env": "BITMAGNET_HOSTNAME",
+        "href_template": "https://${BITMAGNET_HOSTNAME}",
+        "name": "Bitmagnet",
+        "desc": "BitTorrent indexer and DHT crawler.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/bitmagnet.svg"
+      }
+    ],
+    "cors-proxy": [
+      {
+        "slug": "cors-proxy",
+        "hostname_env": null,
+        "href_template": "https://cors-proxy.${DOMAIN}",
+        "name": "CORS Proxy",
+        "desc": "Browser-facing proxy for cross-origin addon setup calls.",
+        "icon": "https://corsfix.com/logo.png"
+      }
+    ],
+    "debridav": [
+      {
+        "slug": "debridav",
+        "hostname_env": "DEBRIDAV_HOSTNAME",
+        "href_template": "https://${DEBRIDAV_HOSTNAME}",
+        "name": "Debridav",
+        "desc": "WebDAV bridge for debrid-backed media access.",
+        "icon": "https://github.com/skjaere.png?size=256"
+      }
+    ],
+    "decypharr": [
+      {
+        "slug": "decypharr",
+        "hostname_env": "DECYPHARR_HOSTNAME",
+        "href_template": "https://${DECYPHARR_HOSTNAME}",
+        "name": "Decypharr",
+        "desc": "Download client bridge for Arr apps and debrid providers.",
+        "icon": "https://raw.githubusercontent.com/sirrobot01/decypharr/HEAD/docs/src/assets/logo.png"
+      }
+    ],
+    "discord-tickets": [
+      {
+        "slug": "discord-tickets",
+        "hostname_env": "DISCORD_TICKETS_HOSTNAME",
+        "href_template": "https://${DISCORD_TICKETS_HOSTNAME}",
+        "name": "Discord Tickets",
+        "desc": "Open-source Discord ticket management bot.",
+        "icon": "https://discordtickets.app/assets/images/social/index.png"
+      }
+    ],
+    "dockge": [
+      {
+        "slug": "dockge",
+        "hostname_env": "DOCKGE_HOSTNAME",
+        "href_template": "https://${DOCKGE_HOSTNAME}",
+        "name": "Dockge",
+        "desc": "Docker Compose stack manager.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/dockge.svg"
+      }
+    ],
+    "dockhand": [
+      {
+        "slug": "dockhand",
+        "hostname_env": "DOCKHAND_HOSTNAME",
+        "href_template": "https://${DOCKHAND_HOSTNAME}",
+        "name": "Dockhand",
+        "desc": "Simple Docker dashboard and container manager.",
+        "icon": "https://dockhand.pro/images/logo.webp"
+      }
+    ],
+    "easynews-plus-plus": [
+      {
+        "slug": "easynews-plus-plus",
+        "hostname_env": "EASYNEWS_PLUS_PLUS_HOSTNAME",
+        "href_template": "https://${EASYNEWS_PLUS_PLUS_HOSTNAME}",
+        "name": "Easynews++",
+        "desc": "Enhanced Easynews search and browsing frontend.",
+        "icon": "https://pbs.twimg.com/profile_images/479627852757733376/8v9zH7Yo_400x400.jpeg"
+      }
+    ],
+    "erdb": [
+      {
+        "slug": "erdb",
+        "hostname_env": "ERDB_HOSTNAME",
+        "href_template": "https://${ERDB_HOSTNAME}",
+        "name": "ERDB",
+        "desc": "Poster, rating, and metadata utility for media setups.",
+        "icon": "https://raw.githubusercontent.com/RealBestia1/ERDB/HEAD/.github/assets/logo.png"
+      }
+    ],
+    "fivefilters-full-text-rss": [
+      {
+        "slug": "fivefilters-full-text-rss",
+        "hostname_env": "FIVEFILTERS_FULL_TEXT_RSS_HOSTNAME",
+        "href_template": "https://${FIVEFILTERS_FULL_TEXT_RSS_HOSTNAME}",
+        "name": "FiveFilters Full-Text RSS",
+        "desc": "Converts partial feeds into full-text RSS feeds.",
+        "icon": "https://www.fivefilters.org/favicon.ico"
+      }
+    ],
+    "freshrss": [
+      {
+        "slug": "freshrss",
+        "hostname_env": "FRESHRSS_HOSTNAME",
+        "href_template": "https://${FRESHRSS_HOSTNAME}",
+        "name": "FreshRSS",
+        "desc": "Self-hosted RSS aggregator and reader.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/freshrss.svg"
+      }
+    ],
+    "homarr": [
+      {
+        "slug": "homarr",
+        "hostname_env": "HOMARR_HOSTNAME",
+        "href_template": "https://${HOMARR_HOSTNAME}",
+        "name": "Homarr",
+        "desc": "Customizable homelab dashboard.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/homarr.svg"
+      }
+    ],
+    "honey": [
+      {
+        "slug": "honey",
+        "hostname_env": "HONEY_HOSTNAME",
+        "href_template": "https://${HONEY_HOSTNAME}",
+        "name": "Honey",
+        "desc": "Self-hosted dashboard for your services.",
+        "icon": "https://raw.githubusercontent.com/dani3l0/honey/HEAD/public/img/icon.png"
+      }
+    ],
+    "hound": [
+      {
+        "slug": "hound",
+        "hostname_env": "HOUND_HOSTNAME",
+        "href_template": "https://${HOUND_HOSTNAME}",
+        "name": "Hound",
+        "desc": "Media server and streaming-focused library manager.",
+        "icon": "https://raw.githubusercontent.com/Hound-Media-Server/hound/HEAD/web/public/hound-logo.png"
+      }
+    ],
+    "huntarr": [
+      {
+        "slug": "huntarr",
+        "hostname_env": "HUNTARR_HOSTNAME",
+        "href_template": "https://${HUNTARR_HOSTNAME}",
+        "name": "Huntarr",
+        "desc": "Automates discovery and upgrades across Arr apps.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/png/huntarr.png"
+      }
+    ],
+    "immich": [
+      {
+        "slug": "immich",
+        "hostname_env": "IMMICH_HOSTNAME",
+        "href_template": "https://${IMMICH_HOSTNAME}",
+        "name": "Immich",
+        "desc": "Self-hosted photo and video backup platform.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/immich.svg"
+      }
+    ],
+    "iptvboss": [
+      {
+        "slug": "iptvboss",
+        "hostname_env": "IPTVBOSS_HOSTNAME",
+        "href_template": "https://${IPTVBOSS_HOSTNAME}",
+        "name": "IPTVBoss",
+        "desc": "EPG and playlist management for IPTV workflows.",
+        "icon": "https://iptvboss.pro/wp-content/uploads/2022/10/cropped-Icon-300x300.png"
+      }
+    ],
+    "it-tools": [
+      {
+        "slug": "it-tools",
+        "hostname_env": "IT_TOOLS_HOSTNAME",
+        "href_template": "https://${IT_TOOLS_HOSTNAME}",
+        "name": "IT Tools",
+        "desc": "Handy tools for developers and sysadmins.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/it-tools.svg"
+      }
+    ],
+    "karakeep": [
+      {
+        "slug": "karakeep",
+        "hostname_env": "KARAKEEP_HOSTNAME",
+        "href_template": "https://${KARAKEEP_HOSTNAME}",
+        "name": "Karakeep",
+        "desc": "Bookmark manager and read-it-later archive.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/karakeep.svg"
+      }
+    ],
+    "librespeed": [
+      {
+        "slug": "librespeed",
+        "hostname_env": "LIBRESPEED_HOSTNAME",
+        "href_template": "https://${LIBRESPEED_HOSTNAME}",
+        "name": "LibreSpeed",
+        "desc": "Self-hosted internet speed test.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/librespeed.svg"
+      }
+    ],
+    "mealie": [
+      {
+        "slug": "mealie",
+        "hostname_env": "MEALIE_HOSTNAME",
+        "href_template": "https://${MEALIE_HOSTNAME}",
+        "name": "Mealie",
+        "desc": "Recipe manager and meal planner.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/mealie.svg"
+      }
+    ],
+    "minecraft": [
+      {
+        "slug": "minecraft",
+        "hostname_env": "MINECRAFT_HOSTNAME",
+        "href_template": "https://${MINECRAFT_HOSTNAME}",
+        "name": "Minecraft Server",
+        "desc": "Minecraft server hostname for the hosted game instance.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/minecraft.svg"
+      }
+    ],
+    "nitter": [
+      {
+        "slug": "nitter",
+        "hostname_env": "NITTER_HOSTNAME",
+        "href_template": "https://${NITTER_HOSTNAME}",
+        "name": "Nitter",
+        "desc": "Alternative privacy-friendly X/Twitter frontend.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/nitter.svg"
+      }
+    ],
+    "notifiarr": [
+      {
+        "slug": "notifiarr",
+        "hostname_env": "NOTIFIARR_HOSTNAME",
+        "href_template": "https://${NOTIFIARR_HOSTNAME}",
+        "name": "Notifiarr",
+        "desc": "Notifications and integrations for media stacks.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/notifiarr.svg"
+      }
+    ],
+    "ntfy": [
+      {
+        "slug": "ntfy",
+        "hostname_env": "NTFY_HOSTNAME",
+        "href_template": "https://${NTFY_HOSTNAME}",
+        "name": "ntfy",
+        "desc": "Push notifications via simple pub-sub topics.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/ntfy.svg"
+      }
+    ],
+    "nzbdav": [
+      {
+        "slug": "nzbdav",
+        "hostname_env": "NZBDAV_HOSTNAME",
+        "href_template": "https://${NZBDAV_HOSTNAME}",
+        "name": "NZBDAV",
+        "desc": "WebDAV gateway for Usenet content access.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/nzbdav.svg"
+      }
+    ],
+    "nzbhydra2": [
+      {
+        "slug": "nzbhydra2",
+        "hostname_env": "NZBHYDRA2_HOSTNAME",
+        "href_template": "https://${NZBHYDRA2_HOSTNAME}",
+        "name": "NZBHydra2",
+        "desc": "Meta-search for NZB indexers.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/nzbhydra2.svg"
+      }
+    ],
+    "omg-tv-addon": [
+      {
+        "slug": "omg-tv-addon",
+        "hostname_env": "OMG_TV_STREMIO_ADDON_HOSTNAME",
+        "href_template": "https://${OMG_TV_STREMIO_ADDON_HOSTNAME}",
+        "name": "OMG TV Addon",
+        "desc": "Stremio addon for IPTV and live TV streams.",
+        "icon": "https://raw.githubusercontent.com/mccoy88f/OMG-Premium-TV/HEAD/tv.png"
+      }
+    ],
+    "plexio": [
+      {
+        "slug": "plexio",
+        "hostname_env": "PLEXIO_HOSTNAME",
+        "href_template": "https://${PLEXIO_HOSTNAME}",
+        "name": "Plexio",
+        "desc": "Modern web client and companion for Plex libraries.",
+        "icon": "https://raw.githubusercontent.com/vanchaxy/plexio/HEAD/frontend/public/favicon.ico"
+      }
+    ],
+    "quetre": [
+      {
+        "slug": "quetre",
+        "hostname_env": "QUETRE_HOSTNAME",
+        "href_template": "https://${QUETRE_HOSTNAME}",
+        "name": "Quetre",
+        "desc": "Privacy-friendly Quora frontend.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/quetre.svg"
+      }
+    ],
+    "radarr": [
+      {
+        "slug": "radarr",
+        "hostname_env": "RADARR_HOSTNAME",
+        "href_template": "https://${RADARR_HOSTNAME}",
+        "name": "Radarr",
+        "desc": "Movie collection manager for Usenet and BitTorrent users.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/radarr.svg"
+      },
+      {
+        "slug": "radarr-4k",
+        "hostname_env": "RADARR4K_HOSTNAME",
+        "href_template": "https://${RADARR4K_HOSTNAME}",
+        "name": "Radarr 4K",
+        "desc": "4K movie library manager.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/radarr-4k.svg"
+      },
+      {
+        "slug": "radarr-anime",
+        "hostname_env": "RADARRANIME_HOSTNAME",
+        "href_template": "https://${RADARRANIME_HOSTNAME}",
+        "name": "Radarr Anime",
+        "desc": "Anime-focused movie library manager.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/radarr.svg"
+      }
+    ],
+    "redlib": [
+      {
+        "slug": "redlib",
+        "hostname_env": "REDLIB_HOSTNAME",
+        "href_template": "https://${REDLIB_HOSTNAME}",
+        "name": "Redlib",
+        "desc": "Privacy-friendly Reddit frontend.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/redlib.svg"
+      }
+    ],
+    "rss-bridge": [
+      {
+        "slug": "rss-bridge",
+        "hostname_env": "RSS_BRIDGE_HOSTNAME",
+        "href_template": "https://${RSS_BRIDGE_HOSTNAME}",
+        "name": "RSS-Bridge",
+        "desc": "Generates RSS and Atom feeds from websites.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/rss-bridge.svg"
+      }
+    ],
+    "sonarr": [
+      {
+        "slug": "sonarr",
+        "hostname_env": "SONARR_HOSTNAME",
+        "href_template": "https://${SONARR_HOSTNAME}",
+        "name": "Sonarr",
+        "desc": "TV series collection manager for Usenet and BitTorrent users.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/sonarr.svg"
+      },
+      {
+        "slug": "sonarr-4k",
+        "hostname_env": "SONARR4K_HOSTNAME",
+        "href_template": "https://${SONARR4K_HOSTNAME}",
+        "name": "Sonarr 4K",
+        "desc": "4K TV series library manager.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/sonarr-4k.svg"
+      },
+      {
+        "slug": "sonarr-anime",
+        "hostname_env": "SONARRANIME_HOSTNAME",
+        "href_template": "https://${SONARRANIME_HOSTNAME}",
+        "name": "Sonarr Anime",
+        "desc": "Anime-focused TV library manager.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/sonarr.svg"
+      }
+    ],
+    "speedtest-tracker": [
+      {
+        "slug": "speedtest-tracker",
+        "hostname_env": "SPEEDTEST_TRACKER_HOSTNAME",
+        "href_template": "https://${SPEEDTEST_TRACKER_HOSTNAME}",
+        "name": "Speedtest Tracker",
+        "desc": "Tracks internet speed tests over time.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/png/speedtest-tracker.png"
+      }
+    ],
+    "stirling-pdf": [
+      {
+        "slug": "stirling-pdf",
+        "hostname_env": "STIRLING_PDF_HOSTNAME",
+        "href_template": "https://${STIRLING_PDF_HOSTNAME}",
+        "name": "Stirling PDF",
+        "desc": "Self-hosted PDF toolbox and document utilities.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/stirling-pdf.svg"
+      }
+    ],
+    "streamystats": [
+      {
+        "slug": "streamystats",
+        "hostname_env": "STREAMYSTATS_HOSTNAME",
+        "href_template": "https://${STREAMYSTATS_HOSTNAME}",
+        "name": "Streamystats",
+        "desc": "Analytics and watch statistics for Jellyfin libraries.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/streamystats.svg"
+      }
+    ],
+    "stremio-ai-companion": [
+      {
+        "slug": "stremio-ai-companion",
+        "hostname_env": "STREMIO_AI_COMPANION_HOSTNAME",
+        "href_template": "https://${STREMIO_AI_COMPANION_HOSTNAME}",
+        "name": "Stremio AI Companion",
+        "desc": "AI-assisted companion app for Stremio workflows.",
+        "icon": "https://raw.githubusercontent.com/willtho89/stremio-ai-companion/HEAD/.assets/logo1_256.png"
+      }
+    ],
+    "stremio-ai-search": [
+      {
+        "slug": "stremio-ai-search",
+        "hostname_env": "STREMIO_AI_SEARCH_HOSTNAME",
+        "href_template": "https://${STREMIO_AI_SEARCH_HOSTNAME}",
+        "name": "Stremio AI Search",
+        "desc": "Natural-language search addon for Stremio.",
+        "icon": "https://raw.githubusercontent.com/itcon-pty-au/stremio-ai-search/HEAD/public/logo.png"
+      }
+    ],
+    "stremio-catalog-providers": [
+      {
+        "slug": "stremio-catalog-providers",
+        "hostname_env": "STREMIO_CATALOG_PROVIDERS_HOSTNAME",
+        "href_template": "https://${STREMIO_CATALOG_PROVIDERS_HOSTNAME}",
+        "name": "Stremio Catalog Providers",
+        "desc": "Stremio addon for external catalog providers.",
+        "icon": "https://raw.githubusercontent.com/redd-ravenn/stremio-catalog-providers/refs/heads/main/public/assets/logo.png"
+      }
+    ],
+    "stremio-letterboxd": [
+      {
+        "slug": "stremio-letterboxd",
+        "hostname_env": "STREMIO_LETTERBOXD_HOSTNAME",
+        "href_template": "https://${STREMIO_LETTERBOXD_HOSTNAME}",
+        "name": "Stremio Letterboxd",
+        "desc": "Letterboxd lists and discovery inside Stremio.",
+        "icon": "https://raw.githubusercontent.com/megadrive/stremio-letterboxd/HEAD/packages/web/public/logo.png"
+      }
+    ],
+    "stremio-streaming-catalogs": [
+      {
+        "slug": "stremio-streaming-catalogs",
+        "hostname_env": "STREMIO_STREAMING_CATALOGS_HOSTNAME",
+        "href_template": "https://${STREMIO_STREAMING_CATALOGS_HOSTNAME}",
+        "name": "Stremio Streaming Catalogs",
+        "desc": "Streaming availability catalogs for Stremio.",
+        "icon": "https://raw.githubusercontent.com/rleroi/Stremio-Streaming-Catalogs-Addon/HEAD/vue/dist/stremio.png"
+      }
+    ],
+    "stremio-trakt-addon": [
+      {
+        "slug": "stremio-trakt-addon",
+        "hostname_env": "STREMIO_TRAKT_ADDON_HOSTNAME",
+        "href_template": "https://${STREMIO_TRAKT_ADDON_HOSTNAME}",
+        "name": "Stremio Trakt Addon",
+        "desc": "Trakt integration and sync for Stremio.",
+        "icon": "https://raw.githubusercontent.com/redd-ravenn/stremio-catalog-providers/refs/heads/main/public/assets/logoTrakt.png"
+      }
+    ],
+    "syncio": [
+      {
+        "slug": "syncio",
+        "hostname_env": "SYNCIO_HOSTNAME",
+        "href_template": "https://${SYNCIO_HOSTNAME}",
+        "name": "Syncio",
+        "desc": "Private sync service for media and addon workflows.",
+        "icon": "https://raw.githubusercontent.com/iamneur0/syncio/HEAD/client/public/logo-black.png"
+      }
+    ],
+    "syncribullet": [
+      {
+        "slug": "syncribullet",
+        "hostname_env": "SYNCRIBULLET_HOSTNAME",
+        "href_template": "https://${SYNCRIBULLET_HOSTNAME}",
+        "name": "Syncribullet",
+        "desc": "Stremio addon for synced watch and recommendation flows.",
+        "icon": "https://github.com/aliyss/syncribullet/blob/master/public/android-chrome-192x192.png?raw=true"
+      }
+    ],
+    "tandoor": [
+      {
+        "slug": "tandoor",
+        "hostname_env": "TANDOOR_HOSTNAME",
+        "href_template": "https://${TANDOOR_HOSTNAME}",
+        "name": "Tandoor Recipes",
+        "desc": "Recipe manager and meal planning platform.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/tandoor-recipes.svg"
+      }
+    ],
+    "tautulli": [
+      {
+        "slug": "tautulli",
+        "hostname_env": "TAUTULLI_HOSTNAME",
+        "href_template": "https://${TAUTULLI_HOSTNAME}",
+        "name": "Tautulli",
+        "desc": "Plex monitoring, notifications, and stats.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/tautulli.svg"
+      }
+    ],
+    "thelounge": [
+      {
+        "slug": "thelounge",
+        "hostname_env": "THE_LOUNGE_HOSTNAME",
+        "href_template": "https://${THE_LOUNGE_HOSTNAME}",
+        "name": "The Lounge",
+        "desc": "Self-hosted web IRC client.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/thelounge.svg"
+      }
+    ],
+    "tmdb-addon": [
+      {
+        "slug": "tmdb-addon",
+        "hostname_env": "TMDB_ADDON_HOSTNAME",
+        "href_template": "https://${TMDB_ADDON_HOSTNAME}",
+        "name": "TMDB Addon",
+        "desc": "Stremio addon for TMDB-backed metadata.",
+        "icon": "https://94c8cb9f702d-tmdb-addon.baby-beamup.club/logo.png"
+      }
+    ],
+    "tmdb-collections": [
+      {
+        "slug": "tmdb-collections",
+        "hostname_env": "TMDB_COLLECTIONS_HOSTNAME",
+        "href_template": "https://${TMDB_COLLECTIONS_HOSTNAME}",
+        "name": "TMDB Collections",
+        "desc": "Stremio addon for TMDB collections and box sets.",
+        "icon": "https://github.com/youchi1/tmdb-collections/raw/main/Images/logo.png"
+      }
+    ],
+    "torbox-manager": [
+      {
+        "slug": "torbox-manager",
+        "hostname_env": "TORBOX_MANAGER_HOSTNAME",
+        "href_template": "https://${TORBOX_MANAGER_HOSTNAME}",
+        "name": "TorBox Manager",
+        "desc": "Web manager for TorBox downloads and storage.",
+        "icon": "https://raw.githubusercontent.com/jittarao/torbox-app/HEAD/public/images/TBM-logo.png"
+      }
+    ],
+    "tuliprox": [
+      {
+        "slug": "tuliprox",
+        "hostname_env": "TULIPROX_HOSTNAME",
+        "href_template": "https://${TULIPROX_HOSTNAME}",
+        "name": "Tuliprox",
+        "desc": "IPTV proxy and playlist processing platform.",
+        "icon": "https://raw.githubusercontent.com/euzu/tuliprox/HEAD/frontend/public/assets/tuliprox-logo.svg"
+      }
+    ],
+    "usenet-streamer": [
+      {
+        "slug": "usenet-streamer",
+        "hostname_env": "USENET_STREAMER_HOSTNAME",
+        "href_template": "https://${USENET_STREAMER_HOSTNAME}",
+        "name": "Usenet Streamer",
+        "desc": "Usenet-backed streaming addon and browser.",
+        "icon": "https://raw.githubusercontent.com/sanket9225/usenetstreamer/HEAD/assets/icon.png"
+      }
+    ],
+    "usenet-ultimate": [
+      {
+        "slug": "usenet-ultimate",
+        "hostname_env": "USENET_ULTIMATE_HOSTNAME",
+        "href_template": "https://${USENET_ULTIMATE_HOSTNAME}",
+        "name": "Usenet Ultimate",
+        "desc": "All-in-one Usenet streaming addon for Stremio.",
+        "icon": "https://raw.githubusercontent.com/DSmart33/Usenet-Ultimate/HEAD/ui/public/pwa-icon.svg"
+      }
+    ],
+    "wallos": [
+      {
+        "slug": "wallos",
+        "hostname_env": "WALLOS_HOSTNAME",
+        "href_template": "https://${WALLOS_HOSTNAME}",
+        "name": "Wallos",
+        "desc": "Subscription and recurring expense tracker.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/png/wallos.png"
+      }
+    ],
+    "webstreamr": [
+      {
+        "slug": "webstreamr",
+        "hostname_env": "WEBSTREAMR_HOSTNAME",
+        "href_template": "https://${WEBSTREAMR_HOSTNAME}",
+        "name": "WebStreamr",
+        "desc": "Web-streaming addon for Stremio.",
+        "icon": "https://emojiapi.dev/api/v1/spider_web/256.png"
+      }
+    ],
+    "wud": [
+      {
+        "slug": "wud",
+        "hostname_env": "WUD_HOSTNAME",
+        "href_template": "https://${WUD_HOSTNAME}",
+        "name": "What's Up Docker",
+        "desc": "Container update monitoring and notifications.",
+        "icon": "https://raw.githubusercontent.com/getwud/wud/HEAD/ui/src/assets/wud-logo.svg"
+      }
+    ],
+    "xrdb": [
+      {
+        "slug": "xrdb",
+        "hostname_env": "XRDB_HOSTNAME",
+        "href_template": "https://${XRDB_HOSTNAME}",
+        "name": "XRDB",
+        "desc": "Ratings and artwork rendering proxy for Stremio setups.",
+        "icon": "https://raw.githubusercontent.com/IbbyLabs/XRDB/HEAD/public/XRDB-logo.svg"
+      }
+    ],
+    "yamtrack": [
+      {
+        "slug": "yamtrack",
+        "hostname_env": "YAMTRACK_HOSTNAME",
+        "href_template": "https://${YAMTRACK_HOSTNAME}",
+        "name": "Yamtrack",
+        "desc": "Self-hosted media tracking and watch progress sync.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/yamtrack.svg"
+      }
+    ],
+    "zilean": [
+      {
+        "slug": "zilean",
+        "hostname_env": "ZILEAN_HOSTNAME",
+        "href_template": "https://${ZILEAN_HOSTNAME}",
+        "name": "Zilean",
+        "desc": "Debrid and torrent indexing companion for streaming workflows.",
+        "icon": "https://raw.githubusercontent.com/iPromKnight/zilean/HEAD/src/Zilean.ApiService/wwwroot/images/zilean-logo.png"
+      }
+    ],
+    "zipline": [
+      {
+        "slug": "zipline",
+        "hostname_env": "ZIPLINE_HOSTNAME",
+        "href_template": "https://${ZIPLINE_HOSTNAME}",
+        "name": "Zipline",
+        "desc": "File uploads, sharing, and short links.",
+        "icon": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/HEAD/svg/zipline.svg"
+      }
+    ],
+    "zurg": [
+      {
+        "slug": "zurg",
+        "hostname_env": "ZURG_HOSTNAME",
+        "href_template": "https://${ZURG_HOSTNAME}",
+        "name": "Zurg",
+        "desc": "Debrid library bridge with WebDAV-style access.",
+        "icon": "https://github.com/debridmediamanager.png?size=256"
+      }
+    ]
+  }
+}

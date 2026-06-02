@@ -300,7 +300,7 @@ select_modules_interactively() {
   fi
 
   section "Module selection"
-  log "Required modules are always enabled because the base stack depends on them (REQUIRED_MODULES): $(join_by ', ' "${required_modules[@]}")"
+  log "Required modules are always enabled because the base stack depends on them: $(join_by ', ' "${required_modules[@]}")"
   printf '%s\n' "Optional modules:"
   for token in "${optional_modules[@]}"; do
     index=$((index + 1))
@@ -315,7 +315,7 @@ select_modules_interactively() {
     die "Module selection is interactive unless --modules is provided."
   fi
 
-  raw_input="$(prompt_value "Enter the optional modules to enable by name or number, separated by commas, so the script knows which app folders to deploy (MODULES)" "$(join_by ',' "${default_selected_optional[@]}")")"
+  raw_input="$(prompt_value "Enter the optional modules to enable by name or number, separated by commas, so the script knows which app folders to deploy [MODULES]" "$(join_by ',' "${default_selected_optional[@]}")")"
   selected=("${required_modules[@]}")
 
   if [[ -n "${raw_input}" ]]; then
@@ -412,7 +412,7 @@ select_modules_with_whiptail() {
   (( dialog_width < 72 )) && dialog_width=72
 
   required_label="$(join_by ', ' "${required_modules[@]}")"
-  prompt_text="Choose which optional app modules to deploy. Use Up/Down to move, Space to toggle, and Enter to confirm. Required modules are always enabled because the base stack depends on them: ${required_label} (MODULES)"
+  prompt_text="Choose which optional app modules to deploy [MODULES]. Use Up/Down to move, Space to toggle, and Enter to confirm. Required modules are always enabled because the base stack depends on them: ${required_label}"
 
   selected_output="$(
     whiptail_capture_on_tty \

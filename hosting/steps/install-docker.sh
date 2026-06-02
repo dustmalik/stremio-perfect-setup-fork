@@ -45,7 +45,7 @@ install_docker() {
   fi
 
   if is_interactive && [[ "${HOSTING_DOCKER_PROMPTED:-0}" != "1" ]]; then
-    prompt_yes_no "Docker is not installed yet. This step will add Docker's official repository, install Docker Engine plus the Compose plugin, and may ask for sudo privileges because the hosting stack runs entirely through Docker Compose. Continue? (DOCKER_INSTALL)" yes || die "Docker installation cancelled."
+    prompt_yes_no "Docker is not installed yet. This step will add Docker's official repository, install Docker Engine plus the Compose plugin, and may ask for sudo privileges because the hosting stack runs entirely through Docker Compose. Continue?" yes || die "Docker installation cancelled."
   fi
 
   [[ -r /etc/os-release ]] || die "Unsupported Linux distribution: missing /etc/os-release"

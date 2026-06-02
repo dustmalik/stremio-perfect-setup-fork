@@ -103,13 +103,13 @@ Before you continue:
 4. Open Project Settings > Database > Connection string.
 5. Copy the direct session pooler IPv4 connection string exactly as shown.
 
-If you enable this, the script will create one schema and one login role per selected addon, then write the generated connection strings into each staged addon `.env` file automatically (SUPABASE_SETUP)."
+If you enable this, the script will create one schema and one login role per selected addon, then write the generated connection strings into each staged addon `.env` file automatically."
     warn "Use a new database, not one already used for unrelated data."
-    if ! prompt_yes_no "Use Supabase/Postgres instead of local SQLite for $(join_by ', ' "${selected_addons[@]}") so the script can provision per-addon schemas and credentials? (SUPABASE_ENABLED)" no; then
+    if ! prompt_yes_no "Use Supabase/Postgres instead of local SQLite for $(join_by ', ' "${selected_addons[@]}") so the script can provision per-addon schemas and credentials?" no; then
       log "Keeping local SQLite for $(join_by ', ' "${selected_addons[@]}")"
       exit 0
     fi
-    connection_string="$(prompt_value "Paste the Supabase direct session pooler IPv4 connection string that has enough access to create addon schemas and roles (SUPABASE_CONNECTION_STRING)")"
+    connection_string="$(prompt_value "Paste the Supabase direct session pooler IPv4 connection string that has enough access to create addon schemas and roles [SUPABASE_CONNECTION_STRING]")"
   else
     log "No Supabase connection string supplied; keeping local SQLite for $(join_by ', ' "${selected_addons[@]}")"
     exit 0
@@ -117,14 +117,14 @@ If you enable this, the script will create one schema and one login role per sel
 fi
 
 if [[ -z "${database_password}" ]] && is_interactive; then
-  database_password="$(prompt_secret "Enter the database password referenced by that connection string so schema creation can authenticate successfully (SUPABASE_DB_PASSWORD)")"
+  database_password="$(prompt_secret "Enter the database password referenced by that connection string so schema creation can authenticate successfully [SUPABASE_DB_PASSWORD]")"
 fi
 
 [[ -n "${connection_string}" ]] || die "Supabase connection string is required for ${selected_addons[*]}"
 [[ -n "${database_password}" ]] || die "Supabase database password is required for ${selected_addons[*]}"
 
 addons_csv="$(join_by ',' "${selected_addons[@]}")"
-if is_interactive && ! prompt_yes_no "Create or update the Supabase schemas and login roles now for ${addons_csv}, then write the generated connection strings into the staged addon `.env` files? (SUPABASE_APPLY)" yes; then
+if is_interactive && ! prompt_yes_no "Create or update the Supabase schemas and login roles now for ${addons_csv}, then write the generated connection strings into the staged addon `.env` files?" yes; then
   log "Skipping Supabase schema deployment and keeping local SQLite for ${addons_csv}"
   exit 0
 fi

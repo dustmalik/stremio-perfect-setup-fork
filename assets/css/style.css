@@ -298,5 +298,13 @@ pre {
   .pager { grid-template-columns: 1fr; }
   .pager__next { text-align: left; }
 
-  .home-wizard-card { flex-direction: column; align-items: flex-start; }
+  .home-wizard-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .home-wizard-card__text {
+    text-align: center;
+  }
 }

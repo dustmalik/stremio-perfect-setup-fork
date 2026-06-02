@@ -111,7 +111,7 @@ select_key() {
     if [[ -n "${detected_key}" ]]; then
       key_mode="$(prompt_choice \
         "SSH Key" \
-        "Choose how the SSH helper should prepare your local SSH private key for VPS access. This key is needed so you can connect to the server securely from this machine (SSH_KEY_MODE)." \
+        "Choose how the SSH helper should prepare your local SSH private key for VPS access. This key is needed so you can connect to the server securely from this machine." \
         "use-default" \
         "use-default" "Use the detected key at ${detected_key}" \
         "existing-path" "Enter a different existing private key path" \
@@ -122,7 +122,7 @@ select_key() {
           return 0
           ;;
         existing-path)
-          KEY_PATH="$(prompt_value "Enter the existing SSH private key path so the script can reference it in your SSH client config (SSH_KEY_PATH)")"
+          KEY_PATH="$(prompt_value "Enter the existing SSH private key path so the script can reference it in your SSH client config [SSH_KEY_PATH]")"
           [[ -f "${KEY_PATH}" ]] || die "SSH key does not exist: ${KEY_PATH}"
           return 0
           ;;
@@ -139,13 +139,13 @@ select_key() {
 
     key_mode="$(prompt_choice \
       "SSH Key" \
-      "No default SSH key was detected. Choose whether to reuse an existing private key or generate a new one so the VPS can trust this machine (SSH_KEY_MODE)." \
+      "No default SSH key was detected. Choose whether to reuse an existing private key or generate a new one so the VPS can trust this machine." \
       "generate-new" \
       "existing-path" "Enter an existing private key path" \
       "generate-new" "Create a new ed25519 key in ${SSH_DIR}")"
     case "${key_mode}" in
       existing-path)
-        KEY_PATH="$(prompt_value "Enter the existing SSH private key path so the script can reference it in your SSH client config (SSH_KEY_PATH)")"
+        KEY_PATH="$(prompt_value "Enter the existing SSH private key path so the script can reference it in your SSH client config [SSH_KEY_PATH]")"
         [[ -f "${KEY_PATH}" ]] || die "SSH key does not exist: ${KEY_PATH}"
         ;;
       generate-new)
@@ -189,7 +189,7 @@ configure_ssh_alias() {
   fi
 
   if (( ! ALIAS_SET )); then
-    SSH_ALIAS="$(prompt_value "Choose the short SSH alias name to save in ${SSH_CONFIG}. This lets you connect with a simple `ssh <alias>` command later (SSH_ALIAS)" "${SSH_ALIAS}")"
+    SSH_ALIAS="$(prompt_value "Choose the short SSH alias name to save in ${SSH_CONFIG}. This lets you connect with a simple `ssh <alias>` command later [SSH_ALIAS]" "${SSH_ALIAS}")"
   fi
   [[ -n "${SSH_ALIAS}" ]] || die "SSH alias cannot be empty"
 }
@@ -202,10 +202,10 @@ collect_connection_details() {
   fi
 
   if [[ -z "${SSH_HOST}" ]]; then
-    SSH_HOST="$(prompt_value "Enter the VPS IP address or hostname that this SSH alias should connect to (SSH_HOST)" )"
+    SSH_HOST="$(prompt_value "Enter the VPS IP address or hostname that this SSH alias should connect to [SSH_HOST]" )"
   fi
   if [[ -z "${SSH_USER}" ]]; then
-    SSH_USER="$(prompt_value "Enter the SSH username that should be used when connecting to ${SSH_HOST:-the VPS} (SSH_USER)" "root")"
+    SSH_USER="$(prompt_value "Enter the SSH username that should be used when connecting to ${SSH_HOST:-the VPS} [SSH_USER]" "root")"
   fi
 
   [[ -n "${SSH_HOST}" ]] || die "VPS IP address or hostname is required to configure the SSH alias"
@@ -225,7 +225,7 @@ update_ssh_config() {
   fi
 
   if (( alias_exists )) && is_interactive; then
-    prompt_yes_no "SSH alias ${SSH_ALIAS} already exists in ${SSH_CONFIG}. Replace it with the new HostName, User, and key settings so future `ssh ${SSH_ALIAS}` connections use the values from this setup? (SSH_ALIAS)" yes || die "SSH alias update cancelled."
+    prompt_yes_no "SSH alias ${SSH_ALIAS} already exists in ${SSH_CONFIG}. Replace it with the new HostName, User, and key settings so future `ssh ${SSH_ALIAS}` connections use the values from this setup?" yes || die "SSH alias update cancelled."
   fi
 
   tmp_file="$(temp_file_next_to "${SSH_CONFIG}")"
@@ -274,7 +274,7 @@ EOF
 
   show_message "SSH Setup Complete" "${message}
 
-This step only prepares your local key and SSH client config. You still need to install the public key on the VPS before passwordless login will work (SSH_SETUP_COMPLETE)."
+This step only prepares your local key and SSH client config. You still need to install the public key on the VPS before passwordless login will work."
   log "Next step: install ${KEY_PATH}.pub on the VPS, then connect with ${connect_command}"
 }
 

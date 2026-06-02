@@ -206,10 +206,10 @@ run_existing_docker_backup() {
 
   if (( BACKUP_MODE )); then
     if (( ! DOCKER_DIR_SET )); then
-      DOCKER_DIR_VALUE="$(prompt_value "Enter the deployed Docker Compose directory that should be backed up. This is the live stack folder that currently contains the root .env and compose files (DOCKER_DIR)" "${docker_dir_default}")"
+      DOCKER_DIR_VALUE="$(prompt_value "Enter the deployed Docker Compose directory that should be backed up. This is the live stack folder that currently contains the root .env and compose files [DOCKER_DIR]" "${docker_dir_default}")"
     fi
     if (( ! BACKUP_DIR_SET )); then
-      BACKUP_DIR_VALUE="$(prompt_value "Enter the directory where the backup ZIP should be written so you can restore this stack later (BACKUP_OUTPUT_DIR)" "${backup_dir_default}")"
+      BACKUP_DIR_VALUE="$(prompt_value "Enter the directory where the backup ZIP should be written so you can restore this stack later [BACKUP_OUTPUT_DIR]" "${backup_dir_default}")"
     fi
   fi
 
@@ -264,7 +264,7 @@ fi
 ensure_dialog_ui "the hosting setup"
 
 if is_interactive; then
-  show_message "Hosting Setup" "This guided setup will prepare SSH access, verify Docker, download the upstream Docker template, let you choose which app modules to deploy, stage editable config files, and then deploy the final stack to your VPS. You will be asked to confirm each major step before the script makes changes (HOSTING_SETUP)."
+  show_message "Hosting Setup" "This guided setup will prepare SSH access, verify Docker, download the upstream Docker template, let you choose which app modules to deploy, stage editable config files, and then deploy the final stack to your VPS. You will be asked to confirm each major step before the script makes changes."
 fi
 
 if (( DRY_RUN )); then
@@ -272,7 +272,7 @@ if (( DRY_RUN )); then
 elif (( PREPARE_SSH )); then
   section "SSH setup"
   "${HOSTING_ROOT}/steps/prepare-ssh.sh"
-elif (( ! SKIP_SSH )) && is_interactive && prompt_yes_no "Prepare or update the local SSH key and alias configuration now? This is needed so you can connect to the VPS reliably from this machine (SSH_SETUP)." yes; then
+elif (( ! SKIP_SSH )) && is_interactive && prompt_yes_no "Prepare or update the local SSH key and alias configuration now? This is needed so you can connect to the VPS reliably from this machine." yes; then
   section "SSH setup"
   "${HOSTING_ROOT}/steps/prepare-ssh.sh"
 fi
@@ -282,8 +282,8 @@ if (( DRY_RUN )); then
 else
   section "Docker setup"
   if is_interactive; then
-    show_message "Docker Setup" "The next step verifies Docker and Docker Compose on this machine, installs them if they are missing, and makes sure your user can access Docker. This is required because the entire hosting stack is deployed with Docker Compose (DOCKER_INSTALL)."
-    prompt_yes_no "Check Docker now and install or configure it if needed so the hosting stack can be deployed later? (DOCKER_INSTALL)" yes || die "Docker setup cancelled."
+    show_message "Docker Setup" "The next step verifies Docker and Docker Compose on this machine, installs them if they are missing, and makes sure your user can access Docker. This is required because the entire hosting stack is deployed with Docker Compose."
+    prompt_yes_no "Check Docker now and install or configure it if needed so the hosting stack can be deployed later?" yes || die "Docker setup cancelled."
   fi
   HOSTING_DOCKER_PROMPTED=1 "${HOSTING_ROOT}/steps/install-docker.sh"
 fi
@@ -292,8 +292,8 @@ section "Template fetch"
 "${HOSTING_ROOT}/steps/fetch-template.sh" --source "${TEMPLATE_SOURCE_VALUE}" --template-dir "${TEMPLATE_DIR_ABS}"
 
 if is_interactive; then
-  show_message "Custom Modules" "The upstream template has been downloaded into ${TEMPLATE_DIR_ABS}. If you want to add any extra app folders under ${TEMPLATE_DIR_ABS}/apps now, do that before module discovery continues. Each extra module must live in its own folder and contain a compose.yaml or compose.yml file so the script can detect it (CUSTOM_APPS)."
-  prompt_yes_no "Have you finished adding any custom app folders under ${TEMPLATE_DIR_ABS}/apps so module discovery can continue? (CUSTOM_APPS_READY)" yes || die "Module discovery cancelled."
+  show_message "Custom Modules" "The upstream template has been downloaded into ${TEMPLATE_DIR_ABS}. If you want to add any extra app folders under ${TEMPLATE_DIR_ABS}/apps now, do that before module discovery continues. Each extra module must live in its own folder and contain a compose.yaml or compose.yml file so the script can detect it."
+  prompt_yes_no "Have you finished adding any custom app folders under ${TEMPLATE_DIR_ABS}/apps so module discovery can continue?" yes || die "Module discovery cancelled."
 fi
 
 backup_available_modules=()
@@ -398,17 +398,17 @@ env_value_is_placeholder "${root_domain_default}" && root_domain_default=""
 env_value_is_placeholder "${root_letsencrypt_default}" && root_letsencrypt_default=""
 
 if is_interactive; then
-  show_message "Environment Details" "Next, enter the core environment values for the stack: timezone, final Docker directory, public base domain, and the email address used for Let's Encrypt notifications. These values are written into the staged root .env and used across multiple services (ROOT_ENV)."
+  show_message "Environment Details" "Next, enter the core environment values for the stack: timezone, final Docker directory, public base domain, and the email address used for Let's Encrypt notifications. These values are written into the staged root .env and used across multiple services."
 fi
 
-TIMEZONE_VALUE="${TIMEZONE_VALUE:-$(prompt_value "Enter the server timezone using the TZ database identifier so containers log and schedule tasks correctly, for example Europe/Berlin (TZ)" "${root_tz_default}")}"
+TIMEZONE_VALUE="${TIMEZONE_VALUE:-$(prompt_value "Enter the server timezone using the TZ database identifier so containers log and schedule tasks correctly, for example Europe/Berlin [TZ]" "${root_tz_default}")}"
 if (( DRY_RUN )); then
   dry_run_log "Overriding DOCKER_DIR with ${DOCKER_DIR_VALUE}"
 else
-  DOCKER_DIR_VALUE="${DOCKER_DIR_VALUE:-$(prompt_value "Enter the final Docker Compose directory where the prepared stack should be deployed on this machine. You can use ~, an absolute path, or a relative path (DOCKER_DIR)" "${root_docker_dir_default}")}"
+  DOCKER_DIR_VALUE="${DOCKER_DIR_VALUE:-$(prompt_value "Enter the final Docker Compose directory where the prepared stack should be deployed on this machine. You can use ~, an absolute path, or a relative path [DOCKER_DIR]" "${root_docker_dir_default}")}"
 fi
-DOMAIN_VALUE="${DOMAIN_VALUE:-$(prompt_value "Enter the public base domain that Traefik-routed services should use for their hostnames, for example example.com (DOMAIN)" "${root_domain_default}")}"
-LETSENCRYPT_EMAIL_VALUE="${LETSENCRYPT_EMAIL_VALUE:-$(prompt_value "Enter the email address that Let's Encrypt should use for expiry and certificate notifications (LETSENCRYPT_EMAIL)" "${root_letsencrypt_default}")}"
+DOMAIN_VALUE="${DOMAIN_VALUE:-$(prompt_value "Enter the public base domain that Traefik-routed services should use for their hostnames, for example example.com [DOMAIN]" "${root_domain_default}")}"
+LETSENCRYPT_EMAIL_VALUE="${LETSENCRYPT_EMAIL_VALUE:-$(prompt_value "Enter the email address that Let's Encrypt should use for expiry and certificate notifications [LETSENCRYPT_EMAIL]" "${root_letsencrypt_default}")}"
 
 [[ -n "${TIMEZONE_VALUE}" ]] || die "Timezone is required"
 [[ -n "${DOCKER_DIR_VALUE}" ]] || die "DOCKER_DIR is required"
@@ -531,11 +531,11 @@ if (( ! SKIP_REVIEW )) && is_interactive; then
   section "Manual review"
   log "Review staged files in ${CONFIG_DIR_ABS}"
   warn "Do not rename staged files. Prefixes such as AIOSTREAMS., HONEY., and TRAEFIK. map files back to modules."
-  show_message "Manual Review" "Review the staged files in ${CONFIG_DIR_ABS} before deployment. You can edit values there if needed, but do not rename the files because their names map back to source files in specific modules. Continue when you are satisfied with the staged configuration (MANUAL_REVIEW)."
+  show_message "Manual Review" "Review the staged files in ${CONFIG_DIR_ABS} before deployment. You can edit values there if needed, but do not rename the files because their names map back to source files in specific modules. Continue when you are satisfied with the staged configuration."
 fi
 
 if is_interactive; then
-  prompt_yes_no "Deploy the prepared stack into ${DOCKER_DIR_VALUE} now? This will sync the generated files into that directory and make it the live Docker Compose tree for this setup (DOCKER_DIR)." yes || die "Deployment cancelled."
+  prompt_yes_no "Deploy the prepared stack into ${DOCKER_DIR_VALUE} now? This will sync the generated files into that directory and make it the live Docker Compose tree for this setup." yes || die "Deployment cancelled."
 fi
 
 section "Deploy"
@@ -547,9 +547,9 @@ section "Deploy"
   $([[ "${HOSTING_DRY_RUN:-0}" == "1" ]] && printf '%s' '--no-fix-permissions')
 
 if (( ! SKIP_BACKUP )); then
-  if ! is_interactive || prompt_yes_no "Create a backup ZIP of the prepared configuration now? This is recommended because it makes later restores and migrations much easier (BACKUP_CREATE)." yes; then
+  if ! is_interactive || prompt_yes_no "Create a backup ZIP of the prepared configuration now? This is recommended because it makes later restores and migrations much easier." yes; then
     if is_interactive && (( ! BACKUP_DIR_SET )); then
-      BACKUP_DIR_VALUE="$(prompt_value "Enter the directory where the generated backup ZIP should be saved after deployment (BACKUP_OUTPUT_DIR)" "${BACKUP_DIR_VALUE}")"
+      BACKUP_DIR_VALUE="$(prompt_value "Enter the directory where the generated backup ZIP should be saved after deployment [BACKUP_OUTPUT_DIR]" "${BACKUP_DIR_VALUE}")"
     fi
     BACKUP_DIR_VALUE="$(absolute_path "${BACKUP_DIR_VALUE}")"
     section "Backup"
@@ -559,7 +559,7 @@ fi
 
 if (( ! SKIP_START )); then
   if is_interactive; then
-    prompt_yes_no "Start the Docker Compose stack now so Docker can launch the selected services immediately? (STACK_START)" yes || {
+    prompt_yes_no "Start the Docker Compose stack now so Docker can launch the selected services immediately?" yes || {
       warn "Skipping Docker Compose start at your request."
       SKIP_START=1
     }
