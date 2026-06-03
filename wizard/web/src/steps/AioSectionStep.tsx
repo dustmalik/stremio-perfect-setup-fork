@@ -138,10 +138,13 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
       <div style={{ marginBottom: '1.25rem' }}>
         <button
           type="button"
-          className="wizard-hover-lift"
+          className={`wizard-hover-lift${isEnabled ? '' : ' wizard-hover-lift--guide'}`}
           onClick={() => onChange(!value)}
           aria-pressed={isEnabled}
           style={{
+            '--wizard-hover-selected-bg': 'var(--panel-2)',
+            '--wizard-hover-selected-border': 'var(--accent)',
+            '--wizard-hover-selected-color': 'var(--text)',
             width: '100%',
             borderRadius: '14px',
             border: `2px solid ${isEnabled ? 'var(--accent)' : 'var(--border)'}`,
@@ -155,7 +158,7 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
             alignItems: 'flex-start',
             justifyContent: 'space-between',
             gap: '1rem',
-          }}
+          } as CSSProperties}
         >
           <div style={{ minWidth: 0, flex: '1 1 auto' }}>
             <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text)' }}>
@@ -223,7 +226,18 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
       {field.type === 'select' && field.options && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
           {field.options.map(opt => (
-            <button key={opt.value} type="button" className="wizard-hover-lift" style={selectedBtn(value === opt.value)} onClick={() => onChange(opt.value)}>
+            <button
+              key={opt.value}
+              type="button"
+              className={`wizard-hover-lift${value === opt.value ? '' : ' wizard-hover-lift--guide'}`}
+              style={{
+                ...selectedBtn(value === opt.value),
+                '--wizard-hover-selected-bg': 'var(--panel-2)',
+                '--wizard-hover-selected-border': 'var(--accent)',
+                '--wizard-hover-selected-color': 'var(--text)',
+              } as CSSProperties}
+              onClick={() => onChange(opt.value)}
+            >
               <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{opt.label}</span>
             </button>
           ))}
@@ -241,8 +255,15 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
               <button
                 key={opt.value}
                 type="button"
-                className="wizard-hover-lift"
-                style={{ ...selectedBtn(sel), fontSize: '0.8125rem', padding: '0.45rem 0.6rem' }}
+                className={`wizard-hover-lift${sel ? '' : ' wizard-hover-lift--guide'}`}
+                style={{
+                  ...selectedBtn(sel),
+                  fontSize: '0.8125rem',
+                  padding: '0.45rem 0.6rem',
+                  '--wizard-hover-selected-bg': 'var(--panel-2)',
+                  '--wizard-hover-selected-border': 'var(--accent)',
+                  '--wizard-hover-selected-color': 'var(--text)',
+                } as CSSProperties}
                 onClick={() => {
                   const current = Array.isArray(value) ? (value as string[]) : [];
                   onChange(sel ? current.filter(v => v !== opt.value) : [...current, opt.value]);

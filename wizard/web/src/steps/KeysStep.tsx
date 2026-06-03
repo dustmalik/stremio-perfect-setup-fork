@@ -261,9 +261,12 @@ export function KeysStep({ keyIndex }: Props) {
                 <button
                   key={service.id}
                   type="button"
-                  className="wizard-hover-lift"
+                  className={`wizard-hover-lift${selected ? '' : ' wizard-hover-lift--guide'}`}
                   onClick={() => toggleDebridService(service.id)}
                   style={{
+                    '--wizard-hover-selected-bg': 'var(--panel-2)',
+                    '--wizard-hover-selected-border': 'var(--accent)',
+                    '--wizard-hover-selected-color': 'var(--text)',
                     padding: '0.6rem 0.4rem',
                     border: `2px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
                     borderRadius: '10px',
@@ -274,7 +277,7 @@ export function KeysStep({ keyIndex }: Props) {
                     gap: '0.35rem',
                     cursor: 'pointer',
                     transition: 'all 0.15s',
-                  }}
+                  } as CSSProperties}
                 >
                   {logoUrl ? (
                     <img src={logoUrl} alt={service.name} style={{ height: '24px', width: '100%', objectFit: 'contain' }} />

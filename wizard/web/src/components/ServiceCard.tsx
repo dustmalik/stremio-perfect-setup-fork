@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Service } from '../lib/services';
 import { resolveLogoUrl } from '../lib/services';
 
@@ -11,16 +12,19 @@ export function ServiceCard({ service, selected, onToggle }: Props) {
   const logoUrl = resolveLogoUrl(service.logo);
   return (
     <button
-      className="wizard-hover-lift"
+      className={`wizard-hover-lift${selected ? '' : ' wizard-hover-lift--guide'}`}
       onClick={onToggle}
       style={{
+        '--wizard-hover-selected-bg': 'var(--panel-2)',
+        '--wizard-hover-selected-border': 'var(--accent)',
+        '--wizard-hover-selected-color': 'var(--text)',
         padding: '0.75rem 0.5rem',
         border: `2px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
         borderRadius: '12px',
         background: selected ? 'var(--panel-2)' : 'var(--panel)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem',
         cursor: 'pointer', transition: 'all 0.15s', color: 'var(--text)',
-      }}
+      } as CSSProperties}
     >
       {logoUrl ? (
         <img src={logoUrl} alt={service.name} style={{ height: '28px', width: '100%', objectFit: 'contain' }} />

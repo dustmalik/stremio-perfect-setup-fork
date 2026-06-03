@@ -3,6 +3,9 @@
 assets/data/guide-stats.json
 hosting/.work
 .vscode
+.codex
+.claude
+.agents
 _site/
 wizard/web/dist/
 wizard/web/node_modules/

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { ArrowRight, Loader2, LogIn, UserPlus, UserRound } from 'lucide-react';
 import { WizardShell } from '../components/WizardShell';
 import { MarkdownText } from '../components/MarkdownText';
@@ -200,9 +200,12 @@ export function AccountStep() {
           <button
             key={m}
             type="button"
-            className="wizard-hover-lift"
+            className={`wizard-hover-lift${account.mode === m ? '' : ' wizard-hover-lift--guide'}`}
             onClick={() => { updateAccount({ mode: m }); setError(''); }}
             style={{
+              '--wizard-hover-selected-bg': 'var(--accent)',
+              '--wizard-hover-selected-border': 'var(--accent)',
+              '--wizard-hover-selected-color': '#fff',
               padding: '0.7rem 1rem', borderRadius: '10px', fontSize: '0.875rem',
               fontWeight: 600, border: `1px solid ${account.mode === m ? 'var(--accent)' : 'var(--border)'}`,
               cursor: 'pointer', transition: 'all 0.15s',
@@ -210,7 +213,7 @@ export function AccountStep() {
               color: account.mode === m ? '#fff' : 'var(--muted)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.45rem',
               flex: 1,
-            }}
+            } as CSSProperties}
           >
             {m === 'create' ? <UserPlus size={15} /> : <LogIn size={15} />}
             {m === 'create' ? 'Create account' : 'Sign in'}

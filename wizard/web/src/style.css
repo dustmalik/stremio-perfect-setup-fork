@@ -138,11 +138,11 @@
   transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
-.wizard-hover-lift:hover,
-.wizard-hover-lift:focus-visible {
-  background: color-mix(in srgb, var(--panel-2) 88%, var(--accent) 12%);
-  border-color: color-mix(in srgb, var(--accent) 72%, var(--border) 28%);
-  filter: saturate(1.03) brightness(1.02);
+.wizard-hover-lift--guide:hover,
+.wizard-hover-lift--guide:focus-visible {
+  background: var(--wizard-hover-selected-bg, var(--panel-2)) !important;
+  border-color: var(--wizard-hover-selected-border, var(--accent)) !important;
+  color: var(--wizard-hover-selected-color, var(--text)) !important;
   transform: translateY(-1px);
 }
 

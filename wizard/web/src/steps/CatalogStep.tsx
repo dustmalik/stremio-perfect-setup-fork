@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { useWizard } from '../store/wizard';
@@ -78,34 +78,50 @@ export function CatalogStep() {
       {/* Discover section, folder-granular */}
       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">🔭 Discover</p>
       <div className="grid grid-cols-2 gap-2 mb-5">
-        {discoverFolders.map((f: DiscoverFolder) => (
-          <button
-            key={f.id}
-            onClick={() => toggleDiscover(f.id)}
-            className="p-2.5 border-2 rounded-xl text-left transition-all"
-            style={tileStyle(enabledDiscoverFolderIds.has(f.id))}
-          >
-            <span className="text-sm font-semibold">{f.label}</span>
-          </button>
-        ))}
+        {discoverFolders.map((f: DiscoverFolder) => {
+          const isSelected = enabledDiscoverFolderIds.has(f.id);
+          return (
+            <button
+              key={f.id}
+              onClick={() => toggleDiscover(f.id)}
+              className={`wizard-hover-lift p-2.5 border-2 rounded-xl text-left transition-all${isSelected ? '' : ' wizard-hover-lift--guide'}`}
+              style={{
+                ...tileStyle(isSelected),
+                '--wizard-hover-selected-bg': 'color-mix(in srgb, var(--panel-2) 78%, var(--accent) 22%)',
+                '--wizard-hover-selected-border': 'var(--accent)',
+                '--wizard-hover-selected-color': 'var(--text)',
+              } as CSSProperties}
+            >
+              <span className="text-sm font-semibold">{f.label}</span>
+            </button>
+          );
+        })}
       </div>
 
       {/* Regular categories */}
       <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Categories</p>
       <div className="flex flex-col gap-2">
-        {categories.map((cat: Category) => (
-          <button
-            key={cat.key}
-            onClick={() => toggleCategory(cat.key)}
-            className="px-4 py-3 border-2 rounded-xl flex justify-between items-center transition-all"
-            style={tileStyle(enabledCategories.has(cat.key))}
-          >
-            <span className="font-semibold text-sm">{cat.label}</span>
-            <span className="text-xs" style={{ color: 'var(--muted)' }}>
-              {cat.count} catalogs {enabledCategories.has(cat.key) ? '✓' : ''}
-            </span>
-          </button>
-        ))}
+        {categories.map((cat: Category) => {
+          const isSelected = enabledCategories.has(cat.key);
+          return (
+            <button
+              key={cat.key}
+              onClick={() => toggleCategory(cat.key)}
+              className={`wizard-hover-lift px-4 py-3 border-2 rounded-xl flex justify-between items-center transition-all${isSelected ? '' : ' wizard-hover-lift--guide'}`}
+              style={{
+                ...tileStyle(isSelected),
+                '--wizard-hover-selected-bg': 'color-mix(in srgb, var(--panel-2) 78%, var(--accent) 22%)',
+                '--wizard-hover-selected-border': 'var(--accent)',
+                '--wizard-hover-selected-color': 'var(--text)',
+              } as CSSProperties}
+            >
+              <span className="font-semibold text-sm">{cat.label}</span>
+              <span className="text-xs" style={{ color: 'var(--muted)' }}>
+                {cat.count} catalogs {isSelected ? '✓' : ''}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       <p className="text-xs text-gray-400 mt-3 text-right">{enabledCount} catalogs enabled</p>
