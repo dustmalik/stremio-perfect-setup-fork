@@ -32,12 +32,20 @@ export interface WizardInstances {
   watchly?: string[];
 }
 
-export interface WizardTemplates {
+export interface WizardTargetTemplates {
   aiostreams: string;
-  aiometadata_stremio: string;
-  aiometadata_nuvio: string;
-  nuvio_collections: string;
-  nuvio_settings: string;
+  aiometadata: string;
+  collections?: string;
+}
+
+export interface WizardNuvioTemplates extends WizardTargetTemplates {
+  collections: string;
+  settings: string;
+}
+
+export interface WizardTemplates {
+  stremio: WizardTargetTemplates;
+  nuvio: WizardNuvioTemplates;
 }
 
 export interface WizardKeys {
@@ -101,30 +109,38 @@ function normalizeInstances(value: unknown): WizardInstances | null {
   return { aiostreams, aiometadata, watchly };
 }
 
-function normalizeTemplates(value: unknown): WizardTemplates | null {
+function normalizeTargetTemplates(value: unknown): WizardTargetTemplates | null {
   if (!isRecord(value)) return null;
-  const nuvioCollections = typeof value.nuvio_collections === 'string'
-    ? value.nuvio_collections
-    : typeof value.collections === 'string'
-      ? value.collections
-      : null;
-  if (
-    typeof value.aiostreams !== 'string'
-    || typeof value.aiometadata_stremio !== 'string'
-    || typeof value.aiometadata_nuvio !== 'string'
-    || typeof nuvioCollections !== 'string'
-    || typeof value.nuvio_settings !== 'string'
-  ) {
+  if (typeof value.aiostreams !== 'string' || typeof value.aiometadata !== 'string') {
     return null;
   }
 
   return {
     aiostreams: value.aiostreams,
-    aiometadata_stremio: value.aiometadata_stremio,
-    aiometadata_nuvio: value.aiometadata_nuvio,
-    nuvio_collections: nuvioCollections,
-    nuvio_settings: value.nuvio_settings,
+    aiometadata: value.aiometadata,
+    collections: typeof value.collections === 'string' ? value.collections : undefined,
   };
+}
+
+function normalizeNuvioTemplates(value: unknown): WizardNuvioTemplates | null {
+  const base = normalizeTargetTemplates(value);
+  if (!base || !isRecord(value) || typeof value.collections !== 'string' || typeof value.settings !== 'string') {
+    return null;
+  }
+
+  return {
+    ...base,
+    collections: value.collections,
+    settings: value.settings,
+  };
+}
+
+function normalizeTemplates(value: unknown): WizardTemplates | null {
+  if (!isRecord(value)) return null;
+
+  const stremio = normalizeTargetTemplates(value.stremio);
+  const nuvio = normalizeNuvioTemplates(value.nuvio);
+  return stremio && nuvio ? { stremio, nuvio } : null;
 }
 
 function normalizeObfuscatedKey(value: unknown): WizardObfuscatedKey | null {

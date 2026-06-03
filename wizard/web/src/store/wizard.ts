@@ -55,6 +55,13 @@ export interface InstallResult {
   error: string | null;
 }
 
+export interface LoadedTemplates {
+  aiostreams: unknown;
+  aiometadata: unknown;
+  collections: unknown[];
+  settings: unknown | null;
+}
+
 interface WizardState {
   step: number;
   /** Highest step the user has reached (for sidebar clickability) */
@@ -68,7 +75,7 @@ interface WizardState {
   aiometadataInstance: string;
   catalogSelection: CatalogSelection;
   installResult: InstallResult;
-  templates: { aiostreams: unknown; aiometadata: unknown; nuvioCollections: unknown[]; nuvioSettings: unknown } | null;
+  templates: LoadedTemplates | null;
   /** Computed from template when loaded; drives dynamic step count */
   aioSections: AioSection[];
   /** Runtime config loaded from config.json at startup */

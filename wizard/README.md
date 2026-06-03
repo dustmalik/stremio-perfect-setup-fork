@@ -42,19 +42,19 @@ npm run dev
 
 # Full guide + wizard site
 cd /path/to/stremio-perfect-setup
-scripts/local-serve.sh
+scripts/run-local.sh
 # → guide at http://127.0.0.1:8000/
 # → wizard at http://127.0.0.1:8000/wizard/
 ```
 
 If you want the guide and the wizard together exactly like the built site, use
-`scripts/local-serve.sh`. It builds the guide, builds the wizard, copies the wizard into the site
+`scripts/run-local.sh`. It builds the guide, builds the wizard, copies the wizard into the site
 output, and serves both from one local static server.
 
 ## Privacy and Behavior
 
 - User-entered API keys and passwords are intended to be provided at runtime, not committed to the repo.
-- Shared fallback keys in `wizard/config.json` must be stored only as base64-encoded AES-GCM payload strings under `configurations[].keys`. Use `scripts/encode-wizard-key.sh <passphrase> <secret>` to generate one.
+- Shared fallback keys in `wizard/config.json` must be stored only as base64-encoded AES-GCM payload strings under `configurations[].keys`. Use `scripts/encode.sh <passphrase> <secret>` to generate one.
 - Shared fallback keys are never shown in the UI. If the user leaves a supported field empty, the wizard can pick a random configured fallback key in the background for that install run.
 - The wizard is built around the templates in this repo, so template changes can affect the wizard
   flow.

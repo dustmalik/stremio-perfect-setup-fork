@@ -31,8 +31,8 @@ console.log('\n# deriveCategoryKey');
 ok('Streaming emoji', deriveCategoryKey('🎬 Netflix') === '🎬');
 ok('Genres emoji', deriveCategoryKey('🎭 Action') === '🎭');
 ok('Anime emoji', deriveCategoryKey('🍥 Airing Now') === '🍥');
-ok('Brazilian flag → world', deriveCategoryKey('🇧🇷 Brazilian') === 'world');
-ok('Korean flag → world', deriveCategoryKey('🇰🇷 Korean') === 'world');
+ok('Brazilian flag → 🌍', deriveCategoryKey('🇧🇷 Brazilian') === '🌍');
+ok('Korean flag → 🌍', deriveCategoryKey('🇰🇷 Korean') === '🌍');
 ok('Discover emoji Trakt', deriveCategoryKey('🎯 Trakt Recommendations') === '🎯');
 ok('Discover emoji Popular', deriveCategoryKey('🏆 Popular') === '🏆');
 ok('tmdb.language category (🌐) is excluded-group', deriveCategoryKey('🌐 By Language') === '🌐');
@@ -43,7 +43,7 @@ const keys = cats.map(c => c.key);
 ok('🎬 Streaming category present', keys.includes('🎬'));
 ok('🎭 Genres present', keys.includes('🎭'));
 ok('🍥 Anime present as own category', keys.includes('🍥'));
-ok('🌍 World present (flag catalogs)', keys.includes('world'));
+ok('🌍 World present (flag catalogs)', keys.includes('🌍'));
 ok('Discover emojis NOT in regular categories', !keys.some(k => DISCOVER_EMOJIS.has(k)));
 ok('Excluded emoji groups absent (🌐)', !keys.includes('🌐'));
 ok('Excluded emoji groups absent (📅)', !keys.includes('📅'));
@@ -64,11 +64,11 @@ console.log('\n# defaultEnabledCategories: Stremio starts from reference default
 const stremioDefaults = defaultEnabledCategories(catalogs, 'stremio', collections);
 ok('Stremio: 🎬 Streaming enabled by default', stremioDefaults.categories.has('🎬'));
 ok('Stremio: 🏰 Studios NOT enabled by default', !stremioDefaults.categories.has('🏰'));
-ok('Stremio: 🌍 World NOT enabled by default', !stremioDefaults.categories.has('world'));
+ok('Stremio: 🌍 World NOT enabled by default', !stremioDefaults.categories.has('🌍'));
 
 const nuvioDefaults = defaultEnabledCategories(nuvioTemplate.config.catalogs, 'nuvio', collections);
 ok('Nuvio: 🏰 Studios enabled by default', nuvioDefaults.categories.has('🏰'));
-ok('Nuvio: 🌍 World enabled by default', nuvioDefaults.categories.has('world'));
+ok('Nuvio: 🌍 World enabled by default', nuvioDefaults.categories.has('🌍'));
 ok(
   'Nuvio: all selectable catalogs enabled by default',
   countEnabledCatalogs(
@@ -121,19 +121,19 @@ ok('Nuvio: showInHome=false for ALL enabled catalogs', nuvioCfg.config.catalogs.
 console.log('\n# filterCollections: Nuvio collections filtered to enabled categories');
 {
   // All enabled: all 8 groups pass through
-  const allCats = new Set(['🎬','🎭','🍥','🎨','🏰','🎥','🕒','world']);
+  const allCats = new Set(['🎬','🎭','🍥','🎨','🏰','🎥','🕒','🌍']);
   const allDiscover = new Set(deriveDiscoverFolders(catalogs).map(d => d.id));
   const all = filterCollections(collections, catalogs, { enabledCategories: allCats, enabledDiscoverFolderIds: allDiscover });
   ok('All enabled: all top-level groups present', all.length === collections.length);
 
   // Disable Studios: Studios group should be filtered out (no folders left)
-  const noStudios = new Set(['🎬','🎭','🍥','🎨','🎥','🕒','world']);
+  const noStudios = new Set(['🎬','🎭','🍥','🎨','🎥','🕒','🌍']);
   const filteredStudios = filterCollections(collections, catalogs, { enabledCategories: noStudios, enabledDiscoverFolderIds: allDiscover });
   const studioGroup = filteredStudios.find(g => g.title?.includes('Studios'));
   ok('Studios group absent when disabled', !studioGroup || studioGroup.folders.length === 0);
 
   // Disable Anime: Genres group stays but anime folders removed
-  const noAnime = new Set(['🎬','🎭','🎨','🏰','🎥','🕒','world']);
+  const noAnime = new Set(['🎬','🎭','🎨','🏰','🎥','🕒','🌍']);
   const filteredAnime = filterCollections(collections, catalogs, { enabledCategories: noAnime, enabledDiscoverFolderIds: allDiscover });
   const genreGroup = filteredAnime.find(g => g.title?.includes('Genres'));
   ok('Genres group still present when only Anime disabled', !!genreGroup);

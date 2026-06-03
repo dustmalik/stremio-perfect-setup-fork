@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# encode-wizard-key.sh
+# encode.sh
 # --------------------
 # Encodes a raw shared service key into the base64 string format expected by
 # `wizard/config.json` under:
@@ -29,11 +29,11 @@
 #
 # Usage
 # -----
-#   scripts/encode-wizard-key.sh <passphrase> <raw-secret>
+#   scripts/encode.sh <passphrase> <raw-secret>
 #
 # Example
 # -------
-#   scripts/encode-wizard-key.sh example-passphrase t0-free-rpdb
+#   scripts/encode.sh example-passphrase t0-free-rpdb
 #
 # Example output
 # --------------
@@ -56,7 +56,7 @@
 set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
-  echo "Usage: scripts/encode-wizard-key.sh <passphrase> <secret>" >&2
+  echo "Usage: scripts/encode.sh <passphrase> <secret>" >&2
   exit 1
 fi
 

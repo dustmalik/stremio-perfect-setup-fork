@@ -191,10 +191,13 @@ export function InstallingStep() {
 
       const account = target === 'stremio' ? stremioAccount : nuvioAccount;
       const setupFn = target === 'stremio' ? runStremioSetup : runNuvioSetup;
+      if (target === 'nuvio' && !templates.settings) {
+        throw new Error('The Nuvio settings template is missing from the active config. Check wizard/config.json and try again.');
+      }
       const extraParams = target === 'nuvio'
         ? {
-            collectionsJson: templates.nuvioCollections as object[],
-            nuvioSettingsTemplate: templates.nuvioSettings as Record<string, unknown>,
+            collectionsJson: templates.collections as object[],
+            nuvioSettingsTemplate: templates.settings as Record<string, unknown>,
           }
         : {};
 

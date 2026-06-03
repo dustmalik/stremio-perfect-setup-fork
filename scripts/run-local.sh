@@ -12,7 +12,7 @@
 # 6. Serves ./_site over a local static HTTP server.
 #
 # Usage:
-#   scripts/local-serve.sh
+#   scripts/run-local.sh
 #
 # Optional environment variables:
 #   HOST=127.0.0.1        Bind address for the local server. Default: 127.0.0.1

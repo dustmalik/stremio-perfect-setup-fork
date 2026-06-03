@@ -5,7 +5,7 @@
 import { deriveCategoryKey, DISCOVER_EMOJIS } from './catalog-config.js';
 
 /**
- * Build a lookup: catalogId → category key (emoji or 'world' or discover emoji).
+ * Build a lookup: catalogId → category key (emoji like '🌍' or discover emoji).
  */
 function buildCatalogIndex(catalogs) {
   const index = new Map();

@@ -55,13 +55,13 @@ function StepRouter() {
       return;
     }
 
+    const targetTemplates = target === 'nuvio'
+      ? wizardConfig.templates.nuvio
+      : wizardConfig.templates.stremio;
+    const collectionsTemplatePath = targetTemplates.collections ?? wizardConfig.templates.nuvio.collections ?? null;
     const tplUrls = {
-      aiostreams: resolveRepoUrl(wizardConfig.templates.aiostreams),
-      aiometadata: target === 'nuvio'
-        ? resolveRepoUrl(wizardConfig.templates.aiometadata_nuvio)
-        : resolveRepoUrl(wizardConfig.templates.aiometadata_stremio),
-      nuvioCollections: resolveRepoUrl(wizardConfig.templates.nuvio_collections),
-      nuvioSettings: resolveRepoUrl(wizardConfig.templates.nuvio_settings),
+      aiostreams: resolveRepoUrl(targetTemplates.aiostreams),
+      aiometadata: resolveRepoUrl(targetTemplates.aiometadata),
     };
 
     let cancelled = false;
@@ -69,14 +69,20 @@ function StepRouter() {
     setTemplates(null);
     setAioSections([]);
 
-    Promise.all([
+    const fetches = [
       fetchJson(tplUrls.aiostreams, 'AIOStreams template'),
       fetchJson(tplUrls.aiometadata, 'AIOMetadata template'),
-      fetchJson(tplUrls.nuvioCollections, 'Nuvio collections template'),
-      fetchJson(tplUrls.nuvioSettings, 'Nuvio settings template'),
-    ]).then(([aiostreams, aiometadata, nuvioCollections, nuvioSettings]) => {
+      collectionsTemplatePath
+        ? fetchJson(resolveRepoUrl(collectionsTemplatePath), `${target === 'nuvio' ? 'Nuvio' : 'Collections'} template`)
+        : Promise.resolve([]),
+      target === 'nuvio'
+        ? fetchJson(resolveRepoUrl(wizardConfig.templates.nuvio.settings), 'Nuvio settings template')
+        : Promise.resolve(null),
+    ] as const;
+
+    Promise.all(fetches).then(([aiostreams, aiometadata, collections, settings]) => {
       if (cancelled) return;
-      setTemplates({ aiostreams, aiometadata, nuvioCollections, nuvioSettings });
+      setTemplates({ aiostreams, aiometadata, collections, settings });
       setAioSections(buildAioSections(aiostreams));
     }).catch((error: unknown) => {
       if (cancelled) return;

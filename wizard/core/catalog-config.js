@@ -1,6 +1,6 @@
 // Catalog category logic for the AIOMetadata config builder.
 // Category keys are the leading emoji character of each catalog's name.
-// Country flag catalogs (regional indicator pairs) all map to the key 'world'.
+// Country flag catalogs (regional indicator pairs) all map to the key '🌍'.
 
 // Catalog IDs that are always disabled and never shown in the wizard UI.
 // Source of truth: scripts/sync-aiometadata.sh EXCLUDED_CATALOG_IDS
@@ -17,9 +17,20 @@ export const EXCLUDED_CATALOG_IDS = new Set([
 // Emoji prefixes for the special "Discover" section (folder-granular, not category-level).
 export const DISCOVER_EMOJIS = new Set(['🎯', '🏆', '🔥', '⭐']);
 
+const DEFAULT_CATEGORY_LABELS = {
+  '🎬': '🎬 Streaming',
+  '🎭': '🎭 Genres',
+  '🎨': '🎨 Themes',
+  '🏰': '🏰 Studios',
+  '🎥': '🎥 Decades',
+  '🕒': '🕒 Runtime',
+  '🍥': '🍥 Anime',
+  '🌍': '🌍 World',
+};
+
 /**
  * Extract the leading emoji key from a catalog name.
- * Country flags (pairs of Regional Indicator symbols U+1F1E0–U+1F1FF) → 'world'.
+ * Country flags (pairs of Regional Indicator symbols U+1F1E0–U+1F1FF) → '🌍'.
  * All other leading emojis → that emoji character.
  */
 export function deriveCategoryKey(name) {
@@ -30,7 +41,7 @@ export function deriveCategoryKey(name) {
     chars.length >= 2 &&
     chars[0].codePointAt(0) >= 0x1F1E0 && chars[0].codePointAt(0) <= 0x1F1FF &&
     chars[1].codePointAt(0) >= 0x1F1E0 && chars[1].codePointAt(0) <= 0x1F1FF
-  ) return 'world';
+  ) return '🌍';
   return chars[0] || 'other';
 }
 
@@ -42,14 +53,13 @@ export function deriveCategoryKey(name) {
  * @param {object[]} collections Nuvio-Collections.json groups array
  */
 export function deriveCategories(catalogs, collections) {
-  // Build emoji → human label from nuvio-collections group titles
-  const labelByEmoji = { world: '🌍 World' };
+  // Build emoji → human label from nuvio-collections group titles when available,
+  // with stable built-in labels so Stremio does not depend on Nuvio-only templates.
+  const labelByEmoji = { ...DEFAULT_CATEGORY_LABELS };
   for (const group of collections || []) {
     const firstChar = [...(group.title || '')][0];
     if (firstChar) labelByEmoji[firstChar] = group.title;
   }
-  // 🍥 Anime is nested inside 🎭 Genres in nuvio-collections, so it won't have its own group entry
-  labelByEmoji['🍥'] = '🍥 Anime';
 
   const map = new Map();
   for (const c of catalogs) {
