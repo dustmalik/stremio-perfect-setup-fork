@@ -8,12 +8,14 @@ import { AioSectionStep } from './steps/AioSectionStep';
 import { CatalogStep } from './steps/CatalogStep';
 import { InstallingStep } from './steps/InstallingStep';
 import { DoneStep } from './steps/DoneStep';
+import { WatchlyStep } from './steps/WatchlyStep';
 import { normalizeWizardConfig, resolveWizardConfig } from './lib/constants';
 import {
   ACTIVE_KEY_SCREENS,
   AIO_SECTION_START_STEP,
   KEY_SCREEN_START_STEP,
   getCatalogStep,
+  getWatchlyStep,
   getInstallStep,
 } from './lib/keyScreens';
 import { WizardShell } from './components/WizardShell';
@@ -69,6 +71,8 @@ function StepRouter() {
     setTemplates(null);
     setAioSections([]);
 
+    const watchlyTemplatePath = targetTemplates.watchly ?? null;
+
     const fetches = [
       fetchJson(tplUrls.aiostreams, 'AIOStreams template'),
       fetchJson(tplUrls.aiometadata, 'AIOMetadata template'),
@@ -78,11 +82,14 @@ function StepRouter() {
       target === 'nuvio'
         ? fetchJson(resolveRepoUrl(wizardConfig.templates.nuvio.settings), 'Nuvio settings template')
         : Promise.resolve(null),
+      watchlyTemplatePath
+        ? fetchJson(resolveRepoUrl(watchlyTemplatePath), 'Watchly template')
+        : Promise.resolve(null),
     ] as const;
 
-    Promise.all(fetches).then(([aiostreams, aiometadata, collections, settings]) => {
+    Promise.all(fetches).then(([aiostreams, aiometadata, collections, settings, watchly]) => {
       if (cancelled) return;
-      setTemplates({ aiostreams, aiometadata, collections, settings });
+      setTemplates({ aiostreams, aiometadata, collections, settings, watchly: watchly ?? null });
       setAioSections(buildAioSections(aiostreams));
     }).catch((error: unknown) => {
       if (cancelled) return;
@@ -109,6 +116,7 @@ function StepRouter() {
   const n = aioSections.length;
   const KEY_SCREEN_END_STEP = KEY_SCREEN_START_STEP + ACTIVE_KEY_SCREENS.length;
   const CATALOGS_STEP = getCatalogStep(n);
+  const WATCHLY_STEP = getWatchlyStep(n);
   const INSTALL_STEP = getInstallStep(n);
 
   if (step > 0 && target && configError) {
@@ -143,6 +151,7 @@ function StepRouter() {
   }
 
   if (step === CATALOGS_STEP) return <CatalogStep />;
+  if (step === WATCHLY_STEP) return <WatchlyStep />;
   if (step === INSTALL_STEP) return <InstallingStep />;
   return <DoneStep />;
 }
