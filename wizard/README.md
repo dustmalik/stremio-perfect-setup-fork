@@ -178,6 +178,70 @@ Denylist values:
 - dynamic AIOStreams params use the `aio_` naming rule above, for example `aio_formatter_choice`, `aio_http_addons`, `aio_seeders`
 - use the final GA4 param name in the denylist, not the raw template field id
 
+## Done-Step Notifications
+
+`wizard/config.json` supports `doneStepNotifications`, an array of styled notification cards shown
+above the credentials on the Done page. Each entry:
+
+```json
+{
+  "markdown": "...",
+  "targets": ["stremio", "nuvio"],
+  "style": {
+    "background": "...",
+    "borderColor": "...",
+    "textColor": "...",
+    "boxShadow": "..."
+  }
+}
+```
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `markdown` | ✓ | Card body, rendered as Markdown |
+| `targets` | — | `"stremio"` and/or `"nuvio"`. Omit to show on all targets. |
+| `style` | — | Override panel card colors. Omit to use the default theme card. |
+
+`style` sub-fields all accept any CSS value string:
+- `background` — card background (supports `rgba`)
+- `borderColor` — border color (rendered as `1px solid <value>`)
+- `textColor` — text color
+- `boxShadow` — CSS `box-shadow` value
+
+The array is filtered at render time: entries whose `targets` list does not include the active target
+are hidden.
+
+### Example (original Trakt notification — kept as reference)
+
+```json
+{
+  "markdown": "🎯 **Trakt** is optional, but needs to be connected manually because it cannot be automated here.\n\n- **🔎 AIOMetadata**: click on **Customize More** above, open the **Catalogs** tab, press the **Trakt** logo, and follow the setup steps. After you connect it, go to the **Configuration tab and click** **Save Configuration**.\n- **🎞️ Stremio**: open **Settings** and enable **Trakt Scrobbling** there.\n- **🚀 Nuvio**: open **Settings** and connect **Trakt** there using the QR code.",
+  "targets": ["stremio", "nuvio"],
+  "style": {
+    "background": "rgba(95, 24, 43, 0.68)",
+    "borderColor": "rgba(255, 230, 236, 0.2)",
+    "textColor": "rgba(255, 255, 255, 0.96)",
+    "boxShadow": "0 10px 24px rgba(57, 7, 21, 0.22)"
+  }
+}
+```
+
+Note: as of the Watchly update this notification has been replaced by the interactive Trakt card in
+the Done page. It is preserved here as a style reference.
+
+## Per-Target Templates
+
+`wizard/config.json` `templates.stremio` and `templates.nuvio` each map a key to a repository-relative
+template path:
+
+| Key | Both targets | Description |
+|-----|-------------|-------------|
+| `aiostreams` | ✓ | AIOStreams config template |
+| `aiometadata` | ✓ | AIOMetadata config template |
+| `watchly` | ✓ | Watchly default `TokenRequest` body fields |
+| `collections` | Nuvio only | Nuvio collection groups |
+| `settings` | Nuvio only | Nuvio platform settings |
+
 ## For Maintainers
 
 Implementation status, architecture notes, API research, and historical planning docs live in the
