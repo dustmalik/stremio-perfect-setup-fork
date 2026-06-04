@@ -176,7 +176,8 @@ interface SubsectionProps {
 function SubsectionGroup({ sub, ctx, childFields, subsectionField, readValue, setValue }: SubsectionProps) {
   // Hidden entirely when the subsection's own __if is false.
   if (subsectionField && !isVisible(subsectionField, ctx)) return null;
-  const [open, setOpen] = useState(!sub.advanced);
+  // Subsections are collapsed by default so each page stays scannable.
+  const [open, setOpen] = useState(false);
   const alerts = (sub.alertFields as TemplateField[]).filter((a) => isVisible(a, ctx));
 
   return (
@@ -244,6 +245,15 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
     cursor: 'pointer', color: 'var(--text)', textAlign: 'left',
     transition: 'all 0.15s', width: '100%', display: 'block',
   });
+
+  // Long option lists (selects/multi-selects) render as a compact 2-column scrollable
+  // grid; short lists keep the roomy single-column layout.
+  const compactOptions = (field.options?.length ?? 0) > 10;
+  const optionsContainerStyle: CSSProperties = compactOptions
+    ? { display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.4rem', maxHeight: '260px', overflowY: 'auto', paddingRight: '0.25rem' }
+    : { display: 'flex', flexDirection: 'column', gap: '0.4rem' };
+  const optionBtnStyle = (sel: boolean): CSSProperties =>
+    compactOptions ? { ...selectedBtn(sel), fontSize: '0.8125rem', padding: '0.45rem 0.6rem' } : selectedBtn(sel);
 
   if (field.type === 'boolean') {
     return (
@@ -336,21 +346,21 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
       </div>
 
       {field.type === 'select' && field.options && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+        <div style={optionsContainerStyle}>
           {field.options.map(opt => (
             <button
               key={opt.value}
               type="button"
               className={`wizard-hover-lift${value === opt.value ? '' : ' wizard-hover-lift--guide'}`}
               style={{
-                ...selectedBtn(value === opt.value),
+                ...optionBtnStyle(value === opt.value),
                 '--wizard-hover-selected-bg': 'var(--panel-2)',
                 '--wizard-hover-selected-border': 'var(--accent)',
                 '--wizard-hover-selected-color': 'var(--text)',
               } as CSSProperties}
               onClick={() => onChange(opt.value)}
             >
-              <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{opt.label}</span>
+              <span style={{ fontWeight: 500, fontSize: compactOptions ? '0.8125rem' : '0.875rem' }}>{opt.label}</span>
             </button>
           ))}
         </div>
@@ -392,22 +402,24 @@ function FieldRenderer({ field, value, onChange }: FieldProps) {
         const matchesOption = field.options.some(o => o.value === String(value));
         return (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            {field.options.map(opt => (
-              <button
-                key={opt.value}
-                type="button"
-                className={`wizard-hover-lift${String(value) === opt.value ? '' : ' wizard-hover-lift--guide'}`}
-                style={{
-                  ...selectedBtn(String(value) === opt.value),
-                  '--wizard-hover-selected-bg': 'var(--panel-2)',
-                  '--wizard-hover-selected-border': 'var(--accent)',
-                  '--wizard-hover-selected-color': 'var(--text)',
-                } as CSSProperties}
-                onClick={() => onChange(opt.value)}
-              >
-                <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{opt.label}</span>
-              </button>
-            ))}
+            <div style={optionsContainerStyle}>
+              {field.options.map(opt => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={`wizard-hover-lift${String(value) === opt.value ? '' : ' wizard-hover-lift--guide'}`}
+                  style={{
+                    ...optionBtnStyle(String(value) === opt.value),
+                    '--wizard-hover-selected-bg': 'var(--panel-2)',
+                    '--wizard-hover-selected-border': 'var(--accent)',
+                    '--wizard-hover-selected-color': 'var(--text)',
+                  } as CSSProperties}
+                  onClick={() => onChange(opt.value)}
+                >
+                  <span style={{ fontWeight: 500, fontSize: compactOptions ? '0.8125rem' : '0.875rem' }}>{opt.label}</span>
+                </button>
+              ))}
+            </div>
             <input
               type="text"
               placeholder="Custom value…"
