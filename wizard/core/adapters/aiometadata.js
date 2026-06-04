@@ -85,5 +85,65 @@ export function createAiometadataAdapter(instanceUrl) {
       const res = await fetch(`${base}/api/config`).catch(() => null);
       return Boolean(res && res.ok);
     },
+
+    /**
+     * Update an existing config in-place by including the userUUID in the POST body.
+     * The server treats a POST with userUUID as an update (returns same UUID).
+     * Used by the Done page to attach a Trakt tokenId after install.
+     *
+     * @param {object} config  Full config with traktTokenId merged into apiKeys.
+     * @param {string} password  The addon password set during initial save.
+     * @param {string} userUUID  The existing user UUID to update.
+     */
+    async updateConfig(config, password, userUUID) {
+      if (!password) throw new Error('AIOMetadata updateConfig: password is required');
+      if (!userUUID) throw new Error('AIOMetadata updateConfig: userUUID is required');
+      let res;
+      try {
+        res = await fetch(`${base}/api/config/save`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password, userUUID, config }),
+        });
+      } catch (err) {
+        throw new Error(`AIOMetadata at ${base} is unreachable: ${err?.message || err}. Check your internet connection or try again shortly.`);
+      }
+      if (!res.ok) {
+        let detail = '';
+        try { detail = (await res.json())?.error || (await res.json())?.message || ''; } catch { /* ignore */ }
+        if (!detail) detail = await res.text().catch(() => '');
+        throw new Error(
+          `AIOMetadata at ${base} rejected the config update (HTTP ${res.status}).` +
+          (detail ? ` Server said: ${String(detail).slice(0, 300)}` : '')
+        );
+      }
+      const body = await res.json();
+      return { userUUID: body.userUUID ?? userUUID };
+    },
+
+    /**
+     * Validate a Trakt tokenId returned on the AIOMetadata OAuth callback page.
+     * The user copies the tokenId from the callback page and pastes it into the wizard.
+     *
+     * @param {string} tokenId  The UUID shown on /api/auth/trakt/callback.
+     * @returns {Promise<{ provider: string, username: string, status: string }>}
+     */
+    async validateTokenId(tokenId) {
+      if (!tokenId) throw new Error('AIOMetadata validateTokenId: tokenId is required');
+      let res;
+      try {
+        res = await fetch(`${base}/api/oauth/token/info`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tokenId }),
+        });
+      } catch (err) {
+        throw new Error(`AIOMetadata at ${base} is unreachable: ${err?.message || err}. Check your internet connection or try again shortly.`);
+      }
+      if (!res.ok) {
+        throw new Error(`Token ID validation failed at ${base} (HTTP ${res.status}). Please make sure you pasted the correct Token ID.`);
+      }
+      return res.json();
+    },
   };
 }
