@@ -1,12 +1,16 @@
-import type { CSSProperties } from 'react';
-import { ListChecks } from 'lucide-react';
+import { useState, type CSSProperties } from 'react';
+import { ListChecks, ChevronDown } from 'lucide-react';
 import { WizardShell } from '../components/WizardShell';
 import { NextButton } from '../components/NextButton';
 import { MarkdownText } from '../components/MarkdownText';
 import { useWizard } from '../store/wizard';
+import type { AioSubsectionItem } from '../lib/aioSections';
 
 // @ts-ignore
-import { isVisible } from '@core/template-engine.js';
+import { isVisible as isVisibleRaw } from '@core/template-engine.js';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const isVisible = isVisibleRaw as (field: any, ctx: { inputs: Record<string, any>; services: string[] }) => boolean;
 
 interface TemplateField {
   id: string;
@@ -17,6 +21,22 @@ interface TemplateField {
   default?: unknown;
   options?: { value: string; label: string }[];
   intent?: string;
+  constraints?: { min?: number; max?: number; forceInUi?: boolean };
+  subOptions?: TemplateField[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Ctx = { inputs: Record<string, any>; services: string[] };
+
+/** Read a possibly-nested input value by dotted id (e.g. "bitrate.bitrateCap"). */
+function readNested(inputs: Record<string, unknown>, id: string): unknown {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return id.split('.').reduce<any>((o, k) => (o == null ? undefined : o[k]), inputs);
+}
+
+function isEmptyValue(val: unknown): boolean {
+  if (Array.isArray(val)) return val.length === 0;
+  return val === undefined || val === null || val === '';
 }
 
 function AlertBanner({ field }: { field: TemplateField }) {
@@ -56,30 +76,46 @@ export function AioSectionStep({ sectionIndex }: Props) {
   const allInputs = t?.metadata?.inputs ?? [];
   const inputsById = Object.fromEntries(allInputs.map((f: TemplateField) => [f.id, f]));
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ctx: any = {
+  const ctx: Ctx = {
     inputs: aioStreamsInputs,
     services: credentials.debridServices.map((d: { id: string }) => d.id),
   };
 
   const headerField = section.headerField as TemplateField | null;
   const alertFields = section.alertFields as TemplateField[];
-
-  // Get visible fields for this section
-  const sectionFields: TemplateField[] = section.fieldIds
-    .map((id: string) => inputsById[id])
-    .filter(Boolean)
-    .filter((f: TemplateField) => isVisible(f, ctx));
-
   const sectionAlerts: TemplateField[] = alertFields.filter((f: TemplateField) => isVisible(f, ctx));
 
-  // Block continue if any required visible field is empty
-  const isBlocked = sectionFields.some((f: TemplateField) => {
-    if (!f.required) return false;
-    const val = aioStreamsInputs[f.id] ?? f.default;
-    if (Array.isArray(val)) return val.length === 0;
-    return val === undefined || val === null || val === '';
+  // Resolve a subsection's visible child fields (looked up within its own subOptions,
+  // since child ids can collide across subsections).
+  const subVisibleChildren = (sub: AioSubsectionItem): TemplateField[] => {
+    const childById = Object.fromEntries(
+      ((sub.headerField as TemplateField)?.subOptions ?? []).map((o) => [o.id, o]),
+    );
+    return sub.fieldIds
+      .map((id) => childById[id])
+      .filter(Boolean)
+      .filter((f) => isVisible(f, ctx));
+  };
+
+  // Block continue if any visible required field (top-level or inside a visible
+  // subsection) is empty.
+  const isBlocked = section.items.some((item) => {
+    if (item.kind === 'field') {
+      const f = inputsById[item.id];
+      if (!f || !f.required || !isVisible(f, ctx)) return false;
+      return isEmptyValue(readNested(aioStreamsInputs, item.id) ?? f.default);
+    }
+    // subsection
+    if (!isVisible(inputsById[item.id] ?? item.headerField, ctx)) return false;
+    return subVisibleChildren(item).some((cf) => {
+      if (!cf.required) return false;
+      return isEmptyValue(readNested(aioStreamsInputs, `${item.id}.${cf.id}`) ?? cf.default);
+    });
   });
+
+  const visibleFieldItems = section.items.filter((item) =>
+    item.kind === 'field' ? isVisible(inputsById[item.id] ?? { id: item.id }, ctx) : true,
+  );
 
   return (
     <WizardShell>
@@ -90,23 +126,99 @@ export function AioSectionStep({ sectionIndex }: Props) {
       {headerField?.description && <AlertBanner field={headerField} />}
       {sectionAlerts.map((field) => <AlertBanner key={field.id} field={field} />)}
 
-      {sectionFields.length === 0 && (
+      {visibleFieldItems.length === 0 && (
         <p style={{ color: 'var(--muted)', fontSize: '0.875rem', marginBottom: '1rem' }}>
           No options to configure for your current setup.
         </p>
       )}
 
-      {sectionFields.map((field: TemplateField) => (
-        <FieldRenderer
-          key={field.id}
-          field={field}
-          value={aioStreamsInputs[field.id] ?? field.default}
-          onChange={(val: unknown) => setAioStreamsInput(field.id, val)}
-        />
-      ))}
+      {section.items.map((item) => {
+        if (item.kind === 'subsection') {
+          return (
+            <SubsectionGroup
+              key={item.id}
+              sub={item}
+              ctx={ctx}
+              childFields={subVisibleChildren(item)}
+              subsectionField={(inputsById[item.id] ?? item.headerField) as TemplateField}
+              readValue={(id) => readNested(aioStreamsInputs, id)}
+              setValue={setAioStreamsInput}
+            />
+          );
+        }
+        const field = inputsById[item.id];
+        if (!field || !isVisible(field, ctx)) return null;
+        return (
+          <FieldRenderer
+            key={field.id}
+            field={field}
+            value={readNested(aioStreamsInputs, field.id) ?? field.default}
+            onChange={(val: unknown) => setAioStreamsInput(field.id, val)}
+          />
+        );
+      })}
 
       <NextButton onClick={nextStep} disabled={isBlocked} icon={<ListChecks size={16} />} />
     </WizardShell>
+  );
+}
+
+interface SubsectionProps {
+  sub: AioSubsectionItem;
+  ctx: Ctx;
+  childFields: TemplateField[];
+  subsectionField: TemplateField;
+  readValue: (id: string) => unknown;
+  setValue: (id: string, value: unknown) => void;
+}
+
+/** A collapsible group of fields rendered within a page. Advanced subsections start collapsed. */
+function SubsectionGroup({ sub, ctx, childFields, subsectionField, readValue, setValue }: SubsectionProps) {
+  // Hidden entirely when the subsection's own __if is false.
+  if (subsectionField && !isVisible(subsectionField, ctx)) return null;
+  const [open, setOpen] = useState(!sub.advanced);
+  const alerts = (sub.alertFields as TemplateField[]).filter((a) => isVisible(a, ctx));
+
+  return (
+    <div style={{ border: '1px solid var(--border)', borderRadius: '12px', marginBottom: '1rem', overflow: 'hidden' }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        style={{
+          width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '0.85rem 1rem', background: 'var(--panel-2)', border: 'none', cursor: 'pointer',
+          color: 'var(--text)', fontWeight: 600, fontSize: '0.9rem', textAlign: 'left',
+        }}
+      >
+        <span>{sub.title}</span>
+        <ChevronDown size={16} style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s', flex: '0 0 auto' }} />
+      </button>
+      {open && (
+        <div style={{ padding: '0.85rem 1rem 0.1rem' }}>
+          {sub.description && (
+            <MarkdownText
+              text={sub.description}
+              style={{ color: 'var(--muted)', fontSize: '0.8125rem', marginBottom: '0.85rem', lineHeight: 1.55 }}
+            />
+          )}
+          {alerts.map((a) => <AlertBanner key={a.id} field={a} />)}
+          {childFields.map((cf) => (
+            <FieldRenderer
+              key={cf.id}
+              field={cf}
+              value={readValue(`${sub.id}.${cf.id}`) ?? cf.default}
+              onChange={(val: unknown) => setValue(`${sub.id}.${cf.id}`, val)}
+            />
+          ))}
+          {childFields.length === 0 && (
+            <p style={{ color: 'var(--muted)', fontSize: '0.8125rem', marginBottom: '0.85rem' }}>
+              No options to configure here for your current setup.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
 
