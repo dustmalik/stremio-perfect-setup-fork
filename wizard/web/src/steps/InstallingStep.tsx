@@ -19,6 +19,7 @@ const STEP_LABELS: Record<string, string> = {
   profile:     'Profile loaded',
   aiostreams:  'AIOStreams configuration saved',
   aiometadata: 'AIOMetadata configuration saved',
+  watchly:     'Watchly configuration saved',
   addons:      'Add-ons installed',
   collections: 'Collections installed',
   settings:    'Settings updated',
@@ -47,7 +48,7 @@ export function InstallingStep() {
     try {
       const {
         target, stremioAccount, nuvioAccount, credentials, aioStreamsInputs,
-        catalogSelection, templates, wizardConfig,
+        catalogSelection, templates, wizardConfig, watchly,
       } = wizard;
 
       if (!templates) {
@@ -134,6 +135,30 @@ export function InstallingStep() {
         language: (aiometadataBaseTemplate as { config?: { language?: string } }).config?.language ?? 'en-US',
       };
 
+      // Assemble Watchly body if enabled and instances are configured
+      const effectiveWatchlyInstances = effectiveInstances.watchly ?? [];
+      const watchlyEnabled = watchly.enabled && effectiveWatchlyInstances.length > 0;
+
+      let watchlyBody: Record<string, unknown> | null = null;
+      if (watchlyEnabled) {
+        const watchlyDefaults = (templates.watchly ?? {}) as Record<string, unknown>;
+        const stremioAuthKey = target === 'stremio'
+          ? stremioAccount.authKey
+          : watchly.nuvioStremioLogin?.authKey;
+
+        if (!stremioAuthKey) {
+          throw new Error('Watchly is enabled but no Stremio identity is available. Go back to the Watchly page and sign in to Stremio.');
+        }
+
+        watchlyBody = {
+          ...watchlyDefaults,
+          authKey: stremioAuthKey,
+          tmdb_api_key: effectiveCredentials.tmdbApiKey,
+          ...(effectiveCredentials.geminiApiKey ? { gemini_api_key: effectiveCredentials.geminiApiKey } : {}),
+          ...(effectiveCredentials.rpdbApiKey ? { poster_rating: { provider: 'rpdb', api_key: effectiveCredentials.rpdbApiKey } } : {}),
+        };
+      }
+
       const onStep = (name: string, data: unknown) => {
         const label = STEP_LABELS[name];
         if (!label) return;
@@ -154,6 +179,9 @@ export function InstallingStep() {
           const d = data as { instance?: string };
           detail = `Saved on ${d?.instance ?? ''}.`;
         } else if (name === 'aiometadata') {
+          const d = data as { instance?: string };
+          detail = `Saved on ${d?.instance ?? ''}.`;
+        } else if (name === 'watchly') {
           const d = data as { instance?: string };
           detail = `Saved on ${d?.instance ?? ''}.`;
         } else if (name === 'install') {
@@ -183,7 +211,11 @@ export function InstallingStep() {
       type SetupResult = {
         addons: {
           aiostreams?: { manifestUrl?: string; uuid?: string; password?: string };
-          aiometadata?: { manifestUrl?: string; uuid?: string; password?: string };
+          aiometadata?: {
+            manifestUrl?: string; uuid?: string; password?: string;
+            instance?: string; config?: Record<string, unknown>;
+          };
+          watchly?: { manifestUrl?: string; token?: string };
         };
         addonPasswordSource?: 'account' | 'generated';
         warnings: string[];
@@ -211,6 +243,7 @@ export function InstallingStep() {
         account,
         aiostreamsParams,
         aiometadataParams,
+        watchlyBody,
         proxyBase,
         onStep,
         ...extraParams,
@@ -225,9 +258,23 @@ export function InstallingStep() {
 
       const aios = result.addons.aiostreams;
       const meta = result.addons.aiometadata;
+      const watchlyResult = result.addons.watchly;
       wizard.setInstallResult({
-        aiostreams:  aios ? { manifestUrl: aios.manifestUrl ?? '', uuid: aios.uuid ?? '', password: aios.password ?? '' } : null,
-        aiometadata: meta ? { manifestUrl: meta.manifestUrl ?? '', uuid: meta.uuid ?? '', password: meta.password ?? '' } : null,
+        aiostreams: aios
+          ? { manifestUrl: aios.manifestUrl ?? '', uuid: aios.uuid ?? '', password: aios.password ?? '' }
+          : null,
+        aiometadata: meta
+          ? {
+              manifestUrl: meta.manifestUrl ?? '',
+              uuid: meta.uuid ?? '',
+              password: meta.password ?? '',
+              instance: meta.instance ?? '',
+              config: meta.config ?? {},
+            }
+          : null,
+        watchly: watchlyResult
+          ? { manifestUrl: watchlyResult.manifestUrl ?? '', token: watchlyResult.token ?? '' }
+          : null,
         addonPasswordSource: result.addonPasswordSource ?? 'account',
         warnings: result.warnings,
         error: null,
