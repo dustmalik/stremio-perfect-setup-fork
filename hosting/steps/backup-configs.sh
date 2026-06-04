@@ -99,27 +99,6 @@ done < <(read_lines_file "${MODULES_FILE}")
 timestamp="$(date +%Y%m%d%H%M%S)"
 archive_path="${OUTPUT_DIR}/${BASENAME_VALUE}-${timestamp}.zip"
 
-python3 - "${export_dir}" "${archive_path}" <<'PY'
-import os
-import sys
-import zipfile
-
-root = sys.argv[1]
-archive = sys.argv[2]
-
-with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-    for entry in sorted(os.listdir(root)):
-        if entry.startswith(".") and entry != ".env":
-            continue
-        path = os.path.join(root, entry)
-        if os.path.isdir(path):
-            for dirpath, _, filenames in os.walk(path):
-                for filename in sorted(filenames):
-                    file_path = os.path.join(dirpath, filename)
-                    archive_name = os.path.relpath(file_path, root)
-                    zf.write(file_path, archive_name)
-        else:
-            zf.write(path, entry)
-PY
+write_zip_archive "${export_dir}" "${archive_path}"
 
 success "Backup archive created at ${archive_path}"
