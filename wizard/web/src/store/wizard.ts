@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { type WizardConfig, type WizardTarget } from '../lib/constants';
-import type { AioSection } from '../lib/aioSections';
+import { type WizardConfig, type WizardTarget } from '../lib/constants.ts';
+import type { AioSection } from '../lib/aioSections.ts';
 
 export type Target = WizardTarget;
 export type AccountMode = 'create' | 'signin';
@@ -26,6 +26,7 @@ export interface AccountInfo {
   authToken?: string; // Nuvio access_token
   authError?: string; // inline error message
   loading?: boolean;
+  userId?: string;  // Stremio user _id, used for Trakt scrobble auth URL
 }
 
 export interface Credentials {
@@ -49,10 +50,29 @@ export interface CatalogSelection {
 
 export interface InstallResult {
   aiostreams: { manifestUrl: string; uuid: string; password: string } | null;
-  aiometadata: { manifestUrl: string; uuid: string; password: string } | null;
+  aiometadata: {
+    manifestUrl: string;
+    uuid: string;
+    password: string;
+    instance: string;
+    config: Record<string, unknown>;
+  } | null;
+  watchly: { manifestUrl: string; token: string } | null;
   addonPasswordSource: 'account' | 'generated' | null;
   warnings: string[];
   error: string | null;
+}
+
+export interface WatchlyState {
+  enabled: boolean;
+  /** Stremio login collected on the Watchly page for the Nuvio target.
+   *  Stremio target uses stremioAccount directly; this is only needed for Nuvio. */
+  nuvioStremioLogin: {
+    email: string;
+    password: string;
+    authKey: string;
+    userId: string;
+  } | null;
 }
 
 export interface LoadedTemplates {
@@ -60,6 +80,7 @@ export interface LoadedTemplates {
   aiometadata: unknown;
   collections: unknown[];
   settings: unknown | null;
+  watchly: unknown | null;
 }
 
 interface WizardState {
@@ -80,6 +101,8 @@ interface WizardState {
   aioSections: AioSection[];
   /** Runtime config loaded from config.json at startup */
   wizardConfig: WizardConfig | null;
+  watchly: WatchlyState;
+  setWatchly: (w: Partial<WatchlyState>) => void;
 
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -115,10 +138,11 @@ export const useWizard = create<WizardState>((set) => ({
   aioStreamsInputs: {},
   aiometadataInstance: '',
   catalogSelection: { enabledCategories: new Set(), enabledDiscoverFolderIds: new Set() },
-  installResult: { aiostreams: null, aiometadata: null, addonPasswordSource: null, warnings: [], error: null },
+  installResult: { aiostreams: null, aiometadata: null, watchly: null, addonPasswordSource: null, warnings: [], error: null },
   templates: null,
   aioSections: [],
   wizardConfig: null,
+  watchly: { enabled: false, nuvioStremioLogin: null },
 
   setStep: (step) => set(s => ({
     step,
@@ -172,6 +196,7 @@ export const useWizard = create<WizardState>((set) => ({
   setTemplates: (templates) => set({ templates }),
   setAioSections: (aioSections) => set({ aioSections }),
   setInstallResult: (r) => set(s => ({ installResult: { ...s.installResult, ...r } })),
+  setWatchly: (w) => set(s => ({ watchly: { ...s.watchly, ...w } })),
   setWizardConfig: (cfg) => set({
     wizardConfig: cfg,
     aioStreamsInstance: cfg?.instances.aiostreams[0] ?? '',
