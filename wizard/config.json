@@ -52,35 +52,23 @@
           "https://aiometadata.viren070.me",
           "https://aiometadatafortheweebs.midnightignite.me"
         ],
-        "watchly": []
+        "watchly": ["https://watchly-dev.vercel.app"]
       },
       "templates": {
         "stremio": {
           "aiostreams": "templates/AIOStreams.json",
-          "aiometadata": "templates/AIOMetadata.json"
+          "aiometadata": "templates/AIOMetadata.json",
+          "watchly": "templates/Watchly.json"
         },
         "nuvio": {
           "aiostreams": "templates/AIOStreams.json",
           "aiometadata": "templates/AIOMetadata-All.json",
           "collections": "templates/Nuvio-Collections.json",
-          "settings": "templates/Nuvio-Settings.json"
+          "settings": "templates/Nuvio-Settings.json",
+          "watchly": "templates/Watchly.json"
         }
       },
-      "doneStepNotifications": [
-        {
-          "markdown": "🤖 **Watchly** (Netflix-like recommendations) coming soon!"
-        },
-        {
-          "markdown": "🎯 **Trakt** is optional, but needs to be connected manually because it cannot be automated here.\n\n- **🔎 AIOMetadata**: click on **Customize More** above, open the **Catalogs** tab, press the **Trakt** logo, and follow the setup steps. After you connect it, go to the **Configuration tab and click**Save Configuration**.\n- **🎞️ Stremio**: open **Settings** and enable **Trakt Scrobbling** there.\n- **🚀 Nuvio**: open **Settings** and connect **Trakt** there using the QR code.",
-          "targets": ["stremio", "nuvio"],
-          "style": {
-            "background": "rgba(95, 24, 43, 0.68)",
-            "borderColor": "rgba(255, 230, 236, 0.2)",
-            "textColor": "rgba(255, 255, 255, 0.96)",
-            "boxShadow": "0 10px 24px rgba(57, 7, 21, 0.22)"
-          }
-        }
-      ]
+      "doneStepNotifications": []
     }
   ]
 }

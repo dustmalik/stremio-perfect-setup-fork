@@ -36,6 +36,7 @@ export interface WizardTargetTemplates {
   aiostreams: string;
   aiometadata: string;
   collections?: string;
+  watchly?: string;
 }
 
 export interface WizardNuvioTemplates extends WizardTargetTemplates {
@@ -134,6 +135,7 @@ function normalizeTargetTemplates(value: unknown): WizardTargetTemplates | null 
     aiostreams: value.aiostreams,
     aiometadata: value.aiometadata,
     collections: typeof value.collections === 'string' ? value.collections : undefined,
+    watchly: typeof value.watchly === 'string' ? value.watchly : undefined,
   };
 }
 

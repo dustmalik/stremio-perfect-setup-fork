@@ -30,9 +30,8 @@ export const ADDON_REGISTRY = [
     id: 'watchly',
     name: 'Watchly',
     description: 'Netflix-like recommendations and dynamic catalogs',
-    targets: ['stremio'], // nuvio support pending Trakt-based library (dev in progress)
-    status: 'coming-soon',
-    deferredReason: 'Nuvio support pending Trakt-based library implementation by Watchly dev',
+    targets: ['stremio', 'nuvio'],
+    status: 'active',
   },
 ];
 
