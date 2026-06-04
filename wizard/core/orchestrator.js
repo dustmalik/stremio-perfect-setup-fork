@@ -12,6 +12,7 @@ import {
 } from './adapters/nuvio.js';
 import { buildAioMetadataConfig } from './catalog-config.js';
 import { filterCollections } from './nuvio-collections.js';
+import { createWatchlyAdapter } from './adapters/watchly.js';
 
 function randomPassword(len = 20) {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
@@ -100,14 +101,47 @@ async function createAiometadataSummary(instances, aiometadataParams, password, 
     uuid: aioMetaResult.userUUID,
     password,
     manifestUrl: aioMetaResult.manifestUrl || aioMetaResult.installUrl,
+    config: aioMetaConfig,
   };
 }
 
-async function createAddonBundle({ instances, aiostreamsParams, aiometadataParams, password, target, proxyBase }) {
+async function createWatchlySummary(instances, watchlyBody, warnings) {
+  if (!instances.watchly?.length) {
+    throw new Error('No Watchly instances are configured. Add at least one URL to instances.watchly in wizard/config.json.');
+  }
+
+  let watchlyResult = null;
+  for (const instanceUrl of instances.watchly) {
+    try {
+      const adapter = createWatchlyAdapter(instanceUrl);
+      const result = await adapter.createConfig(watchlyBody);
+      watchlyResult = { ...result, instanceUrl };
+      break;
+    } catch (err) {
+      warnings.push(`Watchly ${instanceUrl} tried but failed: ${toError(err).message}`);
+    }
+  }
+
+  if (!watchlyResult) throw new Error('All Watchly instances failed, see warnings');
+
+  return {
+    instance: watchlyResult.instanceUrl,
+    token: watchlyResult.token,
+    manifestUrl: watchlyResult.manifestUrl,
+  };
+}
+
+async function createAddonBundle({ instances, aiostreamsParams, aiometadataParams, watchlyBody, password, target, proxyBase }) {
   const warnings = [];
   const aiostreams = await createAioStreamsSummary(instances, aiostreamsParams, password, proxyBase, warnings);
   const aiometadata = await createAiometadataSummary(instances, aiometadataParams, password, target, warnings);
-  return { addons: { aiostreams, aiometadata }, warnings };
+
+  let watchly = null;
+  if (watchlyBody) {
+    watchly = await createWatchlySummary(instances, watchlyBody, warnings);
+  }
+
+  return { addons: { aiostreams, aiometadata, ...(watchly ? { watchly } : {}) }, warnings };
 }
 
 async function applyNuvioProfileSettings(nuvio, token, profileIndex, settingsTemplate, aiometadataParams) {
@@ -138,13 +172,14 @@ async function applyNuvioProfileSettings(nuvio, token, profileIndex, settingsTem
 /**
  * Full Stremio setup flow.
  * @param {object} p
- * @param {object} p.instances         { aiostreams: string[], aiometadata: string[] } – ordered list; first is primary, rest are fallbacks
+ * @param {object} p.instances         { aiostreams: string[], aiometadata: string[], watchly?: string[] } – ordered list; first is primary, rest are fallbacks
  * @param {object} p.account           { mode: 'create'|'signin', email, password }
  * @param {object} p.aiostreamsParams  { template, inputs, services, credentials }
  * @param {object} p.aiometadataParams { baseTemplate, enabledCategories, enabledDiscoverFolderIds, apiKeys, language }
+ * @param {object} [p.watchlyBody]     Merged Watchly TokenRequest body (null/undefined = skip Watchly)
  * @param {function} p.onStep          (name, data) => void; progress callback
  */
-export async function runStremioSetup({ instances, account, aiostreamsParams, aiometadataParams, proxyBase, onStep }) {
+export async function runStremioSetup({ instances, account, aiostreamsParams, aiometadataParams, watchlyBody, proxyBase, onStep }) {
   const summary = { account: null, addons: {}, warnings: [], addonPasswordSource: 'account' };
   const step = (name, data) => { onStep?.(name, data); return data; };
 
@@ -173,6 +208,7 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
       instances,
       aiostreamsParams,
       aiometadataParams,
+      watchlyBody: watchlyBody ?? null,
       password: account.password,
       target: 'stremio',
       proxyBase,
@@ -186,6 +222,7 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
       instances,
       aiostreamsParams,
       aiometadataParams,
+      watchlyBody: watchlyBody ?? null,
       password: randomPassword(),
       target: 'stremio',
       proxyBase,
@@ -194,9 +231,15 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
 
   summary.addons.aiostreams = addonBundle.addons.aiostreams;
   summary.addons.aiometadata = addonBundle.addons.aiometadata;
+  if (addonBundle.addons.watchly) {
+    summary.addons.watchly = addonBundle.addons.watchly;
+  }
   summary.warnings.push(...addonBundle.warnings);
   step('aiostreams', summary.addons.aiostreams);
   step('aiometadata', summary.addons.aiometadata);
+  if (summary.addons.watchly) {
+    step('watchly', summary.addons.watchly);
+  }
 
   // 4) ATOMIC install: push only after all configs succeeded
   const existing = await stremio.getAddons(auth.authKey);
@@ -204,6 +247,7 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
   const collection = buildAddonCollection(existing, {
     aiometadata: summary.addons.aiometadata.manifestUrl,
     aiostreams: summary.addons.aiostreams.manifestUrl,
+    watchly: summary.addons.watchly?.manifestUrl,
   }, {
     cinemetaDescriptor,
     cleanCinemeta: { removeSearch: true, removeCatalogs: true, removeMetadata: true },
@@ -218,15 +262,16 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
 /**
  * Full Nuvio setup flow.
  * @param {object} p
- * @param {object} p.instances           { aiostreams: string[], aiometadata: string[] } – ordered list; first is primary, rest are fallbacks
+ * @param {object} p.instances           { aiostreams: string[], aiometadata: string[], watchly?: string[] } – ordered list; first is primary, rest are fallbacks
  * @param {object} p.account             { mode: 'create'|'signin', email, password }
  * @param {object} p.aiostreamsParams    { template, inputs, services, credentials }
  * @param {object} p.aiometadataParams   { baseTemplate, enabledCategories, enabledDiscoverFolderIds, apiKeys, language }
+ * @param {object} [p.watchlyBody]       Merged Watchly TokenRequest body (null/undefined = skip Watchly)
  * @param {object[]} p.collectionsJson   Nuvio-Collections.json array
  * @param {object} p.nuvioSettingsTemplate Nuvio-Settings.json platform map
  * @param {function} p.onStep
  */
-export async function runNuvioSetup({ instances, account, aiostreamsParams, aiometadataParams, collectionsJson, nuvioSettingsTemplate, proxyBase, onStep }) {
+export async function runNuvioSetup({ instances, account, aiostreamsParams, aiometadataParams, watchlyBody, collectionsJson, nuvioSettingsTemplate, proxyBase, onStep }) {
   const summary = { account: null, addons: {}, settings: null, warnings: [], addonPasswordSource: 'account' };
   const step = (name, data) => { onStep?.(name, data); return data; };
 
@@ -269,6 +314,7 @@ export async function runNuvioSetup({ instances, account, aiostreamsParams, aiom
       instances,
       aiostreamsParams,
       aiometadataParams,
+      watchlyBody: watchlyBody ?? null,
       password: account.password,
       target: 'nuvio',
       proxyBase,
@@ -282,6 +328,7 @@ export async function runNuvioSetup({ instances, account, aiostreamsParams, aiom
       instances,
       aiostreamsParams,
       aiometadataParams,
+      watchlyBody: watchlyBody ?? null,
       password: randomPassword(),
       target: 'nuvio',
       proxyBase,
@@ -290,14 +337,21 @@ export async function runNuvioSetup({ instances, account, aiostreamsParams, aiom
 
   summary.addons.aiostreams = addonBundle.addons.aiostreams;
   summary.addons.aiometadata = addonBundle.addons.aiometadata;
+  if (addonBundle.addons.watchly) {
+    summary.addons.watchly = addonBundle.addons.watchly;
+  }
   summary.warnings.push(...addonBundle.warnings);
   step('aiostreams', summary.addons.aiostreams);
   step('aiometadata', summary.addons.aiometadata);
+  if (summary.addons.watchly) {
+    step('watchly', summary.addons.watchly);
+  }
 
   // 5) ATOMIC install: replace profile add-ons then push collections only after
-  // all configs succeed. Nuvio addon order: AIOMetadata first (catalog source),
-  // then AIOStreams (stream source).
+  // all configs succeed. Nuvio addon order: Watchly first (watch history), then
+  // AIOMetadata (catalog source), then AIOStreams (stream source).
   const addons = [
+    ...(summary.addons.watchly ? [{ url: summary.addons.watchly.manifestUrl, name: 'Watchly', sort_order: 0 }] : []),
     { url: summary.addons.aiometadata.manifestUrl, name: 'AIOMetadata', sort_order: 1 },
     { url: summary.addons.aiostreams.manifestUrl, name: 'AIOStreams', sort_order: 2 },
   ];
