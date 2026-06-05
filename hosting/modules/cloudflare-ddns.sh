@@ -3,7 +3,7 @@
 # Configures Cloudflare DDNS and Traefik DNS challenge for selected modules.
 #
 # Purpose:
-#   This hook resolves the cloudflare-ddns inconsistency described in prompt.md.
+#   This hook wires up Cloudflare DDNS and the Traefik DNS challenge.
 #   It asks for or accepts CLOUDFLARE_API_TOKEN, disables cloudflare-ddns when no
 #   token is available, stages the Cloudflare DDNS and Traefik compose files,
 #   limits the DDNS DOMAINS list to selected modules, makes PROXIED configurable,

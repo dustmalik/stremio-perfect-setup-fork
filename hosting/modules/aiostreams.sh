@@ -3,11 +3,11 @@
 # Configures the staged AIOStreams .env file.
 #
 # Purpose:
-#   This hook applies the prompt.md AIOStreams defaults in the staged
-#   AIOSTREAMS.env file: set the configured parameter values, generate
-#   SECRET_KEY, optionally prompt for AIOSTREAMS_AUTH, and point
-#   BUILTIN_STREMTHRU_URL at the local stremthru container when stremthru was
-#   selected.
+#   This hook applies the AIOStreams defaults in the staged AIOSTREAMS.env file:
+#   set the configured parameter values, generate SECRET_KEY, optionally prompt
+#   for AIOSTREAMS_AUTH (commenting it out when left empty, since AIOStreams
+#   rejects an empty value), and point BUILTIN_STREMTHRU_URL at the local
+#   stremthru container when stremthru was selected.
 #
 # Called automatically by main.sh when aiostreams is selected.
 #
@@ -75,7 +75,12 @@ import os
 
 values = json.loads(os.environ["HOSTING_AIOSTREAMS_BASE_PARAMETERS_JSON"])
 values["SECRET_KEY"] = os.environ["HOSTING_AIOSTREAMS_SECRET_KEY"]
-values["AIOSTREAMS_AUTH"] = os.environ["HOSTING_AIOSTREAMS_AUTH_VALUE"]
+# Only set AIOSTREAMS_AUTH when a value is provided. AIOStreams rejects an empty
+# value ("Proxy auth must be a comma separated list..."), so an empty value is
+# left out here and the staged line is commented out by the caller instead.
+_auth = os.environ["HOSTING_AIOSTREAMS_AUTH_VALUE"]
+if _auth.strip():
+    values["AIOSTREAMS_AUTH"] = _auth
 
 if os.environ.get("HOSTING_AIOSTREAMS_ENABLE_LOCAL_STREMTHRU", "").strip() == "1":
     values["BUILTIN_STREMTHRU_URL"] = os.environ["HOSTING_AIOSTREAMS_LOCAL_STREMTHRU_URL"]
@@ -135,12 +140,20 @@ if selected_module_enabled "${STREMTHRU_MODULE}"; then
   AIOSTREAMS_ENABLE_LOCAL_STREMTHRU=1
 fi
 
+auth_value="$(prompt_aiostreams_auth_value "${current_auth_value}")"
+
 apply_parameters_json \
   "${AIOSTREAMS_ENV}" \
   "$(build_final_parameters_json \
     "${PARAMETERS}" \
     "${current_secret_key:-$(generate_secret_hex)}" \
-    "$(prompt_aiostreams_auth_value "${current_auth_value}")" \
+    "${auth_value}" \
     "${AIOSTREAMS_ENABLE_LOCAL_STREMTHRU}")"
+
+# AIOStreams crash-loops on an empty AIOSTREAMS_AUTH; comment it out when unset
+# so the app treats it as disabled instead of invalid.
+if [[ -z "${auth_value//[[:space:]]/}" ]]; then
+  env_comment "${AIOSTREAMS_ENV}" AIOSTREAMS_AUTH
+fi
 
 success "Configured AIOStreams defaults"

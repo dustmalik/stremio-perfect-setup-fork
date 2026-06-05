@@ -3,9 +3,10 @@
 # Prepares a local SSH identity and optional SSH config alias for VPS access.
 #
 # Purpose:
-#   This helper covers the prompt.md SSH preflight. It can use an explicit
-#   private key, detect an existing default key, or generate a new ed25519 key
-#   under ~/.ssh. It also writes or replaces a Host block in ~/.ssh/config.
+#   This helper prepares SSH access to the VPS before the local-to-VPS deploy.
+#   It can use an explicit private key, detect an existing default key, or
+#   generate a new ed25519 key under ~/.ssh. It also writes or replaces a Host
+#   block in ~/.ssh/config.
 #
 # Usage:
 #   ./hosting/steps/prepare-ssh.sh
@@ -76,9 +77,20 @@ while (( $# > 0 )); do
 done
 
 sync_key_name_from_alias() {
-  if (( ! KEY_NAME_SET )); then
+  if (( ! KEY_NAME_SET )) && [[ -z "${KEY_PATH}" ]]; then
     KEY_NAME="${SSH_ALIAS}"
   fi
+}
+
+prepare_generated_key_path() {
+  if is_interactive && (( ! KEY_NAME_SET )) && (( ! ALIAS_SET )); then
+    KEY_NAME="$(prompt_value "Choose the local SSH key file name to create under ${SSH_DIR}. This only names the key pair on this machine; the VPS host, user, and SSH alias are configured in the next step [SSH_KEY_NAME]" "${KEY_NAME}")"
+    [[ -n "${KEY_NAME}" ]] || die "SSH key name cannot be empty"
+    KEY_NAME_SET=1
+  fi
+
+  KEY_PATH="${SSH_DIR}/${KEY_NAME}"
+  GENERATE_KEY=1
 }
 
 find_default_key() {
@@ -109,7 +121,7 @@ select_key() {
   fi
 
   if (( GENERATE_KEY )); then
-    KEY_PATH="${SSH_DIR}/${KEY_NAME}"
+    prepare_generated_key_path
     return 0
   fi
 
@@ -135,8 +147,7 @@ select_key() {
           return 0
           ;;
         generate-new)
-          KEY_PATH="${SSH_DIR}/${KEY_NAME}"
-          GENERATE_KEY=1
+          prepare_generated_key_path
           return 0
           ;;
         *)
@@ -157,8 +168,7 @@ select_key() {
         [[ -f "${KEY_PATH}" ]] || die "SSH key does not exist: ${KEY_PATH}"
         ;;
       generate-new)
-        KEY_PATH="${SSH_DIR}/${KEY_NAME}"
-        GENERATE_KEY=1
+        prepare_generated_key_path
         ;;
       *)
         die "Unknown SSH key selection: ${key_mode}"
@@ -170,8 +180,7 @@ select_key() {
   if [[ -n "${detected_key}" ]]; then
     KEY_PATH="${detected_key}"
   else
-    KEY_PATH="${SSH_DIR}/${KEY_NAME}"
-    GENERATE_KEY=1
+    prepare_generated_key_path
   fi
 }
 
@@ -194,6 +203,31 @@ ensure_key_exists() {
 
   chmod 600 "${KEY_PATH}"
   chmod 644 "${KEY_PATH}.pub"
+}
+
+show_key_install_guidance() {
+  local message=""
+
+  if ! is_interactive; then
+    return 0
+  fi
+
+  message=$(
+    cat <<EOF
+Your SSH key is ready on this machine.
+
+Before you configure the SSH alias, make sure the public key will be accepted by the VPS using whichever method your provider expects:
+
+1. If you are still creating the VPS, paste the contents of ${KEY_PATH}.pub into the provider's SSH key field or upload that public key in the provider panel.
+2. If the VPS already exists, add the same public key with the provider's console or documented SSH-key flow.
+3. If password SSH access is available later, the script will show you an ssh-copy-id command after the next step.
+
+Public key file: ${KEY_PATH}.pub
+Review or copy it now with: cat ${KEY_PATH}.pub
+EOF
+  )
+
+  show_message "SSH Key Ready" "${message}"
 }
 
 configure_ssh_alias() {
@@ -277,11 +311,13 @@ show_final_instructions() {
     cat <<EOF
 Your local SSH setup is ready.
 
-This step prepared your local key and SSH client config. Next, install the public key on the VPS before you try the alias:
+If the VPS provider did not already install ${KEY_PATH}.pub while you created the instance, install that public key before you try the alias:
 
-1. Copy the public key:
-   ${copy_command}
-2. Connect using the alias: ${connect_command}
+1. Review or copy the public key:
+  cat ${KEY_PATH}.pub
+2. Add it with your provider's SSH-key flow, or if password SSH is available, run:
+  ${copy_command}
+3. Connect using the alias: ${connect_command}
 EOF
   )
 
@@ -290,11 +326,25 @@ EOF
   log "Next step: install ${KEY_PATH}.pub on the VPS, then connect with ${connect_command}"
 }
 
-configure_ssh_alias
+if (( ALIAS_SET )); then
+  sync_key_name_from_alias
+fi
+
 select_key
 ensure_key_exists
+show_key_install_guidance
 collect_connection_details
+configure_ssh_alias
 update_ssh_config
+
+if [[ -n "${HOSTING_SSH_TARGET_FILE:-}" ]]; then
+  {
+    printf 'SSH_ALIAS=%q\n' "${SSH_ALIAS}"
+    printf 'SSH_HOST=%q\n' "${SSH_HOST}"
+    printf 'SSH_USER=%q\n' "${SSH_USER}"
+    printf 'KEY_PATH=%q\n' "${KEY_PATH}"
+  } > "${HOSTING_SSH_TARGET_FILE}"
+fi
 
 log "SSH key ready: ${KEY_PATH}"
 log "Public key: ${KEY_PATH}.pub"

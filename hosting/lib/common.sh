@@ -102,8 +102,14 @@ die() {
 cleanup_registered_paths() {
   local path=""
   for path in "${HOSTING_CLEANUP_PATHS[@]:-}"; do
-    [[ -n "${path}" && -e "${path}" ]] && rm -rf "${path}"
+    if [[ -n "${path}" && -e "${path}" ]]; then
+      rm -rf "${path}"
+    fi
   done
+  # Always succeed: this runs from an EXIT trap, so a non-zero result from the
+  # last test/rm above would otherwise become the script's exit status and make
+  # a fully successful run report failure.
+  return 0
 }
 
 register_cleanup_path() {
@@ -547,6 +553,13 @@ prompt_yes_no() {
     suffix="[y/N]"
   fi
 
+  # --assume-yes/-y: auto-accept every confirmation, including default-no ones,
+  # so unattended runs do not stall or abort on prompts.
+  if [[ "${HOSTING_ASSUME_YES:-0}" == "1" ]]; then
+    log "${prompt} ${suffix} yes (auto)"
+    return 0
+  fi
+
   if ! is_interactive; then
     [[ "${default_answer}" == "yes" ]]
     return
@@ -871,6 +884,20 @@ elif mode == "uncomment":
     new_lines.append(line)
   if not done:
     new_lines.append(entry)
+elif mode == "comment":
+  # Comment out the first active (uncommented) KEY= line so the app treats the
+  # variable as unset. Already-commented or absent keys are left untouched. The
+  # value argument is ignored.
+  pattern = re.compile(rf'^([ \t]*)({re.escape(key)}=.*)$')
+  new_lines = []
+  done = False
+  for line in lines:
+    m = pattern.match(line.rstrip("\n"))
+    if m and not done:
+      new_lines.append(f"{m.group(1)}# {m.group(2)}\n")
+      done = True
+      continue
+    new_lines.append(line)
 else:
   raise SystemExit(f"Unsupported env write mode: {mode}")
 
@@ -925,6 +952,13 @@ env_upsert_uncomment() {
   local value="$3"
 
   env_write_value uncomment "${file}" "${key}" "${value}"
+}
+
+env_comment() {
+  local file="$1"
+  local key="$2"
+
+  env_write_value comment "${file}" "${key}" ""
 }
 
 env_remove() {

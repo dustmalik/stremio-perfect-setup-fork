@@ -1,135 +1,145 @@
 ---
 layout: guide
-title: "🖥️ Self-Hosting"
+title: "🖥️ Hosting"
 ---
 
-# 🖥️ Self-Hosting
+# 🖥️ Hosting
 
-Self-hosting is the next level for achieving the ultimate streaming experience. It's totally optional, but it might be necessary in a few cases that we will discuss further below. This guide covers running personal instances of multiple addons and tools on a VPS using the scripts in my `hosting/`. The great news is that almost everything is automated. You only answer a few questions, and the scripts take care of the rest. Let's walk through this step by step.
+Self-hosting is the next level for achieving the ultimate streaming experience. It's totally optional, but it might be necessary in a few cases that we will discuss further below. This guide covers running personal instances of multiple addons and tools on a VPS using the scripts in my [**hosting/**](https://github.com/luckynumb3rs/stremio-perfect-setup/tree/main/hosting) GitHub repo folder. The great news is that I've tried to make it as automated as it can be. You only answer a few questions, and the scripts take care of the rest. Important to note however that you still need to have at least some basic technical skills to go through with this: working with a terminal, a few commands, connecting to a remove server, etc. It's not for everyone, but also most don't need it, so if you feel you have a use case for it, let's walk through it step by step.
 
 ## 🤔 Why Self-Host?
 
-* **Your own private URLs**: You get exclusive access to your addon instances, not shared with anyone else
-* **No rate limits**: Public shared instances sometimes have rate limiting. Your own instance gives you full access without those constraints
-* **Full control over your configuration**: Everything is yours to customize, update, and manage as you see fit
-* **Easy updates, backups, and restores**: The setup scripts make it simple to update your stack, back it up, and restore it on a new server if needed
-* **Privacy and independence**: Your data stays on your own server, giving you complete control and peace of mind
+* **Your own private instances**: You get exclusive access to your addon instances, not shared with anyone else.
+* **No rate limits and reliability issues**: Public shared instances sometimes have rate limiting or may be more prone to downtime or reachability issues. Your own instance gives you full access without those constraints.
+* **Full control over your configuration**: Everything is yours to customize, update, and manage as you see fit on an admin level.
+* **Easy updates, backups, and restores**: The setup scripts make it simple to update your stack, back it up, and restore it on a new server if needed.
+* **Privacy and independence**: Your data stays on your own server, giving you complete control and peace of mind.
+* **Usenet**: Last but not least, the king of self-hosting use cases in the Stremio ecosystem. There's really no other/bigger reason for wanting to self-host besides being able to use Usenet, because as it currently stands, it's practically impossible use it reliably without self-hosting. Check out my Usenet section in [**🛠️ Additional Stuff**](7-Additional-Stuff.md#usenet) to learn more.
 
 ## 🧰 What You Will Need
 
-* **Linux VPS** (a cheap cloud server from providers like Hetzner, Vultr, or DigitalOcean where you can rent compute power by the hour)
-* **SSH access** (the standard way to connect to a remote server from your terminal)
-* **Domain name** (for public HTTPS URLs like `aiostreams.example.com`; optional but recommended for a clean setup)
-* **Cloudflare account** (only if you want Cloudflare DDNS to automatically update DNS records when your server IP changes; otherwise optional)
-* **Supabase account** (only if you want a cloud Postgres database instead of local SQLite files; fully optional, we will explain this later)
+* **Server / VPS**: Obviously the most important component for self-hosting, either a local server at home, or a cloud VPS. Check out [**Viren's Guide**](https://guides.viren070.me/selfhosting/oracle) for instructions on how to prepare one of the best free VPS solutions currently around.
+* **Domain Name**: Needed for publicly accessing your instances through HTTPS URLs like `aiostreams.yourdomain.com`.
+* **Cloudflare Account**: Optional, but highly recommended to protect your server's IP and access by proxying it through Cloudflare, and if you want *Cloudflare DDNS* to automatically update DNS records when you make changes.
+* **Supabase Account**: Optional if you want to separate the data layer by storing the tables (currently automated for *AIOStreams*, *AIOMetadata*, and/or *AIOManager*) on a cloud database instead of locally.
 
-The setup scripts guide you step by step through everything. You do not need to understand Docker, DNS, or server administration beforehand.
+>**📢 DISCLAIMER:**
+>* The setup scripts guide you step by step through everything. Normally you don't need to understand Docker, DNS, or server administration beforehand. However, as mentioned in the beginning, you do need to have at least some basic technical understanding to be able to work through this, and even debug in case issues arise. These are complex topics and may vary depending on many factors, and I cannot address them all. Please take everything with a grain of salt and tread carefully. 
+> This guide and scripts are currently a work in progress. I am not responsible for anything that might happen to your data, server, configurations, or anything else. The files are openly available for anyone to study and tinker with, and I'm doing this for fun and just trying to help. Please don't come to me with any complaints or asking for support on this, I really can't help you.
+>* 🙏 This guide is based of the amazing work of [**Viren**](https://guides.viren070.me/selfhosting), and the scripts here actually fetch [**Viren's Docker Templates**](https://github.com/Viren070/docker-compose-template) from GitHub dynamically to make use of the latest configurations and modules and adds the automation layer on top. So a big thanks to **Viren** for all the effort put into the templates.
 
-## 🔗 Step 1: Connect to Your VPS
+## 🧭 Two Ways to Run the Setup
 
-### Sub step A: Prepare SSH Alias on Your Local Machine
+The setup script (`main.sh`) is smart about where it runs. When you start it, it asks one simple question first: are you on the VPS, or on your own computer? You pick whichever fits you, and the script handles the rest.
 
-Start by preparing an easy SSH shortcut on your own computer (not the VPS yet).
+* **From your local computer (recommended for most people):** You run the script on your laptop or desktop. It prepares an SSH key and connection alias, copies the hosting files up to your VPS for you, and then runs the entire setup on the server through that connection. You never have to manually copy files or log in to the VPS yourself.
+* **Directly on the VPS:** If you are already logged in to your server (for example after using `init.sh` to download the files there), you run the script on the VPS and it does everything right there. SSH is already taken care of because you used it to get in.
 
-Run this command in your terminal:
+Both paths ask you the exact same setup questions and produce the exact same result. Pick the one that feels most comfortable.
+
+## 💻 Option A: Run It From Your Local Computer (Recommended)
+
+This is the smoothest path. Everything starts and is driven from your own machine.
+
+1. Get the scripts onto your computer. Either clone the repository:
 
 ```bash
-./hosting/steps/prepare-ssh.sh
+git clone https://github.com/luckynumb3rs/stremio-perfect-setup.git
+cd stremio-perfect-setup
 ```
 
-This script will ask you for:
-* Your VPS IP address
-* Your SSH username (often `root`)
-* Whether to generate a new SSH key or use an existing one
-* What alias name you want (we recommend something like `streaming`)
+   or download just the `hosting/` folder with the bootstrapper (`init.sh`) as shown in Option B below.
 
-After running the script, you will see instructions to copy your public key to the VPS. Usually this looks like:
+2. Start the setup:
+
+```bash
+./hosting/main.sh
+```
+
+3. When it asks **"Where are you running this?"**, choose **"I am on my local computer"**.
+
+From here the script walks you through everything:
+
+* It helps you create or pick an SSH key and choose a short alias (we recommend `streaming`).
+* It reminds you to add that public key to your VPS, either during the provider's instance creation, through their SSH-key panel, or with the `ssh-copy-id` command it shows you, for example:
 
 ```bash
 ssh-copy-id -i ~/.ssh/streaming.pub root@YOUR_VPS_IP
 ```
 
-This command copies your SSH public key to the VPS so you can log in without typing a password.
+* It checks that it can reach your VPS. If it cannot log in without a password yet, it pauses and tells you exactly what to do, then lets you retry once the key is in place.
+* It copies the hosting files up to your VPS automatically.
+* It runs the full guided setup on the server, showing you the questions and screens right there in your terminal.
 
-**Important:** The command in Step 1A runs on your local machine (your laptop/desktop). Starting with Step 1B, all remaining commands in this guide run on the VPS.
+When it finishes, you are back on your local machine and your stack is live on the VPS. That is it.
 
-### Sub step B: Test Your Connection
+## 🖥️ Option B: Run It Directly On the VPS
 
-Once the public key is on the VPS, test your connection by running:
+Prefer to work on the server yourself? You can. First get the files onto the VPS, then run the setup there.
+
+### Step 1: Connect to your VPS
+
+Prepare an SSH key and alias on your local machine if you have not already. You can let `main.sh` do it for you (Option A), or run the helper directly:
+
+```bash
+./hosting/steps/prepare-ssh.sh
+```
+
+This asks whether to generate a new key or reuse one, what to name it, your VPS IP address, your SSH username (often `root`), and an alias. After installing the public key on the VPS, connect with:
 
 ```bash
 ssh streaming
 ```
 
-If this works, you are now connected to the VPS and all remaining commands in this guide should be run here.
+Everything from here runs on the VPS.
 
-## 📥 Step 2: Download the Setup Scripts
+### Step 2: Download the setup scripts
 
-The `init.sh` script bootstraps the entire `hosting/` folder onto your VPS.
-
-1. Copy `init.sh` to the VPS, or clone the repository and navigate to it. You can either:
-   * Download just `init.sh` and run it, or
-   * Clone the full repository and navigate to the `hosting/` folder
-
-2. Make the script executable:
+The `init.sh` script bootstraps the `hosting/` folder onto your VPS without pulling the whole repository:
 
 ```bash
 chmod +x init.sh
-```
-
-3. Run the bootstrapper:
-
-```bash
 ./init.sh
-```
-
-This lightweight script clones only the `hosting/` folder from the repository and places it in your current directory. It will not download the entire repository, keeping things clean and fast.
-
-After it finishes, move into the hosting directory:
-
-```bash
 cd hosting
 ```
 
-That is the only manual download you need to do. Everything else is handled by the main setup script.
-
-## 🚀 Step 3: Run the Setup
-
-Start the guided setup with:
+### Step 3: Run the setup
 
 ```bash
 ./main.sh
 ```
 
-This launches a visual checklist interface using `whiptail`. If `whiptail` is not installed, the script will auto install it. If that fails, it falls back to simple terminal prompts.
+When it asks **"Where are you running this?"**, choose **"I am on the VPS"**. Because you are already on the server, the script skips all the SSH and copying steps and goes straight to the setup.
 
-The setup moves through 12 phases. Here is what each one does:
+## 🚀 What the Setup Does
 
-1. **Phase 1: SSH Preparation Offer**: The script may ask if you want to set up SSH again. Skip this if you already have working SSH access.
+However you started it, once the setup is running on the VPS it launches a visual checklist interface using `whiptail`. If `whiptail` is not installed, the script auto-installs it, and if that fails it falls back to simple terminal prompts.
 
-2. **Phase 2: Docker Setup**: Installs Docker and Docker Compose if not already present. The script asks for confirmation before proceeding.
+The setup moves through several phases:
 
-3. **Phase 3: Deployment Target**: Asks where you want the Docker files to live (usually something like `/opt/streaming`). If a previous setup already exists there, the script offers to continue from it or overwrite it.
+1. **Docker Setup:** Installs Docker and Docker Compose if they are not already present, asking for confirmation first.
 
-4. **Phase 4: Template Fetch**: Downloads the upstream Docker configuration into a temporary work area for staging.
+2. **Deployment Target:** Asks where the Docker files should live (usually something like `/opt/streaming`). If a previous setup already exists there, it offers to continue from it or overwrite it.
 
-5. **Phase 5: Module Selection**: Shows a checklist of addons and services you can enable or disable. Required modules like Traefik cannot be toggled off.
+3. **Template Fetch:** Downloads the upstream Docker configuration into a temporary work area for staging.
 
-6. **Phase 6: Config Staging**: Copies the selected module configs into a safe staging area where they can be reviewed or edited before deployment.
+4. **Module Selection:** Shows a checklist of addons and services to enable or disable. Required modules like Traefik cannot be toggled off.
 
-7. **Phase 7: Core Environment Questions**: Asks for timezone, domain name, and Let's Encrypt email address.
+5. **Config Staging:** Copies the selected module configs into a safe staging area for review.
 
-8. **Phase 8: Module Automation**: Runs module specific setup for things like Cloudflare DDNS or Supabase configuration.
+6. **Core Environment Questions:** Asks for timezone, domain name, and Let's Encrypt email address.
 
-9. **Phase 9: Manual Review**: Pauses and shows you where the staged files are. You can inspect them before deployment.
+7. **Module Automation:** Runs module-specific setup for things like Cloudflare DDNS or Supabase.
 
-10. **Phase 10: Deployment Confirmation**: Asks for final confirmation before copying files into the Docker directory.
+8. **Manual Review:** Pauses and shows you where the staged files are so you can inspect them.
 
-11. **Phase 11: Backup ZIP**: Creates a backup of your configuration for safekeeping.
+9. **Deployment Confirmation:** Asks for final confirmation before copying files into the Docker directory.
 
-12. **Phase 12: Start Stack**: Asks if you want to start the Docker containers now.
+10. **Backup ZIP:** Creates a backup of your configuration for safekeeping.
 
-The script pauses before any destructive steps and always asks for confirmation first.
+11. **Start Stack:** Asks if you want to start the Docker containers now.
+
+The script pauses before any destructive step and always asks for confirmation first.
 
 ## 🔑 The Values You Will Need
 
@@ -235,7 +245,7 @@ Creates a ZIP file with all your configuration. Keep this somewhere safe. You ca
 ./main.sh /path/to/your-backup.zip
 ```
 
-Copy your backup ZIP file to the VPS first, then run this command from inside the hosting folder. The script imports the backed up configuration, lets you pick modules, and redeploys everything. Great for migrating to a new VPS.
+If you run this from the VPS, copy your backup ZIP there first. If you run it from your local computer, the script copies the ZIP to the VPS for you. Either way, the script imports the backed up configuration, lets you pick modules, and redeploys everything. Great for migrating to a new VPS.
 
 **Add or remove modules**
 
@@ -274,7 +284,7 @@ If you want to understand how a specific addon is configured, look at the `modul
 ## 💡 Notes and Tips
 
 >**📢 NOTES:**
->* *Run `./main.sh` on the VPS itself, not your local machine (unless your local machine is running Docker).*
+>* *You can start `./main.sh` from either your local computer or the VPS. The script asks which at the start, and when you run it locally it handles SSH and copying the files to the VPS for you automatically.*
 >* *After the first install, Docker group membership may require a fresh login before Docker works without `sudo`.*
 >* *The temporary `.work/` folder used during setup is cleaned up automatically when the script finishes.*
 >* *Supabase is entirely optional and can be added later.*

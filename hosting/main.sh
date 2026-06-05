@@ -1,61 +1,81 @@
 #!/usr/bin/env bash
 
-# Main end-to-end entrypoint for preparing and deploying the hosting stack.
+# Hosting Perfect Setup - prepare and deploy the self-hosted streaming stack.
 #
-# Purpose:
-#   This script implements the full prompt.md flow. It installs Docker, fetches
-#   the upstream docker-compose-template into a temporary work directory, lets
-#   the user choose modules, stages editable config files, applies module hooks,
-#   restores staged files into the fetched template, deploys the prepared tree
-#   into DOCKER_DIR, optionally backs up the staged config, starts Compose, and
-#   prints DNS guidance.
+# This is the end-to-end entrypoint. It checks/installs Docker, fetches the
+# upstream docker-compose template into a temporary work directory, lets you
+# choose modules, stages editable config files, applies module hooks, deploys
+# the prepared tree into DOCKER_DIR, optionally writes a backup ZIP, starts
+# Docker Compose, and prints DNS guidance.
 #
-# Interactive usage:
-#   ./hosting/main.sh
-#   ./hosting/main.sh /path/to/streaming-backup.zip
+# It can run in two places (it asks at startup, or you can force it):
+#   * On your local computer (--local): prepares SSH, copies the hosting folder
+#     to the VPS, and runs the rest of the setup there over SSH.
+#   * Directly on the VPS (--on-vps): runs the whole setup on this machine.
 #
-# Unattended usage:
-#   ./hosting/main.sh \
-#     --modules aiostreams,aiometadata,honey,cloudflare-ddns \
-#     --domain example.com \
-#     --letsencrypt-email admin@example.com \
-#     --skip-review
+# Usage:
+#   ./main.sh [options] [backup.zip]
 #
-# Key options:
-#   --backup                     Backup an existing deployed Docker tree with prompts.
-#   --backup-quick               Backup an existing deployed Docker tree using defaults.
-#   --modules                     Comma-separated optional modules.
-#   --timezone                    TZ database identifier, for example Europe/Berlin.
-#   --docker-dir                  Final Docker Compose directory, default /opt/docker.
-#   --domain                      Base public domain for Traefik hostnames.
-#   --letsencrypt-email           Email address passed to Let's Encrypt.
-#   --cloudflare-api-token        Token used by cloudflare-ddns when selected.
-#   --cloudflare-proxied          Cloudflare DDNS proxy mode when that module is enabled.
-#   --supabase-connection-string  Supabase direct session pooler IPv4 URL.
-#   --supabase-db-password        Password replacing [YOUR-PASSWORD].
-#   --authelia-username           Authelia initial username (letters, digits, hyphens, underscores).
-#   --authelia-displayname        Authelia initial user display name.
-#   --authelia-email              Authelia initial user email address.
-#   --authelia-password           Authelia initial user password (will be argon2-hashed via Docker).
-#   --backup-zip                  Resume from a previously generated config backup ZIP.
-#   --backup-dir                  Folder where the config ZIP backup is written.
-#   --template-source             upstream or local.
-#   --dry-run                     Exercise file-preparation flow without changing system state.
+# Common usage:
+#   ./main.sh                                 Interactive guided setup.
+#   ./main.sh /path/to/streaming-backup.zip   Restore from a previously made backup ZIP.
+#
+# Execution location:
+#   --on-vps                      Treat this machine as the VPS and run the full setup here.
+#   --local                       Run from your local computer: prepare SSH, copy to the VPS, run it there.
 #   --prepare-ssh                 Run the SSH helper before Docker preparation.
-#   --skip-ssh                    Skip the interactive SSH preparation prompt.
+#   --skip-ssh                    Skip SSH preparation and reuse the existing alias (local mode).
+#   --ssh-host HOST               VPS IP/hostname for the SSH alias (enables unattended --local).
+#   --ssh-user USER               SSH username for the VPS (enables unattended --local).
+#   --ssh-alias NAME              SSH alias name to create/use (default: streaming).
+#   --ssh-key-path PATH           Existing private key to use for the alias (skips key generation).
+#
+# Existing setup (when DOCKER_DIR already has a live stack):
+#   --modify                      Reuse the existing setup and add/remove modules (with --modules).
+#   --overwrite                   Replace the existing setup with a fresh template deployment.
+#   -y, --assume-yes              Answer yes to confirmation prompts (unattended runs).
+#
+# Backup modes:
+#   --backup                      Back up an existing deployed Docker tree with prompts.
+#   --backup-quick                Back up an existing deployed Docker tree using defaults.
+#   --backup-zip PATH             Resume from a previously generated config backup ZIP.
+#   --backup-dir DIR              Folder where the config ZIP backup is written.
+#
+# Modules and target:
+#   --modules LIST                Comma-separated module names.
+#   --docker-dir DIR              Final Docker Compose directory (default: /opt/docker).
+#   --template-source SOURCE      Template source: upstream or local.
+#
+# Core environment:
+#   --timezone TZ                 TZ database identifier, for example Europe/Berlin.
+#   --domain DOMAIN               Base public domain for Traefik hostnames.
+#   --letsencrypt-email EMAIL     Email address passed to Let's Encrypt.
+#
+# Cloudflare DDNS:
+#   --cloudflare-api-token TOKEN  Token used by cloudflare-ddns when selected.
+#   --cloudflare-proxied VALUE    Cloudflare DDNS proxy mode when that module is enabled.
+#
+# Supabase (offered only for aiomanager, aiometadata, and aiostreams; if declined
+# or no connection string is supplied, those addons keep their SQLite defaults):
+#   --supabase-connection-string URL  Supabase direct session pooler IPv4 URL.
+#   --supabase-db-password PASS       Password replacing [YOUR-PASSWORD].
+#
+# Authelia:
+#   --authelia-username NAME      Initial username (letters, digits, hyphens, underscores).
+#   --authelia-displayname NAME   Initial user display name.
+#   --authelia-email EMAIL        Initial user email address.
+#   --authelia-password PASS      Initial user password (argon2-hashed via Docker).
+#
+# Flow control:
+#   --dry-run                     Exercise the flow without changing system state.
 #   --skip-review                 Do not pause for manual staged-config review.
 #   --skip-backup                 Do not create a config ZIP backup.
 #   --skip-start                  Deploy files but do not start Docker Compose.
+#   -h, --help                    Show this help and exit.
 #
 # Positional input:
-#   backup.zip                    Optional path to a previously generated backup ZIP.
-#                                 When supplied, main.sh imports it into staging and
-#                                 skips fresh config staging plus module hooks.
-#
-# Supabase behavior:
-#   Supabase is intentionally offered only for aiomanager, aiometadata, and
-#   aiostreams. If the user declines or no connection string is supplied in
-#   unattended mode, those addons keep their upstream SQLite defaults.
+#   backup.zip                    Optional path to a previously generated backup ZIP. When
+#                                 supplied, main.sh imports it and skips fresh config staging.
 
 set -Eeuo pipefail
 
@@ -80,6 +100,7 @@ MODULE_HOOK_TARGETS_FILE="${WORK_ROOT_ABS}/hook-target-modules.txt"
 MODULE_HOOK_SYNC_ONLY_FILE="${WORK_ROOT_ABS}/hook-sync-only-modules.txt"
 INSTALL_MODULES_FILE="${WORK_ROOT_ABS}/install-modules.txt"
 REMOVED_MODULES_FILE="${WORK_ROOT_ABS}/removed-modules.txt"
+UPDATE_MODULES_FILE="${WORK_ROOT_ABS}/update-modules.txt"
 CLOUDFLARE_DDNS_MODULE=cloudflare-ddns
 HOSTNAME_SYNC_MODULES=(authelia cloudflare-ddns honey)
 
@@ -105,14 +126,43 @@ SKIP_BACKUP=0
 SKIP_START=0
 PREPARE_SSH=0
 SKIP_SSH=0
+ON_VPS=0
+ON_VPS_SET=0
+RUN_LOCAL=0
+BACKUP_ZIP_RAW=""
 BACKUP_MODE=0
 BACKUP_QUICK_MODE=0
 BACKUP_DIR_SET=0
 DOCKER_DIR_SET=0
 EXISTING_SETUP_MODE="fresh"
+EXISTING_SETUP_MODE_REQUESTED=""
+ASSUME_YES=0
+SSH_HOST_VALUE=""
+SSH_USER_VALUE=""
+SSH_ALIAS_VALUE=""
+SSH_KEY_PATH_VALUE=""
+
+ORIGINAL_ARGS=("$@")
+
+print_usage() {
+  # Render this script's own intro comment block (the contiguous comment lines
+  # right after the shebang) with the leading "# " stripped. Keeping --help
+  # sourced from that block means editing the header at the top of this file is
+  # all that is needed to update the help text.
+  awk '
+    NR == 1 && /^#!/ { next }
+    !started && /^[[:space:]]*$/ { next }
+    /^#/ { started = 1; line = $0; sub(/^#[ \t]?/, "", line); print line; next }
+    started { exit }
+  ' "${BASH_SOURCE[0]}"
+}
 
 while (( $# > 0 )); do
   case "$1" in
+    -h|--help)
+      print_usage
+      exit 0
+      ;;
     --backup)
       BACKUP_MODE=1
       shift
@@ -211,12 +261,51 @@ while (( $# > 0 )); do
       SKIP_SSH=1
       shift
       ;;
+    --ssh-host)
+      SSH_HOST_VALUE="$2"
+      shift 2
+      ;;
+    --ssh-user)
+      SSH_USER_VALUE="$2"
+      shift 2
+      ;;
+    --ssh-alias)
+      SSH_ALIAS_VALUE="$2"
+      shift 2
+      ;;
+    --ssh-key-path)
+      SSH_KEY_PATH_VALUE="$2"
+      shift 2
+      ;;
+    --modify)
+      EXISTING_SETUP_MODE_REQUESTED="modify"
+      shift
+      ;;
+    --overwrite)
+      EXISTING_SETUP_MODE_REQUESTED="overwrite"
+      shift
+      ;;
+    -y|--assume-yes|--yes)
+      ASSUME_YES=1
+      shift
+      ;;
+    --on-vps)
+      ON_VPS=1
+      ON_VPS_SET=1
+      shift
+      ;;
+    --local)
+      RUN_LOCAL=1
+      ON_VPS_SET=1
+      shift
+      ;;
     -*)
       die "Unknown argument: $1"
       ;;
     *)
       [[ -z "${BACKUP_ZIP_INPUT}" ]] || die "Unexpected extra argument: $1"
       BACKUP_ZIP_INPUT="$1"
+      BACKUP_ZIP_RAW="$1"
       shift
       ;;
   esac
@@ -225,6 +314,9 @@ done
 if [[ -n "${BACKUP_ZIP_INPUT}" ]]; then
   BACKUP_ZIP_INPUT="$(absolute_path "${BACKUP_ZIP_INPUT}")"
 fi
+
+# Let confirmation prompts auto-accept when --assume-yes/-y is set (unattended).
+export HOSTING_ASSUME_YES="${ASSUME_YES}"
 
 detect_existing_setup_modules() {
   local docker_dir="$1"
@@ -266,11 +358,27 @@ remove_root_host_vars_for_modules() {
 
   local module=""
   local env_var=""
+  local sel=""
+  local protected_vars=()
+
+  # module_host_env_vars extracts every ${VAR} referenced in a module's
+  # Host(`...`) rule, which can include shared vars like DOMAIN (when a rule is
+  # written as `${DOMAIN}` directly) as well as hostname vars that a still
+  # selected module also uses. Protect those: only remove *_HOSTNAME vars that no
+  # currently-selected module depends on, so DOMAIN and in-use hostnames survive.
+  for sel in "${selected_modules[@]+"${selected_modules[@]}"}"; do
+    while IFS= read -r env_var; do
+      [[ -n "${env_var}" ]] || continue
+      protected_vars+=("${env_var}")
+    done < <(module_host_env_vars "${TEMPLATE_DIR_ABS}" "${sel}")
+  done
 
   for module in "$@"; do
     [[ -n "${module}" ]] || continue
     while IFS= read -r env_var; do
       [[ -n "${env_var}" ]] || continue
+      [[ "${env_var}" == *_HOSTNAME ]] || continue
+      array_contains "${env_var}" "${protected_vars[@]+"${protected_vars[@]}"}" && continue
       env_remove "${root_env_file}" "${env_var}"
     done < <(module_host_env_vars "${TEMPLATE_DIR_ABS}" "${module}")
   done
@@ -316,6 +424,126 @@ run_existing_docker_backup() {
     --output-dir "${BACKUP_DIR_VALUE}"
 }
 
+run_local_remote_deploy() {
+  local ssh_target_file="${WORK_ROOT_ABS}/ssh-target.env"
+  local remote_dir="hosting-setup"
+  local ssh_alias=""
+  local hosting_parent="" hosting_name=""
+  local remote_args=() arg=""
+  local remote_cmd=""
+  local local_rc=0
+  local prepare_ssh_args=()
+
+  ensure_dialog_ui "the hosting setup"
+  ensure_directory "${WORK_ROOT_ABS}"
+  require_commands ssh scp tar
+
+  if is_interactive; then
+    show_message "🖥️  Local-to-VPS Setup" "You are running this on your local computer, so the script will take care of the connection for you. First we prepare an SSH key and a connection alias for your VPS. Then it copies the hosting files up to your server and runs the rest of the setup there over SSH. You will still answer all the usual questions; they are just being asked by the server through your connection."
+  fi
+
+  section "SSH setup"
+  if (( SKIP_SSH )); then
+    log "Skipping SSH preparation (--skip-ssh); using the existing '${SSH_ALIAS_VALUE:-${DEFAULT_SSH_ALIAS:-streaming}}' SSH alias."
+  else
+    # Forward any SSH details supplied as flags so prepare-ssh can run without
+    # prompts (enables a fully unattended --local deploy).
+    [[ -n "${SSH_ALIAS_VALUE}" ]] && prepare_ssh_args+=(--alias "${SSH_ALIAS_VALUE}")
+    [[ -n "${SSH_HOST_VALUE}" ]] && prepare_ssh_args+=(--host "${SSH_HOST_VALUE}")
+    [[ -n "${SSH_USER_VALUE}" ]] && prepare_ssh_args+=(--user "${SSH_USER_VALUE}")
+    [[ -n "${SSH_KEY_PATH_VALUE}" ]] && prepare_ssh_args+=(--key-path "${SSH_KEY_PATH_VALUE}")
+    # This runs inside a function the caller invokes as `run_local_remote_deploy
+    # || ...`, which disables errexit here. Check the result explicitly so a
+    # failed SSH prep aborts instead of silently continuing into the copy step.
+    HOSTING_SSH_TARGET_FILE="${ssh_target_file}" "${HOSTING_ROOT}/steps/prepare-ssh.sh" \
+      "${prepare_ssh_args[@]+"${prepare_ssh_args[@]}"}" \
+      || die "SSH preparation failed; cannot continue with the local-to-VPS deploy."
+  fi
+
+  if [[ -f "${ssh_target_file}" ]]; then
+    # shellcheck disable=SC1090
+    source "${ssh_target_file}"
+    ssh_alias="${SSH_ALIAS:-}"
+  fi
+
+  [[ -n "${ssh_alias}" ]] || ssh_alias="${SSH_ALIAS_VALUE:-${DEFAULT_SSH_ALIAS:-streaming}}"
+  [[ -n "${ssh_alias}" ]] || die "Could not determine which SSH alias to use for the VPS connection."
+
+  section "VPS connection check"
+  log "Checking that ${ssh_alias} can be reached over SSH..."
+  if ! ssh -o BatchMode=yes -o ConnectTimeout=10 "${ssh_alias}" true 2>/dev/null; then
+    if is_interactive; then
+      warn "Could not log in to ${ssh_alias} without a password yet."
+      show_message "One More SSH Step" "Before the files can be copied, your VPS needs to trust this computer's SSH key. If you have not done that yet, add the public key on the server now (paste it into your provider's SSH-key field, or run the ssh-copy-id command shown in the previous step). Once 'ssh ${ssh_alias}' logs you in without asking for a password, come back here and continue."
+      prompt_yes_no "Is 'ssh ${ssh_alias}' now logging you in without a password? Choose yes to try the connection again." yes || die "The VPS connection is not ready yet. Re-run this setup once 'ssh ${ssh_alias}' works."
+      ssh -o ConnectTimeout=15 "${ssh_alias}" true || die "Still could not connect to ${ssh_alias}. Please re-run once SSH is working."
+    else
+      die "Cannot reach ${ssh_alias} over SSH. Make sure the key is installed and the alias works, then retry."
+    fi
+  fi
+  success "Connected to ${ssh_alias}."
+
+  section "Copying hosting files to the VPS"
+  hosting_parent="$(dirname "${SCRIPT_DIR}")"
+  hosting_name="$(basename "${SCRIPT_DIR}")"
+  log "Uploading the hosting folder to ~/${remote_dir} on ${ssh_alias}..."
+  tar -C "${hosting_parent}" --exclude="${hosting_name}/.work" -czf - "${hosting_name}" \
+    | ssh "${ssh_alias}" "rm -rf ~/${remote_dir} && mkdir -p ~/${remote_dir} && tar -C ~/${remote_dir} -xzf -" \
+    || die "Failed to copy the hosting files to the VPS."
+  success "Hosting files are now on the VPS at ~/${remote_dir}/${hosting_name}."
+
+  local skip_next=0
+  for arg in "${ORIGINAL_ARGS[@]+"${ORIGINAL_ARGS[@]}"}"; do
+    if (( skip_next )); then
+      skip_next=0
+      continue
+    fi
+    case "${arg}" in
+      --local|--on-vps|--prepare-ssh|--skip-ssh|--dry-run)
+        ;;
+      --ssh-host|--ssh-user|--ssh-alias|--ssh-key-path)
+        # Local-only SSH details; drop the flag and its value from the remote run.
+        skip_next=1
+        ;;
+      *)
+        if [[ -n "${BACKUP_ZIP_RAW}" && "${arg}" == "${BACKUP_ZIP_RAW}" ]]; then
+          continue
+        fi
+        remote_args+=("${arg}")
+        ;;
+    esac
+  done
+
+  if [[ -n "${BACKUP_ZIP_INPUT}" ]]; then
+    log "Copying the backup ZIP to the VPS..."
+    scp -q "${BACKUP_ZIP_INPUT}" "${ssh_alias}:${remote_dir}/$(basename "${BACKUP_ZIP_INPUT}")" \
+      || die "Failed to copy the backup ZIP to the VPS."
+    remote_args+=("../$(basename "${BACKUP_ZIP_INPUT}")")
+  fi
+
+  remote_args+=(--on-vps --skip-ssh)
+
+  remote_cmd="cd ~/${remote_dir}/${hosting_name} && ./main.sh"
+  for arg in "${remote_args[@]}"; do
+    remote_cmd+=" $(printf '%q' "${arg}")"
+  done
+
+  section "Running the setup on the VPS"
+  if is_interactive; then
+    show_message "Continuing on Your VPS" "Everything is uploaded. From here the setup runs on your VPS, so the next questions and screens are coming from the server through your SSH connection. When it finishes you will land back on your local machine."
+  fi
+  log "Connecting to ${ssh_alias} to run the rest of the setup..."
+
+  if is_interactive && tty_device_available; then
+    ssh -t "${ssh_alias}" "${remote_cmd}" || local_rc=$?
+  else
+    ssh "${ssh_alias}" "${remote_cmd}" || local_rc=$?
+  fi
+
+  rm -rf "${WORK_ROOT_ABS}" 2>/dev/null || true
+  return "${local_rc}"
+}
+
 if (( BACKUP_MODE && BACKUP_QUICK_MODE )); then
   die "Use either --backup or --backup-quick, not both"
 fi
@@ -324,6 +552,53 @@ if (( BACKUP_MODE || BACKUP_QUICK_MODE )); then
   [[ -z "${BACKUP_ZIP_INPUT}" ]] || die "Backup ZIP import cannot be combined with --backup or --backup-quick"
   run_existing_docker_backup
   exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Decide where this run actually executes.
+#
+# main.sh supports two starting points:
+#   * On the VPS itself (for example right after init.sh placed the hosting
+#     folder there). SSH is already done, so we just continue the setup here.
+#   * On your local computer, where the script first prepares SSH, copies the
+#     hosting folder to the VPS, and re-runs itself there automatically.
+# A dry run always executes locally because it only exercises the prep logic.
+# ---------------------------------------------------------------------------
+if (( DRY_RUN )); then
+  ON_VPS=1
+  ON_VPS_SET=1
+fi
+
+if [[ "${HOSTING_ON_VPS:-0}" == "1" ]]; then
+  ON_VPS=1
+  ON_VPS_SET=1
+fi
+
+if (( ! ON_VPS_SET )); then
+  if (( RUN_LOCAL )); then
+    ON_VPS=0
+  elif is_interactive; then
+    ensure_dialog_ui "the hosting setup"
+    location_choice="$(prompt_choice \
+      "Where Are You Running This?" \
+      "This setup can run in two places. If you are already logged in to your VPS (for example right after running init.sh on it), pick the first option and everything happens here on this server. If you are sitting at your own laptop or desktop, pick the second option and the script will set up SSH, copy the hosting files to your VPS, and continue the whole setup there for you." \
+      "vps" \
+      "vps" "I am on the VPS - run the setup here on this machine" \
+      "local" "I am on my local computer - connect to my VPS and run it there")"
+    case "${location_choice}" in
+      vps) ON_VPS=1 ;;
+      local) ON_VPS=0 ;;
+      *) die "Unknown execution location choice: ${location_choice}" ;;
+    esac
+  else
+    ON_VPS=1
+  fi
+fi
+
+if (( ! ON_VPS )); then
+  local_rc=0
+  run_local_remote_deploy || local_rc=$?
+  exit "${local_rc}"
 fi
 
 section "Hosting preparation"
@@ -350,7 +625,7 @@ fi
 ensure_dialog_ui "the hosting setup"
 
 if is_interactive; then
-  show_message "🖥️  Hosting Perfect Setup" "This guided setup will prepare SSH access, verify Docker, download the upstream Docker template, let you choose which app modules to deploy, stage editable config files, and then deploy the final stack to your VPS. You will be asked to confirm each major step before the script makes changes."
+  show_message "🖥️  Hosting Perfect Setup" "This guided setup runs on your VPS. It will verify Docker, download the upstream Docker template, let you choose which app modules to deploy, stage editable config files, and then deploy the final stack to this server. You will be asked to confirm each major step before the script makes any changes."
 fi
 
 if (( DRY_RUN )); then
@@ -358,9 +633,11 @@ if (( DRY_RUN )); then
 elif (( PREPARE_SSH )); then
   section "SSH setup"
   "${HOSTING_ROOT}/steps/prepare-ssh.sh"
-elif (( ! SKIP_SSH )) && is_interactive && prompt_yes_no "Prepare or update the local SSH key and alias configuration now? This is needed so you can connect to the VPS reliably from this machine." no; then
-  section "SSH setup"
-  "${HOSTING_ROOT}/steps/prepare-ssh.sh"
+else
+  # We are running directly on the VPS now, so SSH access is already working
+  # (you used it to get here). The local-computer path handles all SSH and key
+  # preparation before this script is ever copied up and run here.
+  log "Running directly on the VPS, so local SSH preparation is not needed here."
 fi
 
 if (( DRY_RUN )); then
@@ -401,6 +678,16 @@ if detect_existing_setup_modules "${DOCKER_DIR_VALUE}" existing_live_modules; th
     else
       warn "Existing setup detected in ${DOCKER_DIR_VALUE}; continuing in overwrite mode because prompts are unavailable."
     fi
+  elif [[ -n "${EXISTING_SETUP_MODE_REQUESTED}" ]]; then
+    EXISTING_SETUP_MODE="${EXISTING_SETUP_MODE_REQUESTED}"
+    case "${EXISTING_SETUP_MODE}" in
+      modify)
+        log "Continuing from existing setup in ${DOCKER_DIR_VALUE} (--modify)."
+        ;;
+      overwrite)
+        warn "Overwriting the existing setup in ${DOCKER_DIR_VALUE} (--overwrite)."
+        ;;
+    esac
   elif is_interactive; then
     show_message "Existing Setup Detected" "A live hosting setup already exists in ${DOCKER_DIR_VALUE}. You can either overwrite that target with the prepared upstream files, or continue from the existing setup so the current modules start preselected and you can add or remove modules safely."
     EXISTING_SETUP_MODE="$(prompt_choice "Existing Setup Detected" "Choose how the installer should handle the existing live setup in ${DOCKER_DIR_VALUE}." "modify" "modify" "Reuse the existing setup, preload its values, and let me add or remove modules." "overwrite" "Overwrite the target directory with the prepared template deployment." "cancel" "Abort without touching this target directory.")"
@@ -694,15 +981,39 @@ if (( ${#hostname_vars_missing[@]} > 0 )); then
   done
 fi
 
+# Fresh/overwrite installs start from the upstream root .env, which defines a
+# *_HOSTNAME entry for every upstream module. Drop the entries for modules that
+# were not selected so the deployed root .env only lists hostnames in use. (In
+# modify mode, removed modules are already cleaned above; backup restores keep
+# the .env from the backup as-is.) Runs before template pruning so each module's
+# hostname vars are still discoverable from its compose file.
+if [[ -z "${BACKUP_ZIP_INPUT}" && "${EXISTING_SETUP_MODE}" != "modify" ]]; then
+  unselected_modules=()
+  for module in "${base_template_modules[@]}"; do
+    array_contains "${module}" "${selected_modules[@]}" || unselected_modules+=("${module}")
+  done
+  if (( ${#unselected_modules[@]} > 0 )); then
+    remove_root_host_vars_for_modules "${ROOT_ENV}" "${unselected_modules[@]}"
+    success "Pruned root .env hostnames down to the selected modules."
+  fi
+fi
+
 sync_staged_configs_to_modules() {
-  local modules_file="$1"
-  local strict_existing_guard="${2:-0}"
-  local selected_modules_now=()
+  # keep_modules_file:    modules whose staged config must be preserved in the
+  #                       manifest (the full selected set). Entries for modules
+  #                       not in this list are dropped from staging.
+  # restage_modules_file: modules to (re)stage from the template tree. Defaults
+  #                       to keep_modules_file. In modify mode this is only the
+  #                       newly installed modules so already-present modules keep
+  #                       their imported/hook-updated staged config untouched.
+  local keep_modules_file="$1"
+  local restage_modules_file="${2:-$1}"
+  local keep_modules_now=()
   local manifest_tmp=""
   local module="" source_rel="" stage_rel="" item_type=""
 
   manifest_tmp="$(mktemp "${WORK_ROOT_ABS}/stage-map.XXXXXX")"
-  mapfile -t selected_modules_now < <(read_lines_file "${modules_file}")
+  mapfile -t keep_modules_now < <(read_lines_file "${keep_modules_file}")
 
   while IFS=$'\t' read -r module source_rel stage_rel item_type; do
     [[ -n "${source_rel}" ]] || continue
@@ -711,14 +1022,10 @@ sync_staged_configs_to_modules() {
       continue
     fi
 
-    if array_contains "${module}" "${selected_modules_now[@]}"; then
+    if array_contains "${module}" "${keep_modules_now[@]}"; then
       [[ -e "${CONFIG_DIR_ABS}/${stage_rel}" ]] || die "Staged path missing for ${source_rel}: ${CONFIG_DIR_ABS}/${stage_rel}"
       printf '%s\t%s\t%s\t%s\n' "${module}" "${source_rel}" "${stage_rel}" "${item_type}" >> "${manifest_tmp}"
       continue
-    fi
-
-    if [[ "${strict_existing_guard}" == "1" ]]; then
-      die "Existing-setup mode refuses to modify already-present module '${module}'. Only newly installed modules may be staged for deploy."
     fi
 
     rm -rf "${CONFIG_DIR_ABS}/${stage_rel}"
@@ -732,7 +1039,7 @@ sync_staged_configs_to_modules() {
       [[ -n "${entry}" ]] || continue
       stage_item "${module}" "apps/${module}/${entry}" "${MANIFEST_FILE}" "${TEMPLATE_DIR_ABS}" "${CONFIG_DIR_ABS}"
     done < <(module_stageable_entries "${TEMPLATE_DIR_ABS}" "${module}")
-  done < <(read_lines_file "${modules_file}")
+  done < <(read_lines_file "${restage_modules_file}")
 }
 
 module_hook_title() {
@@ -894,6 +1201,23 @@ fi
 write_optional_lines_file "${MODULE_HOOK_TARGETS_FILE}" "${hook_target_modules[@]}"
 write_optional_lines_file "${MODULE_HOOK_SYNC_ONLY_FILE}" "${hook_sync_only_modules[@]}"
 
+# In modify mode, hooks can rewrite the staged config of already-present modules
+# that are not in install_modules: hostname-sync hooks edit authelia/honey, and
+# cloudflare-ddns also rewrites the traefik compose as a side effect. Deploy
+# would otherwise skip every already-present module, so those refreshed configs
+# would never reach DOCKER_DIR. Re-sync all kept (selected, already-present)
+# modules: their staged config is the imported live copy plus any hook edits, and
+# their app directories hold config only (runtime data lives in DOCKER_DATA_DIR),
+# so the data-preserving app-directory sync is safe and a no-op for unchanged
+# modules.
+update_modules=()
+if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
+  for module in "${selected_modules[@]}"; do
+    array_contains "${module}" "${install_modules[@]}" || update_modules+=("${module}")
+  done
+fi
+write_optional_lines_file "${UPDATE_MODULES_FILE}" "${update_modules[@]+"${update_modules[@]}"}"
+
 section "Module automation"
 if [[ -n "${BACKUP_ZIP_INPUT}" ]]; then
   log "Skipping module hooks because the staged config was imported from a backup ZIP."
@@ -903,9 +1227,9 @@ else
   run_module_hooks "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}"
 fi
 if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
-  sync_staged_configs_to_modules "${INSTALL_MODULES_FILE}" 1
+  sync_staged_configs_to_modules "${SELECTED_MODULES_FILE}" "${INSTALL_MODULES_FILE}"
 else
-  sync_staged_configs_to_modules "${SELECTED_MODULES_FILE}" 0
+  sync_staged_configs_to_modules "${SELECTED_MODULES_FILE}"
 fi
 success "Staged config directory synced to the final selected modules."
 
@@ -971,7 +1295,7 @@ deploy_args=(
   --target-dir "${DOCKER_DIR_VALUE}"
 )
 if [[ "${EXISTING_SETUP_MODE}" == "modify" ]]; then
-  deploy_args+=(--modify-mode --install-modules-file "${INSTALL_MODULES_FILE}" --removed-modules-file "${REMOVED_MODULES_FILE}")
+  deploy_args+=(--modify-mode --install-modules-file "${INSTALL_MODULES_FILE}" --removed-modules-file "${REMOVED_MODULES_FILE}" --update-modules-file "${UPDATE_MODULES_FILE}")
 fi
 if [[ "${HOSTING_DRY_RUN:-0}" == "1" ]]; then
   deploy_args+=(--no-fix-permissions)
@@ -1034,6 +1358,6 @@ fi
 
 rm -rf "${TEMPLATE_DIR_ABS}" "${CONFIG_DIR_ABS}"
 rm -f "${SELECTED_MODULES_FILE}"
-rm -f "${BACKUP_AVAILABLE_MODULES_FILE}" "${BACKUP_METADATA_MODULES_FILE}" "${LIVE_SETUP_MODULES_FILE}" "${LIVE_PRESENT_MODULES_FILE}" "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}" "${INSTALL_MODULES_FILE}" "${REMOVED_MODULES_FILE}"
+rm -f "${BACKUP_AVAILABLE_MODULES_FILE}" "${BACKUP_METADATA_MODULES_FILE}" "${LIVE_SETUP_MODULES_FILE}" "${LIVE_PRESENT_MODULES_FILE}" "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}" "${INSTALL_MODULES_FILE}" "${REMOVED_MODULES_FILE}" "${UPDATE_MODULES_FILE}"
 rmdir "${WORK_ROOT_ABS}" 2>/dev/null || true
 success "Temporary work directories cleaned up."

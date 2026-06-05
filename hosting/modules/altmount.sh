@@ -3,8 +3,8 @@
 # Creates the staged AltMount .env file and wires it into the staged compose.
 #
 # Purpose:
-#   Upstream AltMount does not ship an .env file, but prompt.md requires a
-#   generated JWT_SECRET and an env_file reference. This hook creates
+#   Upstream AltMount does not ship an .env file, but it needs a generated
+#   JWT_SECRET and an env_file reference. This hook creates
 #   ALTMOUNT.env in staging, adds a synthetic manifest entry so deploy restores
 #   it to apps/altmount/.env, stages AltMount compose, and inserts env_file:
 #   .env before the environment block.

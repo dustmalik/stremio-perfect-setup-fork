@@ -46,9 +46,11 @@ If not, run the SSH helper from a machine where you normally open your terminal:
 What it will ask you:
 
 - whether to use an existing SSH key or generate a new one
-- what alias name you want, for example `streaming`
+- if you generate a new key before you already picked an alias, what local key file name to create under `~/.ssh/`
+- a reminder to add that public key while creating the VPS, through the provider's SSH-key flow, or later with `ssh-copy-id`
 - the VPS IP address or hostname
 - the SSH username for that VPS, often `root`
+- what alias name you want, for example `streaming`
 
 What it writes:
 
@@ -60,9 +62,10 @@ When it finishes, it will show you what to do next. This step only prepares your
 
 You still need to place the public key on the VPS:
 
-1. Copy the contents of the generated `.pub` file.
-2. Add that public key to `~/.ssh/authorized_keys` for the target VPS user.
-3. After that, test the alias with `ssh your-alias`.
+1. If you are still creating the VPS, paste the `.pub` key into the provider's SSH key field or upload it in the provider panel.
+2. If the VPS already exists, add that public key to `~/.ssh/authorized_keys` for the target VPS user using the provider's console or documented flow.
+3. If password SSH access is available, you can also use `ssh-copy-id` after the helper collects the VPS host and username.
+4. After that, test the alias with `ssh your-alias`.
 
 If `ssh-copy-id` is available on your machine, the helper will also show you a command like this:
 
@@ -170,6 +173,9 @@ If you continue from the existing deployment:
 - the existing modules start preselected in the checklist
 - the later `TZ`, `DOMAIN`, and `LETSENCRYPT_EMAIL` prompts are pre-filled from the live root `.env`
 - modules you deselect are removed from the final tree and their hostname env vars are cleaned up
+- modules you add or remove are reconciled across the shared configs too (for example the Authelia compose and the Cloudflare DDNS domain list are rewritten to match the new module set)
+
+To skip this prompt in a non-interactive run, pass `--modify` (reuse and add/remove modules) or `--overwrite` (replace the live stack). Without either flag, a non-interactive run defaults to overwrite.
 
 ### Phase 4: Template Fetch
 
@@ -373,6 +379,23 @@ Test the file-preparation flow without making system-level changes:
 ./main.sh --dry-run --skip-ssh
 ```
 
+Add or remove modules on an existing deployment without prompts (`--modify` keeps the current stack and reconciles it to the new module list):
+
+```bash
+./main.sh --on-vps --modify --modules aiostreams,honey,cloudflare-ddns \
+  --domain example.com --cloudflare-api-token <token> -y
+```
+
+Run the whole thing unattended from your local computer (prepares SSH, copies the folder to the VPS, runs it there):
+
+```bash
+./main.sh --local --ssh-host vps.example.com --ssh-user root \
+  --modules aiostreams,honey --domain example.com \
+  --letsencrypt-email admin@example.com -y
+```
+
+(See `./main.sh --help` for the full option list.)
+
 ## Common Notes and Pitfalls
 
 - Run `./main.sh` on the VPS, not on your laptop, unless your laptop is the machine that will host Docker.
@@ -392,16 +415,18 @@ Test the file-preparation flow without making system-level changes:
 
 ## If You Want to Run Non-Interactively Later
 
-Once you already understand the flow, you can pass values directly through flags such as:
+Once you already understand the flow, you can pass values directly through flags. `./main.sh --help` always lists the complete, current set (the help text is generated from the comment block at the top of `main.sh`). The most common ones:
 
-- `--modules`
-- `--timezone`
-- `--docker-dir`
-- `--domain`
-- `--letsencrypt-email`
-- `--cloudflare-api-token`
-- `--supabase-connection-string`
-- `--supabase-db-password`
-- `--skip-review`
+- Where it runs: `--on-vps`, `--local`
+- SSH for `--local`: `--ssh-host`, `--ssh-user`, `--ssh-alias`, `--ssh-key-path`, `--skip-ssh`
+- Existing setup: `--modify`, `--overwrite`, `-y` / `--assume-yes`
+- Modules and target: `--modules`, `--docker-dir`, `--template-source`
+- Core environment: `--timezone`, `--domain`, `--letsencrypt-email`
+- Cloudflare DDNS: `--cloudflare-api-token`, `--cloudflare-proxied`
+- Supabase: `--supabase-connection-string`, `--supabase-db-password`
+- Authelia: `--authelia-username`, `--authelia-displayname`, `--authelia-email`, `--authelia-password`
+- Flow control: `--skip-review`, `--skip-backup`, `--skip-start`, `--dry-run`
+
+On a fresh install the deployed root `.env` is trimmed to only the hostnames of the modules you selected (the upstream template ships a `*_HOSTNAME` line for every possible module).
 
 That is useful for repeat deployments, but for a first run, the guided interactive flow is the safer path.

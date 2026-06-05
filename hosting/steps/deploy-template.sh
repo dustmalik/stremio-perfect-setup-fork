@@ -6,7 +6,14 @@
 #   This is the transition from staging back to a runnable Compose tree. It
 #   reads the stage manifest, copies each staged file or directory back to its
 #   original template path, creates/fixes permissions on the target directory,
-#   and rsyncs the entire prepared template into DOCKER_DIR.
+#   and rsyncs the prepared template into DOCKER_DIR.
+#
+#   In --modify-mode it does not replace the whole tree: it updates the root
+#   .env and compose, installs the newly added modules (--install-modules-file),
+#   re-syncs already-present modules whose config changed (--update-modules-file,
+#   e.g. hostname-sync edits to authelia/honey/cloudflare and the traefik compose
+#   that cloudflare-ddns rewrites), and stops + removes deselected modules
+#   (--removed-modules-file). Runtime data under DOCKER_DATA_DIR is preserved.
 #
 # Usage:
 #   ./hosting/steps/deploy-template.sh \
@@ -35,6 +42,7 @@ FIX_PERMISSIONS=1
 MODIFY_MODE=0
 INSTALL_MODULES_FILE=""
 REMOVED_MODULES_FILE=""
+UPDATE_MODULES_FILE=""
 
 while (( $# > 0 )); do
   case "$1" in
@@ -64,6 +72,10 @@ while (( $# > 0 )); do
       ;;
     --removed-modules-file)
       REMOVED_MODULES_FILE="$2"
+      shift 2
+      ;;
+    --update-modules-file)
+      UPDATE_MODULES_FILE="$2"
       shift 2
       ;;
     --no-fix-permissions)
@@ -163,16 +175,25 @@ stop_and_remove_module_profile() {
 
 install_modules=()
 removed_modules=()
+update_modules=()
+restore_modules=()
 if (( MODIFY_MODE )); then
   mapfile -t install_modules < <(read_lines_file "${INSTALL_MODULES_FILE}")
   if [[ -n "${REMOVED_MODULES_FILE}" && -f "${REMOVED_MODULES_FILE}" ]]; then
     mapfile -t removed_modules < <(read_lines_file "${REMOVED_MODULES_FILE}")
   fi
+  if [[ -n "${UPDATE_MODULES_FILE}" && -f "${UPDATE_MODULES_FILE}" ]]; then
+    mapfile -t update_modules < <(read_lines_file "${UPDATE_MODULES_FILE}")
+  fi
+  # Modules whose staged files should be restored to the template and synced
+  # into the target: newly installed modules plus already-present modules whose
+  # config was refreshed by hostname-sync hooks (authelia/honey/cloudflare-ddns).
+  restore_modules=("${install_modules[@]+"${install_modules[@]}"}" "${update_modules[@]+"${update_modules[@]}"}")
 fi
 
 while IFS=$'\t' read -r module source_rel stage_rel item_type; do
   [[ -n "${source_rel}" ]] || continue
-  if (( MODIFY_MODE )) && [[ "${module}" != "root" ]] && ! array_contains "${module}" "${install_modules[@]}"; then
+  if (( MODIFY_MODE )) && [[ "${module}" != "root" ]] && ! array_contains "${module}" "${restore_modules[@]+"${restore_modules[@]}"}"; then
     continue
   fi
   local_source="${TEMPLATE_DIR_ARG}/${source_rel}"
@@ -183,6 +204,11 @@ while IFS=$'\t' read -r module source_rel stage_rel item_type; do
   ensure_directory "$(dirname "${local_source}")"
   cp -a "${local_stage}" "${local_source}"
 done < "${MANIFEST_FILE}"
+
+# Drop upstream repository metadata so it does not clutter the deployed tree.
+for cruft in .git .gitignore README.md LICENSE CLAUDE.md; do
+  rm -rf "${TEMPLATE_DIR_ARG:?}/${cruft}"
+done
 
 ensure_apt_packages rsync
 require_commands rsync
@@ -226,6 +252,18 @@ if (( MODIFY_MODE )); then
     [[ -d "${TEMPLATE_DIR_ARG}/apps/${module}" ]] || die "Install module missing from template: ${module}"
     sync_path_into_target "${TEMPLATE_DIR_ARG}/apps/${module}/" "${TARGET_DIR_ARG}/apps/${module}/"
     copy_seed_data_for_module "${module}"
+  done
+
+  # Re-sync already-present modules whose config was refreshed by hostname-sync
+  # hooks. Their runtime state lives under DOCKER_DATA_DIR, not apps/<module>/,
+  # so a data-preserving app-directory sync is safe. Skip any that are also in
+  # install_modules (already synced above) or being removed.
+  for module in "${update_modules[@]+"${update_modules[@]}"}"; do
+    [[ -n "${module}" ]] || continue
+    array_contains "${module}" "${install_modules[@]+"${install_modules[@]}"}" && continue
+    array_contains "${module}" "${removed_modules[@]+"${removed_modules[@]}"}" && continue
+    [[ -d "${TEMPLATE_DIR_ARG}/apps/${module}" ]] || continue
+    sync_path_into_target "${TEMPLATE_DIR_ARG}/apps/${module}/" "${TARGET_DIR_ARG}/apps/${module}/"
   done
 
   for module in "${removed_modules[@]}"; do

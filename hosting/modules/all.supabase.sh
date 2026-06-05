@@ -4,8 +4,8 @@
 #
 # Purpose:
 #   This hook runs when any selected module is aiomanager, aiometadata, or
-#   aiostreams. Per prompt.md, Supabase is offered to the user as an alternative
-#   to each addon's upstream local SQLite default. If the user says yes, the
+#   aiostreams. Supabase is offered to the user as an alternative to each addon's
+#   upstream local SQLite default. If the user says yes, the
 #   hook creates per-addon schemas and roles, then writes generated Postgres
 #   URLs into the staged addon .env files.
 #
