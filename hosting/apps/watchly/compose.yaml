@@ -1,0 +1,40 @@
+services:
+  watchly-redis:
+    image: redis:7-alpine
+    container_name: watchly-redis
+    restart: unless-stopped
+    volumes:
+      - watchly_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    profiles:
+      - watchly
+      - all
+
+  watchly:
+    image: ghcr.io/timilsinabimal/watchly:latest
+    container_name: watchly
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - watchly-redis
+    expose:
+      - "8000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.watchly.rule=Host(`${WATCHLY_HOSTNAME?}`)"
+      - "traefik.http.routers.watchly.entrypoints=websecure"
+      - "traefik.http.routers.watchly.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.watchly.middlewares=authelia@docker"
+      - "traefik.http.services.watchly.loadbalancer.server.port=8000"
+    profiles:
+      - watchly
+      - all
+
+volumes:
+  watchly_redis_data:
