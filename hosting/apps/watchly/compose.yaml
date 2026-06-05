@@ -4,7 +4,7 @@ services:
     container_name: watchly-redis
     restart: unless-stopped
     volumes:
-      - watchly_redis_data:/data
+      - ${DOCKER_DATA_DIR}/watchly/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -35,6 +35,3 @@ services:
     profiles:
       - watchly
       - all
-
-volumes:
-  watchly_redis_data:
