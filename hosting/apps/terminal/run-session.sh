@@ -1,4 +1,42 @@
 #!/usr/bin/env bash
+
+# Per-session setup and execution wrapper for the browser-based terminal.
+#
+# Purpose:
+#   This script creates an isolated, temporary workspace (tmpfs) for each
+#   browser terminal session, clones the hosting automation source code into
+#   that workspace, and runs the main.sh setup script in --local mode.
+#   The script enforces a hard session timeout and ensures all temporary files
+#   are cleaned up on exit, preventing leakage between sessions.
+#
+# Scope:
+#   This script runs once per WeTTY session (one per browser connection).
+#   It is invoked by the WeTTY daemon as the session command (--command flag).
+#   The subprocess hierarchy is: server.js -> WeTTY -> run-session.sh -> main.sh.
+#
+# Session Isolation:
+#   - Each session gets a unique tmpfs-backed home directory (/tmp/session-<ID>)
+#   - A separate SSH directory with strict 0700 permissions
+#   - A sparse clone of the hosting source (minimal bandwidth, fast clone)
+#   - The session-local HOME and PATH prevent cross-session pollution
+#
+# Timeout Mechanism:
+#   - A background sleep process enforces SESSION_TIMEOUT_SECONDS hard limit
+#   - At timeout, the entire session process group is terminated via SIGTERM
+#   - The EXIT trap ensures cleanup (kill timeout PID, rm -rf session directory)
+#
+# Execution Flow:
+#   1. Create unique session ID and tmpfs directory
+#   2. Configure session-local SSH directory (for user's SSH keys during setup)
+#   3. Start background timeout process with EXIT trap
+#   4. Sparse-clone hosting repo into session workspace
+#   5. Execute main.sh --local to run interactive setup
+#   6. EXIT trap fires on completion/timeout: kill timeout, clean tmpfs
+#
+# Environment:
+#   - SESSION_TIMEOUT_SECONDS: max session duration (default 1800 = 30 min)
+#   - GIT_REPO_OWNER: GitHub account for cloning (default ssterjo)
+
 set -Eeuo pipefail
 
 # Per-session isolation: each browser connection gets its own tmpfs workspace
