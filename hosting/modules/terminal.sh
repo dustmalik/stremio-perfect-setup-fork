@@ -1,6 +1,32 @@
 #!/usr/bin/env bash
-# Configures the terminal service: prompts for Cloudflare Turnstile keys,
-# sets TERMINAL_HOSTNAME, and validates the configuration.
+
+# Configures the browser-based terminal service for interactive setup automation.
+#
+# Purpose:
+#   This module hook prompts for Cloudflare Turnstile challenge keys, extracts
+#   or prompts for the terminal hostname, and generates cryptographic secrets
+#   required by the terminal service. It is responsible for preparing the
+#   TERMINAL.env configuration file that will be mounted into the Docker
+#   container running the terminal service.
+#
+# Scope:
+#   This script runs as part of the main hosting automation pipeline during
+#   the "modules" phase (order 75). It only configures the terminal service;
+#   it does not deploy, build, or start containers. Those tasks are handled by
+#   Docker Compose and other orchestration steps.
+#
+# Configuration Outputs:
+#   - Populates hosting/config/TERMINAL.env with Turnstile credentials
+#   - Generates COOKIE_SECRET for HMAC session cookie signing
+#   - Records TERMINAL_HOSTNAME in the root .env (HOSTING_ROOT_ENV)
+#
+# Dependencies:
+#   - Cloudflare Turnstile account with a site created and API keys ready
+#   - A valid domain or hostname for the terminal service (e.g., setup.example.com)
+#
+# Usage:
+#   This script is invoked automatically by hosting/main.sh during the module
+#   configuration phase. Do not run directly unless advancing a partial setup.
 
 set -Eeuo pipefail
 
