@@ -1,6 +1,7 @@
 FROM node:20-slim
 
 # Install system tools needed by main.sh and terminal operations
+# Include build-essential temporarily for WeTTY native module compilation
 RUN apt-get update && apt-get install -y \
     bash \
     openssh-client \
@@ -9,10 +10,11 @@ RUN apt-get update && apt-get install -y \
     openssl \
     whiptail \
     python3 \
+    build-essential \
+    && npm install -g wetty \
+    && apt-get remove -y build-essential \
+    && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-
-# Install WeTTY globally
-RUN npm install -g wetty
 
 # Create non-root user for terminal sessions
 RUN useradd -m -s /bin/bash terminal
