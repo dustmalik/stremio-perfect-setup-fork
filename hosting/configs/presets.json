@@ -1,22 +1,16 @@
 {
   "presets": [
     {
-      "id": "essentials",
+      "id": "minimal",
       "name": "Essentials",
       "description": "Just the core Stremio addons to get streaming working.",
-      "modules": ["aiostreams", "aiometadata", "aiomanager"]
+      "modules": ["aiostreams", "aiometadata", "aiomanager","watchtower"]
     },
     {
-      "id": "recommended",
-      "name": "Recommended",
+      "id": "perfect",
+      "name": "Perfect Setup",
       "description": "Core addons plus a dashboard and dynamic DNS.",
-      "modules": ["aiostreams", "aiometadata", "aiomanager", "honey", "cloudflare-ddns"]
-    },
-    {
-      "id": "everything",
-      "name": "Everything",
-      "description": "Enable every available optional module.",
-      "modules": ["aiostreams", "aiometadata", "aiomanager", "honey", "cloudflare-ddns", "stremthru", "watchly", "altmount", "cors-proxy"]
+      "modules": ["aiostreams", "aiometadata", "aiomanager", "honey", "cloudflare-ddns", "stremthru", "watchly", "altmount","dash","dozzle","nzbdav","nzbhydra2","uptime-kuma","warp","watchtower"]
     }
   ]
 }

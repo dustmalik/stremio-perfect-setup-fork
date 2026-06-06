@@ -28,6 +28,11 @@ HOSTING_COMMON_LOADED=1
 
 declare -a HOSTING_CLEANUP_PATHS=()
 declare -a HOSTING_WHIPTAIL_ARGS=()
+# Populated by die() with a human-readable message and by the ERR trap with the
+# failing command/line, so the EXIT trap can show a final error dialog.
+HOSTING_ERROR_MESSAGE=""
+HOSTING_ERROR_COMMAND=""
+HOSTING_ERROR_LINE=""
 HOSTING_COLOR_ENABLED=0
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   HOSTING_COLOR_ENABLED=1
@@ -95,6 +100,7 @@ warn() {
 }
 
 die() {
+  HOSTING_ERROR_MESSAGE="$*"
   printf '%s %s\n' "$(style '31' '✗')" "$*" >&2
   exit 1
 }
@@ -116,8 +122,65 @@ register_cleanup_path() {
   HOSTING_CLEANUP_PATHS+=("$1")
 }
 
+# ERR-trap body: capture the command and line that failed for an unexpected
+# crash (one that did not route through die()). set -E propagates this into
+# functions; guarded commands (if/||/&&/!) do not trigger it, so the captured
+# command is the genuinely fatal one.
+record_error() {
+  HOSTING_ERROR_COMMAND="${1:-}"
+  HOSTING_ERROR_LINE="${2:-}"
+}
+
+# Final error dialog, shown from on_exit() on any non-zero exit when a whiptail
+# UI is available. When unavailable the error is left to the stderr output that
+# die() / set -e already produced.
+show_error_dialog() {
+  local exit_code="${1:-1}"
+  local message=""
+
+  dialog_ui_available || return 0
+
+  if [[ -n "${HOSTING_ERROR_MESSAGE}" ]]; then
+    message="${HOSTING_ERROR_MESSAGE}"
+  else
+    message="The hosting setup stopped unexpectedly."
+    if [[ -n "${HOSTING_ERROR_COMMAND}" ]]; then
+      message+=$'\n\n'"Failed command: ${HOSTING_ERROR_COMMAND}"
+    fi
+    if [[ -n "${HOSTING_ERROR_LINE}" ]]; then
+      message+=$'\n'"Line: ${HOSTING_ERROR_LINE}"
+    fi
+  fi
+
+  message+=$'\n\n'"Exit code: ${exit_code}"
+  message+=$'\n'"Full output is in the terminal above, scroll up for details."
+
+  # Tolerate a non-zero return (e.g. Esc dismiss): this runs from the EXIT trap,
+  # so a failure here must not mask the real exit status.
+  whiptail_on_tty \
+    --title "Setup Failed" \
+    --msgbox "${message}" \
+    "$(dialog_msgbox_height "${message}")" 78 || true
+  return 0
+}
+
+# EXIT-trap body: the single decision point for the final screens. Capture the
+# real exit status first, surface a failure dialog when warranted, run the path
+# cleanup, then exit with the original status so a successful run still reports 0.
+on_exit() {
+  local exit_code=$?
+
+  if (( exit_code != 0 )); then
+    show_error_dialog "${exit_code}"
+  fi
+
+  cleanup_registered_paths
+  exit "${exit_code}"
+}
+
 setup_cleanup_trap() {
-  trap cleanup_registered_paths EXIT
+  trap 'record_error "${BASH_COMMAND}" "${LINENO}"' ERR
+  trap on_exit EXIT
 }
 
 hosting_is_dry_run() {
@@ -472,6 +535,19 @@ ensure_dialog_ui() {
   fi
 
   warn "Could not install whiptail automatically, so ${purpose} will continue with plain terminal prompts."
+}
+
+# Compute a whiptail --msgbox height that fits the message. whiptail wraps text
+# and adds chrome, so budget the newline-delimited line count plus padding and
+# clamp to a range that stays usable on small terminals.
+dialog_msgbox_height() {
+  local message="${1:-}"
+  local lines=1
+  lines="$(printf '%s\n' "${message}" | wc -l)"
+  local height=$(( lines + 7 ))
+  (( height < 10 )) && height=10
+  (( height > 22 )) && height=22
+  printf '%s' "${height}"
 }
 
 show_message() {

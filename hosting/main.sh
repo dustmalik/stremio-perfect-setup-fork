@@ -1390,6 +1390,34 @@ if (( ${#hostnames[@]} > 0 )); then
   printf '  %s\n' $(printf '%s\n' "${hostnames[@]}" | dedupe_lines | sort)
 fi
 
+# Mirror the console summary above onto a final whiptail screen so a successful
+# real deploy ends on an on-screen confirmation rather than dropping straight
+# back to the terminal. Dry runs and non-whiptail environments keep the console
+# summary only.
+if (( ! DRY_RUN )) && dialog_ui_available; then
+  summary_message="The hosting stack was deployed successfully."
+  summary_message+=$'\n\n'"Stack deployed to: ${DOCKER_DIR_VALUE}"
+  if [[ -n "${public_ip}" ]]; then
+    summary_message+=$'\n'"Public IP: ${public_ip}"
+  fi
+  if (( ${#hostnames[@]} > 0 )); then
+    if array_contains "${CLOUDFLARE_DDNS_MODULE}" "${final_modules[@]}"; then
+      summary_message+=$'\n\n'"Cloudflare DDNS is configured for these hostnames:"
+    else
+      summary_message+=$'\n\n'"Create DNS A records pointing these hostnames to the public IP above:"
+    fi
+    while IFS= read -r host_line; do
+      summary_message+=$'\n'"  ${host_line}"
+    done < <(printf '%s\n' "${hostnames[@]}" | dedupe_lines | sort)
+  fi
+  # Tolerate Esc/non-zero dismiss so a successful deploy is never reported as a
+  # failure by the trailing ERR/EXIT traps.
+  whiptail_on_tty \
+    --title "Setup Complete" \
+    --msgbox "${summary_message}" \
+    "$(dialog_msgbox_height "${summary_message}")" 78 || true
+fi
+
 rm -rf "${TEMPLATE_DIR_ABS}" "${CONFIG_DIR_ABS}"
 rm -f "${SELECTED_MODULES_FILE}"
 rm -f "${BACKUP_AVAILABLE_MODULES_FILE}" "${BACKUP_METADATA_MODULES_FILE}" "${LIVE_SETUP_MODULES_FILE}" "${LIVE_PRESENT_MODULES_FILE}" "${MODULE_HOOK_TARGETS_FILE}" "${MODULE_HOOK_SYNC_ONLY_FILE}" "${INSTALL_MODULES_FILE}" "${REMOVED_MODULES_FILE}" "${UPDATE_MODULES_FILE}"

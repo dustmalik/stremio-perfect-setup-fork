@@ -333,7 +333,7 @@ export function AccountStep() {
         }}>
           <strong style={{ display: 'block', marginBottom: '0.2rem' }}>⚠️ IMPORTANT: Existing addons will be removed!</strong>
           Completing this wizard replaces every addon currently installed on your {appName} account.
-          If you have addons you want to keep, copy their manifest URLs from your {appName} settings now so you can reinstall them afterwards.
+          If you have addons you want to keep, copy their Manifest URLs from your {appName} settings now so you can reinstall them afterwards.
         </div>
       )}
 

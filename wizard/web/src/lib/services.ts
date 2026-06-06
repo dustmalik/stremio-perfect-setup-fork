@@ -21,8 +21,8 @@ export function resolveLogoUrl(logo?: string | null): string {
 }
 
 export const SERVICES: Service[] = [
-  { id: 'torbox',          name: 'TorBox',         logo: 'services/torbox.svg',      isDebrid: true,  isUsenet: false, url: 'https://torbox.app',      apiKeyUrl: 'https://torbox.app/settings' },
-  { id: 'realdebrid',     name: 'Real-Debrid',    logo: 'services/realdebrid.png',  isDebrid: true,  isUsenet: false, url: 'https://real-debrid.com', apiKeyUrl: 'https://real-debrid.com/apitoken' },
+  { id: 'torbox',          name: 'TorBox',         logo: 'services/torbox.svg',      isDebrid: true,  isUsenet: false, url: 'https://torbox.app/subscription?referral=6e80077e-c232-4b71-8914-5b87202b9577',      apiKeyUrl: 'https://torbox.app/settings' },
+  { id: 'realdebrid',     name: 'Real-Debrid',    logo: 'services/realdebrid.png',  isDebrid: true,  isUsenet: false, url: 'http://real-debrid.com/?id=8801126', apiKeyUrl: 'https://real-debrid.com/apitoken' },
   { id: 'alldebrid',      name: 'AllDebrid',      logo: 'services/alldebrid.png',   isDebrid: true,  isUsenet: false, url: 'https://alldebrid.com',   apiKeyUrl: 'https://alldebrid.com/apikeys/' },
   { id: 'debridlink',     name: 'Debrid-Link',    logo: 'services/debridlink.svg',  isDebrid: true,  isUsenet: false, url: 'https://debrid-link.com', apiKeyUrl: 'https://debrid-link.com/webapp/apikey' },
   { id: 'premiumize',     name: 'Premiumize',     logo: 'services/premiumize.svg',  isDebrid: true,  isUsenet: false, url: 'https://premiumize.me',   apiKeyUrl: 'https://www.premiumize.me/account' },

@@ -114,9 +114,8 @@ The script prompts for a handful of values it needs:
 
 On a **fresh install**, the script first shows a list of preset **Packages** with pre-selected bundles of modules to choose from. Pick one and its modules start preselected on the checklist that follows, where you can still add or remove anything. Pick *None* to start from scratch. The packages live in `hosting/configs/presets.json`.
 
-* **Essentials**: just the core Stremio addons — AIOStreams, AIOMetadata, AIOManager.
-* **Recommended**: the core addons plus Honey (dashboard) and Cloudflare DDNS.
-* **Everything**: every available optional module.
+* **Minimal AIO**: just the core Stremio addons (AIOStreams, AIOMetadata, AIOManager).
+* **Perfect Setup**: recommended optimal setup without overcomplicating.
 
 Then comes the checklist. Toggle modules with `Space` and confirm with `Enter`:
 

@@ -374,7 +374,7 @@ select_preset_interactively() {
   for (( index = 0; index < ${#ids[@]}; index++ )); do
     options+=("${ids[index]}" "${names[index]} — ${descs[index]}")
   done
-  options+=("none" "No package — continue with nothing preselected")
+  options+=("none" "No package, continue with nothing preselected")
 
   local choice=""
   choice="$(prompt_choice "Module Package" "Pick a preset package of modules to start from. The next screen lets you add or remove individual modules. Choose \"none\" to start from scratch." "none" "${options[@]}")"
