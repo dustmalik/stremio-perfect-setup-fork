@@ -13,9 +13,10 @@
 #
 #   HOSTING_CONFIG_DIR=./hosting/.work/config \
 #   HOSTING_SELECTED_MODULES_FILE=./hosting/.work/selected-modules.txt \
-#   HOSTING_SUPABASE_CONNECTION_STRING='postgresql://...' \
-#   HOSTING_SUPABASE_DB_PASSWORD='secret' \
-#   ./hosting/modules/all.supabase.sh
+#
+# Expected environment variables (from module_get_param):
+#   SUPABASE_CONNECTION_STRING - Supabase direct session pooler IPv4 connection string
+#   SUPABASE_DB_PASSWORD - Supabase database password
 #
 # Skip behavior:
 #   If no connection string is supplied in unattended mode, or the interactive
@@ -98,9 +99,12 @@ fi
 
 (( ${#selected_addons[@]} > 0 )) || exit 0
 
-connection_string="${HOSTING_SUPABASE_CONNECTION_STRING:-}"
-database_password="${HOSTING_SUPABASE_DB_PASSWORD:-}"
+connection_string=""
+database_password=""
 connection_string_uses_placeholder=0
+
+connection_string="$(module_get_param "connection_string" "string" "false" \
+  "Supabase direct session pooler IPv4 connection string")" || true
 
 if [[ -z "${connection_string}" ]]; then
   if is_interactive; then
@@ -131,6 +135,9 @@ fi
 if [[ "${connection_string}" == *"[YOUR-PASSWORD]"* ]]; then
   connection_string_uses_placeholder=1
 fi
+
+database_password="$(module_get_param "db_password" "secret" "false" \
+  "Supabase database password")" || true
 
 if [[ -z "${database_password}" ]]; then
   if (( connection_string_uses_placeholder )); then

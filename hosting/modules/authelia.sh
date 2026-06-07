@@ -18,10 +18,12 @@
 #   HOSTING_MANIFEST_FILE=./hosting/.work/config/.stage-map.tsv \
 #   HOSTING_SELECTED_MODULES_FILE=./hosting/.work/selected-modules.txt \
 #   HOSTING_ROOT_ENV=./hosting/.work/config/.env \
-#   HOSTING_AUTHELIA_USERNAME='myuser' \
-#   HOSTING_AUTHELIA_DISPLAYNAME='My User' \
-#   HOSTING_AUTHELIA_EMAIL='user@example.com' \
-#   HOSTING_AUTHELIA_PASSWORD='plaintextpassword' \
+#
+# Expected environment variables (from module_get_param):
+#   AUTHELIA_USERNAME - Authelia user account username
+#   AUTHELIA_DISPLAYNAME - User display name
+#   AUTHELIA_EMAIL - User email address
+#   AUTHELIA_PASSWORD - User account password
 #   ./hosting/modules/authelia.sh
 
 set -Eeuo pipefail
@@ -189,107 +191,41 @@ users_yaml_staged="${HOSTING_CONFIG_DIR}/$(stage_name_for "${MODULE_NAME}" "conf
 
 # ── collect user details ──────────────────────────────────────────────────────
 
-authelia_username="${HOSTING_AUTHELIA_USERNAME:-}"
-authelia_displayname="${HOSTING_AUTHELIA_DISPLAYNAME:-}"
-authelia_email="${HOSTING_AUTHELIA_EMAIL:-}"
-authelia_password="${HOSTING_AUTHELIA_PASSWORD:-}"
+authelia_username=""
+authelia_displayname=""
+authelia_email=""
+authelia_password=""
 
 validate_username() {
   [[ "$1" =~ ^[a-zA-Z0-9_-]+$ ]]
 }
 
-if [[ -z "${authelia_username}" || -z "${authelia_displayname}" || \
-      -z "${authelia_email}" || -z "${authelia_password}" ]] && is_interactive; then
-
+if is_interactive && [[ -z "${authelia_username}" || -z "${authelia_displayname}" || \
+      -z "${authelia_email}" || -z "${authelia_password}" ]]; then
   section "Authelia user account"
-  show_message "Authelia User Setup" "Set up the initial Authelia user account. The username must contain only letters, digits, hyphens, and underscores. The password will be hashed using argon2 via Docker."
-
-  if dialog_ui_available; then
-    while true; do
-      authelia_username="$(
-        whiptail_capture_on_tty \
-          --title "Authelia User Account" \
-          --inputbox "Username (letters, digits, hyphens, underscores only):" \
-          10 78 "${authelia_username}"
-      )" || die "Prompt cancelled."
-
-      if [[ -z "${authelia_username}" ]]; then
-        whiptail_on_tty --title "Validation Error" \
-          --msgbox "Username is required." 8 60
-        continue
-      fi
-
-      if ! validate_username "${authelia_username}"; then
-        whiptail_on_tty --title "Invalid Username" \
-          --msgbox "Username '${authelia_username}' is not valid.\nUse only letters, digits, hyphens, and underscores." \
-          10 70
-        authelia_username=""
-        continue
-      fi
-
-      authelia_displayname="$(
-        whiptail_capture_on_tty \
-          --title "Authelia User Account" \
-          --inputbox "Display Name:" \
-          10 78 "${authelia_displayname}"
-      )" || die "Prompt cancelled."
-
-      if [[ -z "${authelia_displayname}" ]]; then
-        whiptail_on_tty --title "Validation Error" \
-          --msgbox "Display name is required." 8 60
-        continue
-      fi
-
-      authelia_password="$(
-        whiptail_capture_on_tty \
-          --title "Authelia User Account" \
-          --passwordbox "Password (will be argon2-hashed via Docker):" \
-          10 78
-      )" || die "Prompt cancelled."
-
-      if [[ -z "${authelia_password}" ]]; then
-        whiptail_on_tty --title "Validation Error" \
-          --msgbox "Password is required." 8 60
-        continue
-      fi
-
-      authelia_email="$(
-        whiptail_capture_on_tty \
-          --title "Authelia User Account" \
-          --inputbox "Email:" \
-          10 78 "${authelia_email}"
-      )" || die "Prompt cancelled."
-
-      if [[ -z "${authelia_email}" ]]; then
-        whiptail_on_tty --title "Validation Error" \
-          --msgbox "Email is required." 8 60
-        continue
-      fi
-
-      break
-    done
-  else
-    while true; do
-      authelia_username="$(prompt_value "Enter the Authelia username (letters, digits, hyphens, underscores only) [AUTHELIA_USERNAME]" "${authelia_username}")"
-      if [[ -z "${authelia_username}" ]]; then
-        warn "Username is required."
-        continue
-      fi
-      if ! validate_username "${authelia_username}"; then
-        warn "Invalid username '${authelia_username}'. Use only letters, digits, hyphens, and underscores."
-        authelia_username=""
-        continue
-      fi
-      break
-    done
-    authelia_displayname="$(prompt_value "Enter the Authelia display name [AUTHELIA_DISPLAYNAME]" "${authelia_displayname}")"
-    [[ -n "${authelia_displayname}" ]] || die "Display name is required."
-    authelia_password="$(prompt_secret "Enter the Authelia password (will be argon2-hashed) [AUTHELIA_PASSWORD]")"
-    [[ -n "${authelia_password}" ]] || die "Password is required."
-    authelia_email="$(prompt_value "Enter the Authelia user email [AUTHELIA_EMAIL]" "${authelia_email}")"
-    [[ -n "${authelia_email}" ]] || die "Email is required."
-  fi
+  show_message "Authelia User Setup" "Set up the initial Authelia user account. Username must contain only letters, digits, hyphens, and underscores. The password will be hashed using argon2 via Docker."
 fi
+
+# Username: loop for validation (module_get_param prompts; we validate the result)
+while [[ -z "${authelia_username}" ]]; do
+  authelia_username="$(module_get_param "username" "string" "true" \
+    "Authelia username (letters, digits, hyphens, underscores only)")" || break
+  if [[ -n "${authelia_username}" ]] && ! validate_username "${authelia_username}"; then
+    warn "Invalid username '${authelia_username}'. Use only letters, digits, hyphens, and underscores."
+    authelia_username=""
+    # Clear the derived env var so module_get_param prompts again
+    unset AUTHELIA_USERNAME
+  fi
+done
+
+authelia_displayname="$(module_get_param "displayname" "string" "true" \
+  "Authelia display name")" || true
+
+authelia_password="$(module_get_param "password" "secret" "true" \
+  "Authelia password (will be argon2-hashed via Docker)")" || true
+
+authelia_email="$(module_get_param "email" "string" "true" \
+  "Authelia user email address")" || true
 
 if [[ -z "${authelia_username}" || -z "${authelia_displayname}" || \
       -z "${authelia_password}" || -z "${authelia_email}" ]]; then
