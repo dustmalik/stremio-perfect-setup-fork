@@ -54,20 +54,14 @@
 #   --domain DOMAIN               Base public domain for Traefik hostnames.
 #   --letsencrypt-email EMAIL     Email address passed to Let's Encrypt.
 #
-# Cloudflare DDNS:
-#   --cloudflare-api-token TOKEN  Token used by cloudflare-ddns when selected.
-#   --cloudflare-proxied VALUE    Cloudflare DDNS proxy mode when that module is enabled.
-#
-# Supabase (offered only for aiomanager, aiometadata, and aiostreams; if declined
-# or no connection string is supplied, those addons keep their SQLite defaults):
-#   --supabase-connection-string URL  Supabase direct session pooler IPv4 URL.
-#   --supabase-db-password PASS       Password replacing [YOUR-PASSWORD].
-#
-# Authelia:
-#   --authelia-username NAME      Initial username (letters, digits, hyphens, underscores).
-#   --authelia-displayname NAME   Initial user display name.
-#   --authelia-email EMAIL        Initial user email address.
-#   --authelia-password PASS      Initial user password (argon2-hashed via Docker).
+# Module parameters:
+#   --module-param MODULE.KEY=VALUE
+#                       Pass a parameter directly to a module. The module and
+#                       key must match a param declared in the module's --metadata.
+#                       Use --list-module-params to see all available params.
+#   --list-module-params
+#                       Print all available module parameters and their env var
+#                       names, then exit.
 #
 # Flow control:
 #   --dry-run                     Exercise the flow without changing system state.
@@ -89,6 +83,8 @@ source "${SCRIPT_DIR}/lib/common.sh"
 source "${SCRIPT_DIR}/lib/template.sh"
 
 load_defaults
+
+declare -gA MODULE_PARAM_ENV  # "cloudflare-ddns.api_token" -> "CLOUDFLARE_DDNS_API_TOKEN"
 
 # Install the final EXIT/ERR handling immediately so startup failures also land
 # on the whiptail error screen instead of dropping straight back to the shell.
@@ -117,14 +113,6 @@ TIMEZONE_VALUE=""
 DOCKER_DIR_VALUE=""
 DOMAIN_VALUE=""
 LETSENCRYPT_EMAIL_VALUE=""
-CLOUDFLARE_API_TOKEN_VALUE=""
-CLOUDFLARE_PROXIED_VALUE=""
-SUPABASE_CONNECTION_STRING_VALUE=""
-SUPABASE_DB_PASSWORD_VALUE=""
-AUTHELIA_USERNAME_VALUE=""
-AUTHELIA_DISPLAYNAME_VALUE=""
-AUTHELIA_EMAIL_VALUE=""
-AUTHELIA_PASSWORD_VALUE=""
 BACKUP_DIR_VALUE="${BACKUP_OUTPUT_DIR:-$HOME}"
 TEMPLATE_SOURCE_VALUE="${TEMPLATE_SOURCE:-upstream}"
 BACKUP_ZIP_INPUT=""
@@ -149,6 +137,34 @@ SSH_HOST_VALUE=""
 SSH_USER_VALUE=""
 SSH_ALIAS_VALUE=""
 SSH_KEY_PATH_VALUE=""
+
+collect_module_metadata() {
+  local script_path meta_output current_module derived_name
+  local p_key p_type p_req p_label param_spec line
+  while IFS= read -r script_path; do
+    [[ -x "${script_path}" ]] || continue
+    meta_output="$("${script_path}" --metadata 2>/dev/null)" || continue
+    current_module=""
+    derived_name="$(basename "${script_path}" .sh)"
+    derived_name="${derived_name#all.}"  # "all.supabase" -> "supabase"
+    while IFS= read -r line; do
+      if [[ "${line}" =~ ^module=(.+)$ ]]; then
+        current_module="${BASH_REMATCH[1]}"
+      fi
+      if [[ "${line}" =~ ^param=(.+)$ ]]; then
+        local ns="${current_module:-${derived_name}}"
+        param_spec="${BASH_REMATCH[1]}"
+        IFS='|' read -r p_key p_type p_req p_label <<< "${param_spec}"
+        # Derive env var name using the same convention module_get_param uses
+        local env_var
+        env_var="$(module_param_env_var "${ns}" "${p_key}")"
+        MODULE_PARAM_ENV["${ns}.${p_key}"]="${env_var}"
+      fi
+    done <<< "${meta_output}"
+  done < <(find "${HOSTING_ROOT}/modules" -maxdepth 1 -type f -name '*.sh' | sort)
+}
+
+collect_module_metadata
 
 ORIGINAL_ARGS=("$@")
 
@@ -206,38 +222,6 @@ while (( $# > 0 )); do
       ;;
     --letsencrypt-email)
       LETSENCRYPT_EMAIL_VALUE="$2"
-      shift 2
-      ;;
-    --cloudflare-api-token)
-      CLOUDFLARE_API_TOKEN_VALUE="$2"
-      shift 2
-      ;;
-    --cloudflare-proxied)
-      CLOUDFLARE_PROXIED_VALUE="$2"
-      shift 2
-      ;;
-    --supabase-connection-string)
-      SUPABASE_CONNECTION_STRING_VALUE="$2"
-      shift 2
-      ;;
-    --supabase-db-password)
-      SUPABASE_DB_PASSWORD_VALUE="$2"
-      shift 2
-      ;;
-    --authelia-username)
-      AUTHELIA_USERNAME_VALUE="$2"
-      shift 2
-      ;;
-    --authelia-displayname)
-      AUTHELIA_DISPLAYNAME_VALUE="$2"
-      shift 2
-      ;;
-    --authelia-email)
-      AUTHELIA_EMAIL_VALUE="$2"
-      shift 2
-      ;;
-    --authelia-password)
-      AUTHELIA_PASSWORD_VALUE="$2"
       shift 2
       ;;
     --backup-dir)
@@ -314,6 +298,28 @@ while (( $# > 0 )); do
       RUN_LOCAL=1
       ON_VPS_SET=1
       shift
+      ;;
+    --module-param)
+      (( $# >= 2 )) || die "--module-param requires an argument in MODULE.KEY=VALUE form"
+      __mp_spec="$2"; shift 2
+      __mp_ns="${__mp_spec%%.*}"
+      __mp_rest="${__mp_spec#*.}"
+      __mp_key="${__mp_rest%%=*}"
+      __mp_value="${__mp_rest#*=}"
+      __mp_env="${MODULE_PARAM_ENV["${__mp_ns}.${__mp_key}"]:-}"
+      if [[ -n "${__mp_env}" ]]; then
+        printf -v "${__mp_env}" '%s' "${__mp_value}"
+      else
+        die "Unknown module param: ${__mp_spec}. Run --list-module-params to see available params."
+      fi
+      ;;
+    --list-module-params)
+      printf '%-45s %s\n' "MODULE.KEY" "ENV_VAR"
+      printf '%-45s %s\n' "---------" "-------"
+      for __lmp_key in $(printf '%s\n' "${!MODULE_PARAM_ENV[@]}" | sort); do
+        printf '%-45s %s\n' "${__lmp_key}" "${MODULE_PARAM_ENV["${__lmp_key}"]}"
+      done
+      exit 0
       ;;
     -*)
       die "Unknown argument: $1"
@@ -1182,6 +1188,14 @@ run_module_hooks() {
     section "${hook_title}"
     log "Running $(basename "${script_path}") for ${hook_target}"
 
+    # Build module param env args dynamically from MODULE_PARAM_ENV registry
+    local __env_args=()
+    for __env_key in "${!MODULE_PARAM_ENV[@]}"; do
+      local __env_var="${MODULE_PARAM_ENV["${__env_key}"]}"
+      local __env_val="${!__env_var:-}"
+      __env_args+=("${__env_var}=${__env_val}")
+    done
+
     run_module_hook_script "${script_path}" "${hooks_interactive}" env \
       HOSTING_TEMPLATE_DIR="${TEMPLATE_DIR_ABS}" \
       HOSTING_CONFIG_DIR="${CONFIG_DIR_ABS}" \
@@ -1190,14 +1204,7 @@ run_module_hooks() {
       HOSTING_MODULE_HOOK_TARGETS_FILE="${targets_file}" \
       HOSTING_MODULE_SYNC_ONLY_FILE="${sync_only_file}" \
       HOSTING_ROOT_ENV="${ROOT_ENV}" \
-      HOSTING_CLOUDFLARE_API_TOKEN="${CLOUDFLARE_API_TOKEN_VALUE}" \
-      HOSTING_CLOUDFLARE_PROXIED="${CLOUDFLARE_PROXIED_VALUE}" \
-      HOSTING_SUPABASE_CONNECTION_STRING="${SUPABASE_CONNECTION_STRING_VALUE}" \
-      HOSTING_SUPABASE_DB_PASSWORD="${SUPABASE_DB_PASSWORD_VALUE}" \
-      HOSTING_AUTHELIA_USERNAME="${AUTHELIA_USERNAME_VALUE}" \
-      HOSTING_AUTHELIA_DISPLAYNAME="${AUTHELIA_DISPLAYNAME_VALUE}" \
-      HOSTING_AUTHELIA_EMAIL="${AUTHELIA_EMAIL_VALUE}" \
-      HOSTING_AUTHELIA_PASSWORD="${AUTHELIA_PASSWORD_VALUE}"
+      "${__env_args[@]}"
   done < <(sort -t "${hook_delim}" -k1,1n -k2,2 "${hooks_file}")
 
   rm -f "${hooks_file}"
