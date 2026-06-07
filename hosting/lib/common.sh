@@ -668,6 +668,79 @@ prompt_yes_no() {
   [[ "${answer}" == "y" || "${answer}" == "yes" ]]
 }
 
+# module_param_env_var MODULE KEY
+#
+# Derives the environment variable name for a module parameter from the module
+# namespace and key. Module code never needs to know or reference env var names.
+#
+# Convention: uppercase(module with - replaced by _) + "_" + uppercase(key)
+# Examples:
+#   module_param_env_var "authelia"       "username"          → AUTHELIA_USERNAME
+#   module_param_env_var "cloudflare-ddns" "api_token"        → CLOUDFLARE_DDNS_API_TOKEN
+#   module_param_env_var "supabase"        "connection_string" → SUPABASE_CONNECTION_STRING
+module_param_env_var() {
+  local module="$1" key="$2"
+  local sanitized="${module//-/_}"
+  printf '%s_%s' "${sanitized^^}" "${key^^}"
+}
+
+# module_get_param KEY TYPE REQUIRED LABEL [STAGED_FALLBACK] [DEFAULT]
+#
+# Resolves a module parameter — module code never references env var names.
+# Resolution order: CLI-supplied (via --module-param) → STAGED_FALLBACK → prompt → DEFAULT.
+#
+# TYPE:           string → prompt_value, secret → prompt_secret, bool → prompt_yes_no ("true"/"false")
+# REQUIRED:       "true" → warns and returns 1 if no value could be obtained
+# LABEL:          used verbatim in whiptail inputbox and plain-terminal prompt (single source of truth)
+# STAGED_FALLBACK: current value read from a staged .env file (for preserving values on re-runs)
+# DEFAULT:        fallback used only for non-interactive runs with prompt_value
+#
+# Requires MODULE_NAME to be set in the calling module (all modules already do this).
+module_get_param() {
+  local key="$1"
+  local type="$2"
+  local required="$3"
+  local label="$4"
+  local staged_fallback="${5:-}"
+  local default="${6:-}"
+
+  local env_var
+  env_var="$(module_param_env_var "${MODULE_NAME:-}" "${key}")"
+  local value="${!env_var:-${staged_fallback}}"
+
+  if [[ -n "${value}" ]]; then
+    printf '%s' "${value}"
+    return 0
+  fi
+
+  if is_interactive; then
+    case "${type}" in
+      secret)
+        value="$(prompt_secret "${label}")"
+        ;;
+      bool)
+        if prompt_yes_no "${label}"; then
+          value=true
+        else
+          value=false
+        fi
+        ;;
+      *)
+        value="$(prompt_value "${label}" "${default}")"
+        ;;
+    esac
+  elif [[ -n "${default}" ]]; then
+    value="${default}"
+  fi
+
+  if [[ -z "${value}" && "${required}" == "true" ]]; then
+    warn "${label}: required but not provided in unattended mode"
+    return 1
+  fi
+
+  printf '%s' "${value}"
+}
+
 prompt_choice() {
   local title="$1"
   local prompt="$2"
