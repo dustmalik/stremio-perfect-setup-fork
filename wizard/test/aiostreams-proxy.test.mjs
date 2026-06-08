@@ -220,6 +220,99 @@ console.log('\n# AIOStreams clears multiple broken addons across retry rounds');
   ok('createWithFallbacks succeeds after clearing broken addons', retried.primary?.manifestUrl === 'https://only-instance.example/stremio/uuid-multi/enc-multi/manifest.json');
 }
 
+console.log('\n# AIOStreams ignores opaque instance failures when other instances identify the broken addon');
+{
+  let requestCount = 0;
+  globalThis.fetch = async (url, options = {}) => {
+    requestCount++;
+    const base = String(url).replace('/api/v1/user', '');
+    const { config } = JSON.parse(options.body);
+    const subtitlesEnabled = config.presets.find((preset) => preset.options?.name === 'OpenSubtitles V3 Pro')?.enabled !== false;
+
+    if (base === 'https://instance-403-a.example') {
+      return {
+        status: 403,
+        async json() { return {}; },
+        async text() { return ''; },
+      };
+    }
+
+    if (base === 'https://instance-400-a.example' && subtitlesEnabled) {
+      return {
+        status: 400,
+        async json() {
+          return { error: { message: 'Failed to fetch manifest for OpenSubtitles V3 Pro: 502 - Bad Gateway' } };
+        },
+        async text() {
+          return 'Failed to fetch manifest for OpenSubtitles V3 Pro: 502 - Bad Gateway';
+        },
+      };
+    }
+
+    if (base === 'https://instance-403-b.example') {
+      return {
+        status: 403,
+        async json() { return {}; },
+        async text() { return ''; },
+      };
+    }
+
+    if (base === 'https://instance-400-b.example' && subtitlesEnabled) {
+      return {
+        status: 400,
+        async json() {
+          return { error: { message: 'Failed to fetch manifest for OpenSubtitles V3 Pro: 502 - Bad Gateway' } };
+        },
+        async text() {
+          return 'Failed to fetch manifest for OpenSubtitles V3 Pro: 502 - Bad Gateway';
+        },
+      };
+    }
+
+    return {
+      status: 201,
+      async json() {
+        return { data: { uuid: 'uuid-opaque', encryptedPassword: 'enc-opaque' } };
+      },
+    };
+  };
+
+  const retried = await createWithFallbacks(
+    [
+      'https://instance-403-a.example',
+      'https://instance-400-a.example',
+      'https://instance-403-b.example',
+      'https://instance-400-b.example',
+    ],
+    {
+      template: {
+        metadata: { inputs: [] },
+        config: {
+          presets: [
+            { type: 'opensubtitlesv3pro', instanceId: 'osv3p', enabled: true, options: { name: 'OpenSubtitles V3 Pro' } },
+            { type: 'torrentio', instanceId: 'tio', enabled: true, options: { name: 'Torrentio' } },
+          ],
+        },
+      },
+      inputs: {},
+      services: [],
+      credentials: {},
+      serviceCredentials: {},
+      password: 'secret',
+    }
+  );
+
+  ok('createWithFallbacks retries after ignoring non-informative failures', requestCount === 6);
+  ok(
+    'createWithFallbacks disables the addon named by informative failures',
+    JSON.stringify(retried.disabledInternalAddons) === JSON.stringify(['OpenSubtitles V3 Pro'])
+  );
+  ok(
+    'createWithFallbacks succeeds once the shared broken addon is disabled',
+    retried.primary?.manifestUrl === 'https://instance-400-a.example/stremio/uuid-opaque/enc-opaque/manifest.json'
+  );
+}
+
 console.log('\n# AIOStreams stops after first successful instance');
 {
   const seen = [];

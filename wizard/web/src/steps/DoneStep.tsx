@@ -71,6 +71,7 @@ export function DoneStep() {
   const [metaTraktError, setMetaTraktError] = useState<string | null>(null);
   const isUsingAccountPassword = addonPasswordSource === 'account';
   const accountMode = target === 'nuvio' ? nuvioAccount.mode : stremioAccount.mode;
+  const visiblePreviousAddons = accountMode === 'signin' ? previousAddons : [];
   const selectedNuvioProfileName = useMemo(() => {
     const selectedProfile = (nuvioAccount.profiles ?? [])
       .find((profile) => profile.profile_index === nuvioAccount.profileId);
@@ -211,7 +212,7 @@ export function DoneStep() {
     manifestUrl: string;
     configureUrl: string;
   }>;
-  const hasDownloadableDetails = addons.length > 0 || previousAddons.length > 0;
+  const hasDownloadableDetails = addons.length > 0 || visiblePreviousAddons.length > 0;
 
   async function handleCopy(copyKey: string, value: string) {
     try {
@@ -347,12 +348,12 @@ export function DoneStep() {
           '',
         ]),
       ] : []),
-      ...(previousAddons.length > 0 ? [
+      ...(visiblePreviousAddons.length > 0 ? [
         '----------------------------------------------',
         '',
         'Previous Addons',
         '',
-        ...previousAddons.flatMap(addon => [
+        ...visiblePreviousAddons.flatMap(addon => [
           `${addon.name}`,
           `Manifest URL: ${addon.manifestUrl}`,
           '',
@@ -501,7 +502,7 @@ export function DoneStep() {
             </div>
           </div>
         ))}
-        {previousAddons.length > 0 && (
+        {visiblePreviousAddons.length > 0 && (
           <div style={{ ...addonCardStyle, fontFamily: 'system-ui, sans-serif' }}>
             <p
               style={{
@@ -518,7 +519,7 @@ export function DoneStep() {
               These are the addons that were on your account before the wizard replaced them. Keep this list in case you want to restore anything manually.
             </p>
             <div style={{ display: 'grid', gap: '0.6rem' }}>
-              {previousAddons.map((addon, index) => (
+              {visiblePreviousAddons.map((addon, index) => (
                 <div
                   key={`${addon.manifestUrl}-${index}`}
                   style={{
@@ -597,7 +598,7 @@ export function DoneStep() {
               manual guide
             </a>.
           </p>
-          {previousAddons.length > 0 && (
+          {visiblePreviousAddons.length > 0 && (
             <div style={{ marginTop: '1.25rem' }}>
               {renderDetailsCard()}
             </div>

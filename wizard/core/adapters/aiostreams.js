@@ -84,10 +84,17 @@ function sharedFailedManifestAddons(results) {
   const failures = results.filter((result) => !result.ok);
   if (failures.length === 0) return [];
 
+  const informativeFailures = failures
+    .map((failure) => {
+      const names = extractFailedManifestAddons(failure.error);
+      return names.length > 0 ? { failure, names } : null;
+    })
+    .filter(Boolean);
+
+  if (informativeFailures.length === 0) return [];
+
   let intersection = null;
-  for (const failure of failures) {
-    const names = extractFailedManifestAddons(failure.error);
-    if (names.length === 0) return [];
+  for (const { names } of informativeFailures) {
     const current = new Set(names.map(normalizeAddonName).filter(Boolean));
     if (current.size === 0) return [];
     intersection = intersection === null
@@ -97,8 +104,8 @@ function sharedFailedManifestAddons(results) {
   }
 
   const canonical = new Map();
-  for (const failure of failures) {
-    for (const name of extractFailedManifestAddons(failure.error)) {
+  for (const { names } of informativeFailures) {
+    for (const name of names) {
       const normalized = normalizeAddonName(name);
       if (normalized && !canonical.has(normalized)) canonical.set(normalized, name);
     }
