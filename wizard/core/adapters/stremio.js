@@ -127,18 +127,18 @@ export async function fetchAddonDescriptor(transportUrl, fetchImpl = fetch, base
   try {
     res = await fetchImpl(transportUrl);
   } catch (err) {
-    throw new Error(`Could not fetch add-on manifest from ${transportUrl}: ${err?.message || err}`);
+    throw new Error(`Could not fetch addon manifest from ${transportUrl}: ${err?.message || err}`);
   }
 
   if (!res.ok) {
-    throw new Error(`Could not fetch add-on manifest from ${transportUrl}: HTTP ${res.status}`);
+    throw new Error(`Could not fetch addon manifest from ${transportUrl}: HTTP ${res.status}`);
   }
 
   let manifest;
   try {
     manifest = await res.json();
   } catch (err) {
-    throw new Error(`Add-on manifest at ${transportUrl} did not return valid JSON: ${err?.message || err}`);
+    throw new Error(`Addon manifest at ${transportUrl} did not return valid JSON: ${err?.message || err}`);
   }
 
   return {

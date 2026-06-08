@@ -54,7 +54,7 @@ export function DoneStep() {
     catalogSelection,
     watchly,
   } = useWizard();
-  const { aiostreams, aiometadata, addonPasswordSource, warnings: rawWarnings, error } = installResult;
+  const { aiostreams, aiometadata, addonPasswordSource, previousAddons, warnings: rawWarnings, error } = installResult;
   const warnings = rawWarnings.filter(w => !w.includes('tried but failed'));
   const guideUrl = getGuideUrl();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
@@ -175,6 +175,7 @@ export function DoneStep() {
           ? `${watchlyEmail} (${installResult.watchly.token})`
           : installResult.watchly.token,
         password: '',
+        passwordLabel: 'same as your account password',
         manifestUrl: installResult.watchly.manifestUrl,
         configureUrl: toConfigureUrl(installResult.watchly.manifestUrl),
       } : null,
@@ -184,6 +185,7 @@ export function DoneStep() {
             name: '🔎 AIOMetadata',
             uuid: aiometadata.uuid,
             password: aiometadata.password,
+            passwordLabel: isUsingAccountPassword ? 'same as your account password' : null,
             manifestUrl: aiometadata.manifestUrl,
             configureUrl: toConfigureUrl(aiometadata.manifestUrl),
           }
@@ -194,19 +196,22 @@ export function DoneStep() {
             name: '📚 AIOStreams',
             uuid: aiostreams.uuid,
             password: aiostreams.password,
+            passwordLabel: isUsingAccountPassword ? 'same as your account password' : null,
             manifestUrl: aiostreams.manifestUrl,
             configureUrl: toConfigureUrl(aiostreams.manifestUrl),
           }
         : null,
     ].filter(Boolean)
-  ), [aiostreams, aiometadata, installResult.watchly, watchlyEmail]) as Array<{
+  ), [aiostreams, aiometadata, installResult.watchly, isUsingAccountPassword, watchlyEmail]) as Array<{
     id: string;
     name: string;
     uuid: string;
     password: string;
+    passwordLabel: string | null;
     manifestUrl: string;
     configureUrl: string;
   }>;
+  const hasDownloadableDetails = addons.length > 0 || previousAddons.length > 0;
 
   async function handleCopy(copyKey: string, value: string) {
     try {
@@ -317,21 +322,42 @@ export function DoneStep() {
   }, [accountMode, addons, aioStreamsInputs, catalogSelection, credentials, error, target, templates, wizardConfig]);
 
   function handleDownload() {
-    if (!addonDetailsFilename) return;
+    if (!addonDetailsFilename || !hasDownloadableDetails) return;
 
     const lines = [
       wizardMetadata.addonDetailsTitle,
       '',
-      ...addons.flatMap(addon => [
-        `${addon.name}`,
-        `UUID: ${addon.uuid}`,
-        isUsingAccountPassword
-          ? 'Password: same as your account password'
-          : `Password: ${addon.password}`,
-        `Manifest URL: ${addon.manifestUrl}`,
-        `Configure URL: ${addon.configureUrl}`,
+      '----------------------------------------------',
+      '',
+      ...(addons.length > 0 ? [
+        'Configured Addons',
         '',
-      ]),
+        ...addons.flatMap(addon => [
+          `${addon.name}`,
+          `UUID: ${addon.uuid}`,
+          ...(addon.passwordLabel || addon.password
+            ? [
+                addon.passwordLabel
+                  ? `Password: ${addon.passwordLabel}`
+                  : `Password: ${addon.password}`,
+              ]
+            : []),
+          `Manifest URL: ${addon.manifestUrl}`,
+          `Configure URL: ${addon.configureUrl}`,
+          '',
+        ]),
+      ] : []),
+      ...(previousAddons.length > 0 ? [
+        '----------------------------------------------',
+        '',
+        'Previous Addons',
+        '',
+        ...previousAddons.flatMap(addon => [
+          `${addon.name}`,
+          `Manifest URL: ${addon.manifestUrl}`,
+          '',
+        ]),
+      ] : []),
     ];
 
     const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
@@ -349,6 +375,216 @@ export function DoneStep() {
     return copiedKey === copyKey ? <span>Copied</span> : <Copy size={12} />;
   }
 
+  function renderDetailsCard() {
+    if (!hasDownloadableDetails) return null;
+
+    return (
+      <div className="text-xs font-mono space-y-4" style={credentialsCardStyle}>
+        <p
+          className="font-sans font-semibold text-sm mb-1"
+          style={{ color: 'var(--text)', marginTop: 0 }}
+        >
+          {addons.length > 0 ? '📋 Your credentials (save these!)' : '📋 Your addon backup'}
+        </p>
+        {addons.length > 0 && (
+          <div
+            style={{
+              marginBottom: '0.85rem',
+              padding: '0.85rem 1rem',
+              borderRadius: '10px',
+              border: '1px solid var(--border)',
+              background: 'var(--panel)',
+              color: 'var(--text)',
+              fontSize: '0.85rem',
+              lineHeight: 1.55,
+              textAlign: 'center',
+              fontFamily: 'system-ui, sans-serif',
+            }}
+          >
+            {isUsingAccountPassword
+              ? `These addons use your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password. You can change each addon password later from its configuration page if you want.`
+              : `Your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password was not accepted by the addon configurations, so a stronger shared addon password was generated and used for all addons below.`}
+          </div>
+        )}
+        {addons.map((addon) => (
+          <div key={addon.id} style={addonCardStyle}>
+            <div style={addonTitleStyle}>
+              <div style={addonTitleRowStyle}>
+                <span>{addon.name}</span>
+                <a
+                  href={addon.configureUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="guide-pill-link"
+                  aria-label={`Open ${addon.name} configuration`}
+                >
+                  <span>Customize More</span>
+                  <ExternalLink size={12} />
+                </a>
+              </div>
+            </div>
+            <div style={copyableValueRowStyle}>
+              <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>UUID:</span>
+              <span
+                style={{
+                  ...metaValueStyle,
+                  flex: '1 1 auto',
+                  minWidth: 0,
+                  wordBreak: 'break-all',
+                  textAlign: 'left',
+                }}
+              >
+                {addon.uuid}
+              </span>
+              <button
+                onClick={() => handleCopy(`${addon.id}-uuid`, addon.uuid)}
+                type="button"
+                aria-label={`Copy ${addon.name} UUID`}
+                style={copyActionButtonStyle}
+              >
+                {renderCopyStatus(`${addon.id}-uuid`)}
+              </button>
+            </div>
+            {(addon.passwordLabel || addon.password) && (
+              <div style={copyableValueRowStyle}>
+                <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>Password:</span>
+                <span
+                  style={{
+                    ...metaValueStyle,
+                    flex: '1 1 auto',
+                    minWidth: 0,
+                    wordBreak: 'break-all',
+                    textAlign: 'left',
+                  }}
+                >
+                  {addon.passwordLabel
+                    ? addon.passwordLabel
+                    : visiblePasswords[addon.id]
+                    ? addon.password
+                    : '•'.repeat(Math.max(addon.password.length, 8))}
+                </span>
+                {!addon.passwordLabel && (
+                  <>
+                    <button
+                      onClick={() => togglePasswordVisibility(addon.id)}
+                      type="button"
+                      aria-label={`${visiblePasswords[addon.id] ? 'Hide' : 'Show'} ${addon.name} password`}
+                      style={copyActionButtonStyle}
+                    >
+                      {visiblePasswords[addon.id] ? <EyeOff size={12} /> : <Eye size={12} />}
+                    </button>
+                    <button
+                      onClick={() => handleCopy(`${addon.id}-password`, addon.password)}
+                      type="button"
+                      aria-label={`Copy ${addon.name} password`}
+                      style={copyActionButtonStyle}
+                    >
+                      {renderCopyStatus(`${addon.id}-password`)}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+            <div style={copyableValueRowStyle}>
+              <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>Manifest:</span>
+              <span style={{ flex: '1 1 auto', minWidth: 0, wordBreak: 'break-all' }}>
+                {addon.manifestUrl}
+              </span>
+              <button
+                onClick={() => handleCopy(`${addon.id}-manifest`, addon.manifestUrl)}
+                type="button"
+                aria-label={`Copy ${addon.name} manifest URL`}
+                style={copyActionButtonStyle}
+              >
+                {renderCopyStatus(`${addon.id}-manifest`)}
+              </button>
+            </div>
+          </div>
+        ))}
+        {previousAddons.length > 0 && (
+          <div style={{ ...addonCardStyle, fontFamily: 'system-ui, sans-serif' }}>
+            <p
+              style={{
+                color: 'var(--text)',
+                fontSize: '0.9rem',
+                fontWeight: 600,
+                marginTop: 0,
+                marginBottom: '0.4rem',
+              }}
+            >
+              Previous Addons (Backup)
+            </p>
+            <p style={{ ...metaTextStyle, marginBottom: '0.75rem', fontSize: '0.82rem', lineHeight: 1.5, textAlign: 'center' }}>
+              These are the addons that were on your account before the wizard replaced them. Keep this list in case you want to restore anything manually.
+            </p>
+            <div style={{ display: 'grid', gap: '0.6rem' }}>
+              {previousAddons.map((addon, index) => (
+                <div
+                  key={`${addon.manifestUrl}-${index}`}
+                  style={{
+                    border: '1px solid var(--border)',
+                    borderRadius: '8px',
+                    padding: '0.75rem',
+                    background: 'var(--panel)',
+                  }}
+                >
+                  <p style={{ color: 'var(--text)', fontSize: '0.86rem', fontWeight: 600, marginTop: 0, marginBottom: '0.45rem' }}>
+                    {addon.name}
+                  </p>
+                  <div style={copyableValueRowStyle}>
+                    <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>Manifest:</span>
+                    <span style={{ flex: '1 1 auto', minWidth: 0, wordBreak: 'break-all' }}>
+                      {addon.manifestUrl}
+                    </span>
+                    <a
+                      href={addon.manifestUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Open ${addon.name} manifest URL`}
+                      style={copyActionButtonStyle}
+                    >
+                      <ExternalLink size={12} />
+                    </a>
+                    <button
+                      onClick={() => handleCopy(`previous-addon-${index}`, addon.manifestUrl)}
+                      type="button"
+                      aria-label={`Copy ${addon.name} manifest URL`}
+                      style={copyActionButtonStyle}
+                    >
+                      {renderCopyStatus(`previous-addon-${index}`)}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        <button
+          onClick={handleDownload}
+          style={{
+            width: '100%',
+            padding: '0.75rem 1rem',
+            borderRadius: '10px',
+            border: '1px solid var(--border)',
+            background: 'var(--panel)',
+            color: 'var(--text)',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.45rem',
+            cursor: 'pointer',
+            fontFamily: 'system-ui, sans-serif',
+          }}
+        >
+          <Download size={16} />
+          Download all addon details
+        </button>
+      </div>
+    );
+  }
+
   return (
     <WizardShell showBack={false}>
       {error ? (
@@ -361,6 +597,11 @@ export function DoneStep() {
               manual guide
             </a>.
           </p>
+          {previousAddons.length > 0 && (
+            <div style={{ marginTop: '1.25rem' }}>
+              {renderDetailsCard()}
+            </div>
+          )}
         </>
       ) : (
         <>
@@ -372,7 +613,7 @@ export function DoneStep() {
               : 'Open Nuvio and sign in. Your account is ready and you can start watching. Check further down below to optionally integrate Trakt.'}
           </p>
 
-          {addons.length > 0 && (
+          {hasDownloadableDetails && (
             <>
               {warnings.length > 0 && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-700 mb-4">
@@ -380,141 +621,7 @@ export function DoneStep() {
                   {warnings.map((w, i) => <p key={i}>• {w}</p>)}
                 </div>
               )}
-              <div className="text-xs font-mono space-y-4" style={credentialsCardStyle}>
-                <p
-                  className="font-sans font-semibold text-sm mb-1"
-                  style={{ color: 'var(--text)', marginTop: 0 }}
-                >
-                  📋 Your credentials (save these!)
-                </p>
-                <div
-                  style={{
-                    marginBottom: '0.85rem',
-                    padding: '0.85rem 1rem',
-                    borderRadius: '10px',
-                    border: '1px solid var(--border)',
-                    background: 'var(--panel)',
-                    color: 'var(--text)',
-                    fontSize: '0.85rem',
-                    lineHeight: 1.55,
-                    textAlign: 'center',
-                    fontFamily: 'system-ui, sans-serif',
-                  }}
-                >
-                  {isUsingAccountPassword
-                    ? `These add-ons use your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password. You can change each add-on password later from its configuration page if you want.`
-                    : `Your ${target === 'stremio' ? 'Stremio' : 'Nuvio'} account password was not accepted by the add-on configurations, so a stronger shared add-on password was generated and used for all add-ons below.`}
-                </div>
-                {addons.map((addon) => (
-                  <div key={addon.id} style={addonCardStyle}>
-                    <div style={addonTitleStyle}>
-                      <div style={addonTitleRowStyle}>
-                        <span>{addon.name}</span>
-                        <a
-                          href={addon.configureUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="guide-pill-link"
-                          aria-label={`Open ${addon.name} configuration`}
-                        >
-                          <span>Customize More</span>
-                          <ExternalLink size={12} />
-                        </a>
-                      </div>
-                    </div>
-                    <div style={copyableValueRowStyle}>
-                      <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>UUID:</span>
-                      <span
-                        style={{
-                          ...metaValueStyle,
-                          flex: '1 1 auto',
-                          minWidth: 0,
-                          wordBreak: 'break-all',
-                          textAlign: 'left',
-                        }}
-                      >
-                        {addon.uuid}
-                      </span>
-                      <button
-                        onClick={() => handleCopy(`${addon.id}-uuid`, addon.uuid)}
-                        type="button"
-                        aria-label={`Copy ${addon.name} UUID`}
-                        style={copyActionButtonStyle}
-                      >
-                        {renderCopyStatus(`${addon.id}-uuid`)}
-                      </button>
-                    </div>
-                    {!isUsingAccountPassword && (
-                      <div style={copyableValueRowStyle}>
-                        <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>Password:</span>
-                        <span
-                          style={{
-                            ...metaValueStyle,
-                            flex: '1 1 auto',
-                            minWidth: 0,
-                            wordBreak: 'break-all',
-                            textAlign: 'left',
-                          }}
-                        >
-                          {visiblePasswords[addon.id] ? addon.password : '•'.repeat(Math.max(addon.password.length, 8))}
-                        </span>
-                        <button
-                          onClick={() => togglePasswordVisibility(addon.id)}
-                          type="button"
-                          aria-label={`${visiblePasswords[addon.id] ? 'Hide' : 'Show'} ${addon.name} password`}
-                          style={copyActionButtonStyle}
-                        >
-                          {visiblePasswords[addon.id] ? <EyeOff size={12} /> : <Eye size={12} />}
-                        </button>
-                        <button
-                          onClick={() => handleCopy(`${addon.id}-password`, addon.password)}
-                          type="button"
-                          aria-label={`Copy ${addon.name} password`}
-                          style={copyActionButtonStyle}
-                        >
-                          {renderCopyStatus(`${addon.id}-password`)}
-                        </button>
-                      </div>
-                    )}
-                    <div style={copyableValueRowStyle}>
-                      <span style={{ color: 'var(--muted)', flex: '0 0 auto' }}>Manifest:</span>
-                      <span style={{ flex: '1 1 auto', minWidth: 0, wordBreak: 'break-all' }}>
-                        {addon.manifestUrl}
-                      </span>
-                      <button
-                        onClick={() => handleCopy(`${addon.id}-manifest`, addon.manifestUrl)}
-                        type="button"
-                        aria-label={`Copy ${addon.name} manifest URL`}
-                        style={copyActionButtonStyle}
-                      >
-                        {renderCopyStatus(`${addon.id}-manifest`)}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-                <button
-                  onClick={handleDownload}
-                  style={{
-                    width: '100%',
-                    padding: '0.75rem 1rem',
-                    borderRadius: '10px',
-                    border: '1px solid var(--border)',
-                    background: 'var(--panel)',
-                    color: 'var(--text)',
-                    fontWeight: 600,
-                    fontSize: '0.9rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.45rem',
-                    cursor: 'pointer',
-                    fontFamily: 'system-ui, sans-serif',
-                  }}
-                >
-                  <Download size={16} />
-                  Download all addon details
-                </button>
-              </div>
+              {renderDetailsCard()}
               {/* Trakt integration card */}
               {((target === 'stremio' || target === 'nuvio') || !!aiometadata) && (() => {
                 const traktLogo = resolveLogoUrl('services/trakt.png');

@@ -26,6 +26,50 @@ function toError(err) {
   return err instanceof Error ? err : new Error(String(err));
 }
 
+function createPreviousAddonBackupEntry(name, manifestUrl) {
+  const normalizedManifestUrl = String(manifestUrl || '').trim();
+  if (!normalizedManifestUrl) return null;
+
+  const normalizedName = String(name || '').trim() || normalizedManifestUrl;
+  return {
+    name: normalizedName,
+    manifestUrl: normalizedManifestUrl,
+  };
+}
+
+function dedupePreviousAddons(addons) {
+  const seen = new Set();
+  const deduped = [];
+
+  for (const addon of addons) {
+    if (!addon) continue;
+    const key = `${addon.name}\u0000${addon.manifestUrl}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(addon);
+  }
+
+  return deduped;
+}
+
+function buildStremioPreviousAddons(existing) {
+  return dedupePreviousAddons(
+    (Array.isArray(existing) ? existing : []).map((addon) => createPreviousAddonBackupEntry(
+      addon?.manifest?.name || addon?.manifest?.id || addon?.transportUrl,
+      addon?.transportUrl,
+    ))
+  );
+}
+
+function buildNuvioPreviousAddons(existing) {
+  return dedupePreviousAddons(
+    (Array.isArray(existing) ? existing : []).map((addon) => createPreviousAddonBackupEntry(
+      addon?.name || addon?.url,
+      addon?.url,
+    ))
+  );
+}
+
 function shouldRetryWithGeneratedPassword(err, attemptedPassword) {
   const message = String(err?.message || err).toLowerCase();
 
@@ -180,7 +224,7 @@ async function applyNuvioProfileSettings(nuvio, token, profileIndex, settingsTem
  * @param {function} p.onStep          (name, data) => void; progress callback
  */
 export async function runStremioSetup({ instances, account, aiostreamsParams, aiometadataParams, watchlyBody, proxyBase, onStep }) {
-  const summary = { account: null, addons: {}, warnings: [], addonPasswordSource: 'account' };
+  const summary = { account: null, addons: {}, previousAddons: [], warnings: [], addonPasswordSource: 'account' };
   const step = (name, data) => { onStep?.(name, data); return data; };
 
   // 1) Account
@@ -197,6 +241,10 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
     summary.account = { service: 'stremio', email: account.email, created: false };
   }
   step('account', summary.account);
+
+  const existing = await stremio.getAddons(auth.authKey);
+  summary.previousAddons = buildStremioPreviousAddons(existing);
+  step('backup', { count: summary.previousAddons.length, addons: summary.previousAddons });
 
   // 2-3) Create all addon configs with a shared password.
   // Prefer the user's account password so they only need to remember one password.
@@ -242,7 +290,6 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
   }
 
   // 4) ATOMIC install: push only after all configs succeeded
-  const existing = await stremio.getAddons(auth.authKey);
   const cinemetaDescriptor = await resolveCinemetaDescriptor(existing);
   const collection = buildAddonCollection(existing, {
     aiometadata: summary.addons.aiometadata.manifestUrl,
@@ -272,7 +319,7 @@ export async function runStremioSetup({ instances, account, aiostreamsParams, ai
  * @param {function} p.onStep
  */
 export async function runNuvioSetup({ instances, account, aiostreamsParams, aiometadataParams, watchlyBody, collectionsJson, nuvioSettingsTemplate, proxyBase, onStep }) {
-  const summary = { account: null, addons: {}, settings: null, warnings: [], addonPasswordSource: 'account' };
+  const summary = { account: null, addons: {}, previousAddons: [], settings: null, warnings: [], addonPasswordSource: 'account' };
   const step = (name, data) => { onStep?.(name, data); return data; };
 
   // 1) Nuvio account
@@ -290,7 +337,7 @@ export async function runNuvioSetup({ instances, account, aiostreamsParams, aiom
   }
   step('account', summary.account);
 
-  // 2) Resolve the chosen profile, and make sure it uses its own add-ons.
+  // 2) Resolve the chosen profile, and make sure it uses its own addons.
   const profiles = await nuvio.getProfiles(auth.token);
   const profile = account.profileId
     ? profiles.find((entry) => entry.profile_index === account.profileId)
@@ -302,6 +349,12 @@ export async function runNuvioSetup({ instances, account, aiostreamsParams, aiom
     throw new Error('Nuvio: no profiles found. Create or load a Nuvio profile first, then try again.');
   }
   const profileIndex = profile.profile_index;
+  const addonsProfileIndex = profile.uses_primary_addons ? 1 : profileIndex;
+
+  const existingAddons = await nuvio.listAddons(auth.token, addonsProfileIndex);
+  summary.previousAddons = buildNuvioPreviousAddons(existingAddons);
+  step('backup', { count: summary.previousAddons.length, addons: summary.previousAddons });
+
   if (profile.uses_primary_addons) {
     await nuvio.updateProfile(auth.token, profileIndex, { uses_primary_addons: false });
   }
@@ -347,7 +400,7 @@ export async function runNuvioSetup({ instances, account, aiostreamsParams, aiom
     step('watchly', summary.addons.watchly);
   }
 
-  // 5) ATOMIC install: replace profile add-ons then push collections only after
+  // 5) ATOMIC install: replace profile addons then push collections only after
   // all configs succeed. Nuvio addon order: Watchly first (watch history), then
   // AIOMetadata (catalog source), then AIOStreams (stream source).
   const addons = [

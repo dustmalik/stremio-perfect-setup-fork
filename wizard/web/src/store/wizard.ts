@@ -50,6 +50,11 @@ export interface CatalogSelection {
   discoverFolderOrder: string[];
 }
 
+export interface PreviousAddonBackupEntry {
+  name: string;
+  manifestUrl: string;
+}
+
 export interface InstallResult {
   aiostreams: { manifestUrl: string; uuid: string; password: string } | null;
   aiometadata: {
@@ -60,6 +65,7 @@ export interface InstallResult {
     config: Record<string, unknown>;
   } | null;
   watchly: { manifestUrl: string; token: string } | null;
+  previousAddons: PreviousAddonBackupEntry[];
   addonPasswordSource: 'account' | 'generated' | null;
   warnings: string[];
   error: string | null;
@@ -145,7 +151,15 @@ export const useWizard = create<WizardState>((set) => ({
     categoryOrder: [],
     discoverFolderOrder: [],
   },
-  installResult: { aiostreams: null, aiometadata: null, watchly: null, addonPasswordSource: null, warnings: [], error: null },
+  installResult: {
+    aiostreams: null,
+    aiometadata: null,
+    watchly: null,
+    previousAddons: [],
+    addonPasswordSource: null,
+    warnings: [],
+    error: null,
+  },
   templates: null,
   aioSections: [],
   wizardConfig: null,

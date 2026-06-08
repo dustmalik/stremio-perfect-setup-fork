@@ -16,14 +16,15 @@ interface LogEntry {
 
 const STEP_LABELS: Record<string, string> = {
   account:     'Account ready',
+  backup:      'Existing addons backed up',
   profile:     'Profile loaded',
   aiostreams:  'AIOStreams configuration saved',
   aiometadata: 'AIOMetadata configuration saved',
   watchly:     'Watchly configuration saved',
-  addons:      'Add-ons installed',
+  addons:      'Addons installed',
   collections: 'Collections installed',
   settings:    'Settings updated',
-  install:     'Add-ons applied to your account',
+  install:     'Addons applied to your account',
 };
 
 export function InstallingStep() {
@@ -177,6 +178,13 @@ export function InstallingStep() {
           detail = d?.profileName
             ? `${d.profileName} (Profile ${d.profileIndex ?? ''}).`
             : `Profile ${d?.profileIndex ?? ''}.`;
+        } else if (name === 'backup') {
+          const d = data as { count?: number; addons?: Array<{ name?: string; manifestUrl?: string }> };
+          const previousAddons = (d?.addons ?? []).filter((addon): addon is { name: string; manifestUrl: string } =>
+            !!addon?.name && !!addon?.manifestUrl
+          );
+          wizard.setInstallResult({ previousAddons });
+          detail = `${d?.count ?? 0} addon${(d?.count ?? 0) !== 1 ? 's' : ''} saved for reference.`;
         } else if (name === 'aiostreams') {
           const d = data as { instance?: string };
           detail = `Saved on ${d?.instance ?? ''}.`;
@@ -188,13 +196,13 @@ export function InstallingStep() {
           detail = `Saved on ${d?.instance ?? ''}.`;
         } else if (name === 'install') {
           const d = data as { count?: number };
-          detail = `${d?.count ?? 0} add-on${(d?.count ?? 0) !== 1 ? 's' : ''} in your collection.`;
+          detail = `${d?.count ?? 0} addon${(d?.count ?? 0) !== 1 ? 's' : ''} in your collection.`;
         } else if (name === 'addons') {
           const d = data as { count?: number; profileName?: string; profileIndex?: number };
           const profileLabel = d?.profileName
             ? ` for ${d.profileName} (Profile ${d.profileIndex ?? ''})`
             : '';
-          detail = `${d?.count ?? 0} add-on${(d?.count ?? 0) !== 1 ? 's' : ''} pushed to your Nuvio account${profileLabel}.`;
+          detail = `${d?.count ?? 0} addon${(d?.count ?? 0) !== 1 ? 's' : ''} pushed to your Nuvio account${profileLabel}.`;
         } else if (name === 'collections') {
           const d = data as { groupCount?: number };
           detail = `${d?.groupCount ?? 0} collection group${(d?.groupCount ?? 0) !== 1 ? 's' : ''} configured.`;
@@ -220,6 +228,7 @@ export function InstallingStep() {
           watchly?: { manifestUrl?: string; token?: string };
         };
         addonPasswordSource?: 'account' | 'generated';
+        previousAddons?: Array<{ name: string; manifestUrl: string }>;
         warnings: string[];
       };
 
@@ -277,6 +286,7 @@ export function InstallingStep() {
         watchly: watchlyResult
           ? { manifestUrl: watchlyResult.manifestUrl ?? '', token: watchlyResult.token ?? '' }
           : null,
+        previousAddons: result.previousAddons ?? [],
         addonPasswordSource: result.addonPasswordSource ?? 'account',
         warnings: result.warnings,
         error: null,

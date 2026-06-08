@@ -60,6 +60,9 @@ console.log('\n# InstallResult.watchly + aiometadata.instance/config');
   const get = () => useWizard.getState().installResult;
 
   setInstallResult({
+    previousAddons: [
+      { name: 'Old Addon', manifestUrl: 'https://old.example/manifest.json' },
+    ],
     watchly: { manifestUrl: 'https://watchly.example/u1/manifest.json', token: 'u1' },
     aiometadata: {
       manifestUrl: 'https://meta.example/stremio/u2/manifest.json',
@@ -69,6 +72,9 @@ console.log('\n# InstallResult.watchly + aiometadata.instance/config');
       config: { language: 'en-US', apiKeys: { tmdb: 'k' } },
     },
   });
+  eq('installResult.previousAddons', get().previousAddons, [
+    { name: 'Old Addon', manifestUrl: 'https://old.example/manifest.json' },
+  ]);
   ok('installResult.watchly.token', get().watchly?.token === 'u1');
   ok('installResult.watchly.manifestUrl', !!get().watchly?.manifestUrl.includes('u1'));
   ok('installResult.aiometadata.instance', get().aiometadata?.instance === 'https://meta.example');

@@ -166,9 +166,9 @@ export function AccountStep() {
   const descKey = `${target ?? 'stremio'}-${account.mode}`;
   const descriptions: Record<string, string> = {
     'stremio-create': 'We will create a new Stremio account and install your addons automatically.',
-    'stremio-signin': 'We will sign into your existing Stremio account and install your addons.',
+    'stremio-signin': 'We will sign into your existing Stremio account, replace your current addons with this setup, and show you a backup list of your previous addons at the end.',
     'nuvio-create':   'We will create a new Nuvio account, create its first profile, and install your addons automatically.',
-    'nuvio-signin':   'We will sign into your existing Nuvio account, load its profiles, and install your addons and collections into an existing profile or a new one you create here.',
+    'nuvio-signin':   'We will sign into your existing Nuvio account, load its profiles, replace the selected profile addons with this setup, and show you a backup list of the previous addons at the end.',
   };
 
   const inputStyle: React.CSSProperties = {
@@ -312,7 +312,7 @@ export function AccountStep() {
           <p style={{ marginTop: '0.45rem', color: 'var(--muted)', fontSize: '0.78rem', lineHeight: 1.45 }}>
             {account.createNewProfile
               ? 'A new Nuvio profile will be created and then configured by the wizard when you continue.'
-              : 'The selected Nuvio profile will have its current addons replaced and its collections updated by the wizard.'}
+              : 'The selected Nuvio profile will have its current addons replaced and its collections updated by the wizard. A backup list of the previous addons will be shown at the end.'}
           </p>
         </label>
       )}
@@ -333,7 +333,7 @@ export function AccountStep() {
         }}>
           <strong style={{ display: 'block', marginBottom: '0.2rem' }}>⚠️ IMPORTANT: Existing addons will be removed!</strong>
           Completing this wizard replaces every addon currently installed on your {appName} account.
-          If you have addons you want to keep, copy their Manifest URLs from your {appName} settings now so you can reinstall them afterwards.
+          A list of their Manifest URLs from your {appName} settings will be shown in the end so you can reinstall them manually afterwards if needed.
         </div>
       )}
 
