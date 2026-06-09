@@ -11,7 +11,7 @@
 
 Since a few people asked about using my setup with **Nuvio**, and since my previous Nuvio collections post got removed by Reddit filters for whatever reason, I’m posting this again in a cleaner way.
 
-I have now updated my popular [**🍿 Stremio/Nuvio Perfect Setup**](https://numb3rs.stream/) guide with instructions for *Nuvio* too.
+I have now updated my popular [**🍿 Streaming Perfect Setup**](https://numb3rs.stream/) guide with instructions for *Nuvio* too.
 [**READ BEFORE ASKING QUESTIONS**]
 
 **If this guide helps you, PLEASE UPVOTE this post so it remains relevant for others to find it and also benefit from it.** 😊

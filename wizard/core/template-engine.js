@@ -1,4 +1,4 @@
-// Template directive engine for the Stremio/Nuvio Perfect Setup Wizard.
+// Template directive engine for the Streaming Perfect Setup Wizard.
 //
 // Ports the client-side resolution that the AIOStreams import wizard performs, so we can turn a
 // repo template (e.g. templates/AIOStreams.json) + collected `inputs` + `credentials` into a

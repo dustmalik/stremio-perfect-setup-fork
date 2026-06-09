@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Local full-site test runner for the Stremio/Nuvio Perfect Setup repo.
+# Local full-site test runner for the Streaming Perfect Setup repo.
 #
 # What this script does:
 # 1. Generates guide stats data for local builds.
