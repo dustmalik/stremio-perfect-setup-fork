@@ -2,7 +2,7 @@
   "metadata": {
     "id": "stremio.perfect.setup.formatter",
     "name": "🍿 Streaming Perfect Setup [Formatter]",
-    "description": "This template includes only the formatter styles from the original template in [this](https://numb3rs.stream) guide. Credit to Tamtaro's template which served as inspiration.\nYou can choose the formatting of the stream information view (more details [here](https://numb3rs.stream/guide/7-Additional-Stuff/#understanding-stream-information-view)): \n* **Flat Monochrome Icons** has a cleaner look based on minimalistic white icons. \n* **Colorful Icons** contains a colored version with more graphical icons.",
+    "description": "This template includes only the formatter styles from the original template in [this](https://numb3rs.stream) guide. Credit to Tamtaro's template which served as inspiration.\nYou can choose the formatting of the stream information view (more details [here](https://numb3rs.stream/guide/7-Additional-Stuff/#understanding-stream-information-view)): \n* ▶︎ **Flat Monochrome Icons** has a cleaner look based on minimalistic white icons. \n* 🎬 **Colorful Icons** contains a colored version with more graphical icons.",
     "source": "external",
     "sourceUrl": "https://numb3rs.stream/templates/AIOStreams-Formatter.json",
     "changelogUrl": "https://numb3rs.stream/templates/AIOStreams-Changelog.md",
@@ -21,7 +21,7 @@
       {
         "id": "formatterChoice",
         "name": "🖋️ Formatter Style",
-        "description": "Choose the formatting of the stream information view (more details [here](https://numb3rs.stream/guide/7-Additional-Stuff/#understanding-stream-information-view)): \n* **Flat Monochrome Icons** has a cleaner look based on minimalistic white icons. \n* **Colorful Icons** contains a colored version with more graphical icons.",
+        "description": "Choose the formatting of the stream information view (more details [here](https://numb3rs.stream/guide/7-Additional-Stuff/#understanding-stream-information-view)): \n* ▶︎ **Flat Monochrome Icons** has a cleaner look based on minimalistic white icons. \n* 🎬 **Colorful Icons** contains a colored version with more graphical icons.",
         "type": "select",
         "required": false,
         "default": "color",

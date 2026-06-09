@@ -127,7 +127,6 @@ Select an **AIOStreams** instance from [**this**](https://uptime.ibbylabs.dev/ai
       * **🖋️ Formatter Style**: Here you can choose the formatting of the stream information view.
          * **▶︎ *Flat Monochrome Icons*** has a cleaner look based on minimalistic white icons.
          * **🎬 *Colorful Icons*** contains a colored version with more graphical icons.
-         * **🚫 *None*** retains your existing formatter (formatter will not be replaced, if you already have one configured).
       * **📝 Show Filename** toggles showing the filenames on the stream information view.
    * **🗣️ Language Options**:
       * **🔊 Preferred Languages**: Here you can select your preferred stream languages that you want to be sorted first when the streaming options are shown. *Original, Dual Audio, Multi, Dubbed, and Unknown* are automatically appended after your selections.
