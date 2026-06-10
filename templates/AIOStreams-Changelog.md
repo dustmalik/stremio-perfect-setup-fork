@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8 (2026-06-10)
+
+- Made the **~ðŸ§** symbols showing when using Zyclops Proxy for Usenet hidden.
+
 ## 2.0.7 (2026-05-31)
 
 - Added TamTaro's **Synced URL** for *Excluded Regexes*.

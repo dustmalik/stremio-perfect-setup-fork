@@ -7,6 +7,10 @@ title: "📜 Changelog"
 
 ## 📚 AIOStreams
 
+### 2.0.8 (2026-06-10)
+
+- Made the **~ðŸ§** symbols showing when using Zyclops Proxy for Usenet hidden.
+
 ### 2.0.7 (2026-05-31)
 
 - Added TamTaro's **Synced URL** for *Excluded Regexes*.
@@ -61,7 +65,9 @@ title: "📜 Changelog"
 
 ## 🍿 Guide
 
-No tracked guide-specific releases yet.
+### 2.0.1 (2026-06-10)
+
+- Updated the **AIOStreams Formatter** to make the **~ðŸ§** symbols showing when using Zyclops Proxy for Usenet hidden.
 
 ## 🔮 Wizard
 
