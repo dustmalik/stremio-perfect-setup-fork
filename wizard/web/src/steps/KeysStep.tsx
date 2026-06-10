@@ -6,7 +6,7 @@ import { NextButton } from '../components/NextButton';
 import { MarkdownText } from '../components/MarkdownText';
 import { useWizard } from '../store/wizard';
 import { ACTIVE_KEY_SCREENS, type KeyScreenId } from '../lib/keyScreens';
-import { DEBRID_SERVICES, resolveLogoUrl } from '../lib/services';
+import { DEBRID_SERVICES, getServiceById, getServiceCredentialFields, resolveLogoUrl } from '../lib/services';
 import { hasConfiguredKeyArray, hasConfiguredTmdbFallback } from '../lib/sharedKeys';
 
 interface Props { keyIndex: number; }
@@ -141,7 +141,7 @@ function getContinueState(screenId: ServiceScreenId, values: Record<CredentialFi
   };
 }
 
-function getDebridContinueState(debridServices: Array<{ id: string; apiKey: string }>) {
+function getDebridContinueState(debridServices: Array<{ id: string; credentials: Record<string, string> }>) {
   if (debridServices.length === 0) {
     return {
       canContinue: true,
@@ -149,8 +149,20 @@ function getDebridContinueState(debridServices: Array<{ id: string; apiKey: stri
     };
   }
 
-  const missingKeyCount = debridServices.filter((service) => service.apiKey.trim().length === 0).length;
-  if (missingKeyCount === 0) {
+  const requiredFieldCount = debridServices.reduce((count, selectedService) => {
+    const service = getServiceById(selectedService.id);
+    return count + getServiceCredentialFields(service).filter((field) => field.required !== false).length;
+  }, 0);
+
+  const missingCredentialCount = debridServices.reduce((count, selectedService) => {
+    const service = getServiceById(selectedService.id);
+    const missing = getServiceCredentialFields(service)
+      .filter((field) => field.required !== false)
+      .filter((field) => !(selectedService.credentials?.[field.id] ?? '').trim()).length;
+    return count + missing;
+  }, 0);
+
+  if (missingCredentialCount === 0) {
     return {
       canContinue: true,
       label: 'Continue',
@@ -159,9 +171,9 @@ function getDebridContinueState(debridServices: Array<{ id: string; apiKey: stri
 
   return {
     canContinue: false,
-    label: missingKeyCount === debridServices.length
-      ? 'Enter an API key or deselect the service(s)'
-      : 'Enter an API key for each selected service',
+    label: missingCredentialCount === requiredFieldCount
+      ? 'Enter the required credentials or deselect the service(s)'
+      : 'Enter the required credentials for each selected service',
   };
 }
 
@@ -180,7 +192,7 @@ export function KeysStep({ keyIndex }: Props) {
     credentials,
     setCredentials,
     toggleDebridService,
-    setDebridApiKey,
+    setDebridCredential,
     nextStep,
     wizardConfig,
   } = useWizard();
@@ -253,7 +265,17 @@ export function KeysStep({ keyIndex }: Props) {
           <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.5rem' }}>
             Select services (you can pick multiple)
           </p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(118px, 1fr))', gap: '0.5rem', marginBottom: '1rem' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              marginBottom: '1rem',
+              maxWidth: 'calc(6 * 118px + 5 * 0.5rem)',
+              marginInline: 'auto',
+            }}
+          >
             {DEBRID_SERVICES.map((service) => {
               const selected = credentials.debridServices.some(d => d.id === service.id);
               const logoUrl = resolveLogoUrl(service.logo);
@@ -262,6 +284,7 @@ export function KeysStep({ keyIndex }: Props) {
                 <div
                   key={service.id}
                   style={{
+                    flex: '0 0 118px',
                     border: `2px solid ${selected ? 'var(--accent)' : 'var(--border)'}`,
                     borderRadius: '10px',
                     background: selected ? 'var(--panel-2)' : 'var(--panel)',
@@ -329,26 +352,24 @@ export function KeysStep({ keyIndex }: Props) {
           {credentials.debridServices.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '0.5rem' }}>
               <p style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
-                API Keys
+                Credentials
               </p>
               {credentials.debridServices.map((debridService) => {
                 const service = DEBRID_SERVICES.find(candidate => candidate.id === debridService.id);
+                const credentialFields = getServiceCredentialFields(service);
+                const credentialsUrlLabel = service?.credentialsUrlLabel
+                  ?? (credentialFields.length === 1 && credentialFields[0]?.id === 'apiKey'
+                    ? 'Get API Key'
+                    : 'Open Credentials Page');
                 return (
-                  <label key={debridService.id} style={{ display: 'block' }}>
-                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
-                      {service?.name} API Key
-                    </span>
-                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.35rem', alignItems: 'stretch' }}>
-                      <input
-                        type="password"
-                        value={debridService.apiKey}
-                        onChange={e => setDebridApiKey(debridService.id, e.target.value)}
-                        placeholder={`Paste your ${service?.name} API key...`}
-                        style={{ ...inputStyle, flex: 1 }}
-                      />
-                      {service?.apiKeyUrl && (
+                  <div key={debridService.id} style={{ display: 'block', border: '1px solid var(--border)', borderRadius: '10px', padding: '0.85rem', background: 'var(--panel)' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text)' }}>
+                        {service?.name} Credentials
+                      </span>
+                      {service?.credentialsUrl && (
                         <a
-                          href={service.apiKeyUrl}
+                          href={service.credentialsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="wizard-secondary-btn"
@@ -363,16 +384,33 @@ export function KeysStep({ keyIndex }: Props) {
                           }}
                         >
                           <KeyRound size={14} style={{ flex: '0 0 auto' }} />
-                          Get API Key
+                          {credentialsUrlLabel}
                         </a>
                       )}
                     </div>
-                  </label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {credentialFields.map((field) => (
+                        <label key={field.id} style={{ display: 'block' }}>
+                          <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--text)' }}>
+                            {field.label}
+                            {field.required !== false && <span style={{ color: '#e53e3e' }}> *</span>}
+                          </span>
+                          <input
+                            type={field.type === 'email' ? 'email' : (field.type ?? 'password')}
+                            value={debridService.credentials?.[field.id] ?? ''}
+                            onChange={(e) => setDebridCredential(debridService.id, field.id, e.target.value)}
+                            placeholder={field.placeholder}
+                            style={{ ...inputStyle, marginTop: '0.35rem' }}
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </div>
                 );
               })}
               {!continueState.canContinue && (
                 <p style={{ margin: 0, fontSize: '0.8rem', color: '#dc2626', lineHeight: 1.5 }}>
-                  Enter an API key for every selected debrid service, or deselect them to continue with P2P / HTTP only.
+                  Enter every required credential for the selected debrid services, or deselect them to continue with P2P / HTTP only.
                 </p>
               )}
             </div>

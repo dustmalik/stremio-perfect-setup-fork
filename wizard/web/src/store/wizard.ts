@@ -29,9 +29,14 @@ export interface AccountInfo {
   userId?: string;  // Stremio user _id, used for Trakt scrobble auth URL
 }
 
+export interface DebridServiceSelection {
+  id: string;
+  credentials: Record<string, string>;
+}
+
 export interface Credentials {
-  /** Multi-debrid: array of { id, apiKey } pairs */
-  debridServices: Array<{ id: string; apiKey: string }>;
+  /** Multi-debrid: array of { id, credentials } pairs */
+  debridServices: DebridServiceSelection[];
   tmdbApiKey: string;
   tmdbAccessToken: string;
   tvdbApiKey: string;
@@ -120,7 +125,7 @@ interface WizardState {
   setNuvioAccount: (a: Partial<AccountInfo>) => void;
   setCredentials: (c: Partial<Credentials>) => void;
   toggleDebridService: (id: string) => void;
-  setDebridApiKey: (id: string, apiKey: string) => void;
+  setDebridCredential: (id: string, fieldId: string, value: string) => void;
   setAioStreamsInstance: (url: string) => void;
   setAioStreamsInput: (id: string, value: unknown) => void;
   setAiometadataInstance: (url: string) => void;
@@ -189,13 +194,23 @@ export const useWizard = create<WizardState>((set) => ({
     const already = existing.find(d => d.id === id);
     const updated = already
       ? existing.filter(d => d.id !== id)
-      : [...existing, { id, apiKey: '' }];
+      : [...existing, { id, credentials: {} }];
     return { credentials: { ...s.credentials, debridServices: updated } };
   }),
-  setDebridApiKey: (id, apiKey) => set(s => ({
+  setDebridCredential: (id, fieldId, value) => set(s => ({
     credentials: {
       ...s.credentials,
-      debridServices: s.credentials.debridServices.map(d => d.id === id ? { ...d, apiKey } : d),
+      debridServices: s.credentials.debridServices.map((service) => (
+        service.id === id
+          ? {
+              ...service,
+              credentials: {
+                ...service.credentials,
+                [fieldId]: value,
+              },
+            }
+          : service
+      )),
     },
   })),
 

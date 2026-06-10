@@ -85,6 +85,38 @@ console.log('\n# nested subsection defaults + deep-merge');
   eq('nested default survives partial override', out, { cap: '150', soft: true, top: true });
 }
 
+console.log('\n# selected service credentials merge');
+{
+  const tpl = {
+    metadata: { inputs: [] },
+    config: {
+      services: [
+        { id: 'offcloud', enabled: false, credentials: { apiKey: 'template-key' } },
+        { id: 'putio', enabled: false, credentials: { token: 'template-token' } },
+      ],
+    },
+  };
+  const out = resolveTemplate(tpl, {
+    services: ['offcloud', 'putio'],
+    serviceCredentials: {
+      offcloud: { apiKey: 'oc-key', email: 'person@example.com', password: 'secret' },
+      putio: { clientId: 'put-client', token: 'put-token' },
+    },
+  });
+  eq('service credentials preserve arbitrary provider-specific fields', out.services, [
+    {
+      id: 'offcloud',
+      enabled: true,
+      credentials: { apiKey: 'oc-key', email: 'person@example.com', password: 'secret' },
+    },
+    {
+      id: 'putio',
+      enabled: true,
+      credentials: { token: 'put-token', clientId: 'put-client' },
+    },
+  ]);
+}
+
 console.log('\n# field visibility (UI renderer)');
 {
   const inputsSchema = template.metadata.inputs;

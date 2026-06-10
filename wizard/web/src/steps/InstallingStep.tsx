@@ -113,7 +113,12 @@ export function InstallingStep() {
           rpdbApiKey: effectiveCredentials.rpdbApiKey,
         },
         serviceCredentials: Object.fromEntries(
-          credentials.debridServices.map((d: { id: string; apiKey: string }) => [d.id, { apiKey: d.apiKey }])
+          credentials.debridServices.map((service) => [
+            service.id,
+            Object.fromEntries(
+              Object.entries(service.credentials).filter(([, value]) => String(value ?? '').trim().length > 0)
+            ),
+          ])
         ),
       };
 

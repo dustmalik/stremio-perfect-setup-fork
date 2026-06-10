@@ -72,6 +72,10 @@ title: "📜 Changelog"
 
 ## 🔮 Wizard
 
+### 1.0.2 (2026-06-10)
+
+- Fixed **Debrid Keys** page to accept credentials as needed (Put.io, Offcloud, PikPak).
+
 ### 1.0.1 (2026-06-10)
 
 - Added **Elite Badges** to Nuvio Settings template.

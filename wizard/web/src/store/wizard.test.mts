@@ -27,6 +27,28 @@ console.log('\n# setAioStreamsInput: nested dotted paths');
   eq('flat write does not disturb branch', inputs().bitrate, { bitrateCap: '200', bitrateCapSoft: true });
 }
 
+const { toggleDebridService, setDebridCredential } = useWizard.getState();
+
+console.log('\n# Debrid service credentials');
+{
+  const services = () => useWizard.getState().credentials.debridServices;
+
+  toggleDebridService('offcloud');
+  eq('toggleDebridService creates empty credentials object', services(), [
+    { id: 'offcloud', credentials: {} },
+  ]);
+
+  setDebridCredential('offcloud', 'apiKey', 'oc-key');
+  setDebridCredential('offcloud', 'email', 'person@example.com');
+  setDebridCredential('offcloud', 'password', 'secret');
+  eq('setDebridCredential stores multiple fields per service', services(), [
+    { id: 'offcloud', credentials: { apiKey: 'oc-key', email: 'person@example.com', password: 'secret' } },
+  ]);
+
+  toggleDebridService('offcloud');
+  eq('toggleDebridService removes selected service', services(), []);
+}
+
 const { setWatchly, setInstallResult } = useWizard.getState();
 
 console.log('\n# WatchlyState');
