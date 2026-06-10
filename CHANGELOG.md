@@ -65,7 +65,9 @@ No tracked guide-specific releases yet.
 
 ## 🔮 Wizard
 
-No tracked wizard-specific releases yet.
+### 1.0.1 (2026-06-10)
+
+- Added **Elite Badges** to Nuvio Settings template.
 
 ## 🖥️ Hosting
 
