@@ -462,7 +462,7 @@ export function KeysStep({ keyIndex }: Props) {
                   width: '100%', border: 'none', background: 'transparent',
                   color: 'var(--text)', cursor: 'pointer', textAlign: 'left',
                   padding: '0.95rem 1rem', display: 'flex',
-                  alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem',
+                  alignItems: 'center', justifyContent: 'space-between', gap: '1rem',
                 }}
               >
                 <div style={{ minWidth: 0, flex: '1 1 auto' }}>
@@ -492,8 +492,8 @@ export function KeysStep({ keyIndex }: Props) {
                 padding: '0.65rem 1rem',
                 background: 'var(--panel-2)',
               }}>
-                <div className="wizard-notice__title" style={{ marginBottom: '0.3rem' }}>ℹ️ Note</div>
-                <p style={{ margin: 0, fontSize: '0.84rem', color: 'var(--text)', lineHeight: 1.6 }}>
+                <div className="wizard-notice__title" style={{ marginBottom: '0.3rem', textAlign: 'center' }}>ℹ️ Note</div>
+                <p style={{ margin: 0, fontSize: '0.84rem', color: 'var(--text)', lineHeight: 1.6, textAlign: 'center' }}>
                   This feature is still new. It may deliver results slightly faster, but typically returns fewer and less well-organized streams than the standard mode. Unlike the standard mode, it does not definitively exclude P2P streams.
                 </p>
               </div>
