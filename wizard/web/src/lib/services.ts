@@ -16,6 +16,7 @@ export interface Service {
   /** Optional override for the credentials helper button label. */
   credentialsUrlLabel?: string;
   credentialFields?: ServiceCredentialField[];
+  supportsInstantDebrid?: boolean;
 }
 
 export interface ServiceCredentialField {
@@ -42,11 +43,11 @@ function apiKeyField(serviceName: string): ServiceCredentialField {
 }
 
 export const SERVICES: Service[] = [
-  { id: 'torbox',          name: 'TorBox',         logo: 'services/torbox.svg',      isDebrid: true,  isUsenet: false, url: 'https://torbox.app/subscription?referral=6e80077e-c232-4b71-8914-5b87202b9577',      credentialsUrl: 'https://torbox.app/settings', credentialFields: [apiKeyField('TorBox')] },
+  { id: 'torbox',          name: 'TorBox',         logo: 'services/torbox.svg',      isDebrid: true,  isUsenet: false, url: 'https://torbox.app/subscription?referral=6e80077e-c232-4b71-8914-5b87202b9577',      credentialsUrl: 'https://torbox.app/settings', credentialFields: [apiKeyField('TorBox')], supportsInstantDebrid: true },
   { id: 'realdebrid',     name: 'Real-Debrid',    logo: 'services/realdebrid.png',  isDebrid: true,  isUsenet: false, url: 'http://real-debrid.com/?id=8801126', credentialsUrl: 'https://real-debrid.com/apitoken', credentialFields: [apiKeyField('Real-Debrid')] },
   { id: 'alldebrid',      name: 'AllDebrid',      logo: 'services/alldebrid.png',   isDebrid: true,  isUsenet: false, url: 'https://alldebrid.com',   credentialsUrl: 'https://alldebrid.com/apikeys/', credentialFields: [apiKeyField('AllDebrid')] },
   { id: 'debridlink',     name: 'Debrid-Link',    logo: 'services/debridlink.svg',  isDebrid: true,  isUsenet: false, url: 'https://debrid-link.com', credentialsUrl: 'https://debrid-link.com/webapp/apikey', credentialFields: [apiKeyField('Debrid-Link')] },
-  { id: 'premiumize',     name: 'Premiumize',     logo: 'services/premiumize.svg',  isDebrid: true,  isUsenet: false, url: 'https://premiumize.me',   credentialsUrl: 'https://www.premiumize.me/account', credentialFields: [apiKeyField('Premiumize')] },
+  { id: 'premiumize',     name: 'Premiumize',     logo: 'services/premiumize.svg',  isDebrid: true,  isUsenet: false, url: 'https://premiumize.me',   credentialsUrl: 'https://www.premiumize.me/account', credentialFields: [apiKeyField('Premiumize')], supportsInstantDebrid: true },
   { id: 'easydebrid',     name: 'EasyDebrid',     logo: 'services/easydebrid.png',  isDebrid: true,  isUsenet: false, url: 'https://easydebrid.com',  credentialsUrl: 'https://paradise-cloud.com/dashboard/', credentialFields: [apiKeyField('EasyDebrid')] },
   { id: 'debrider',       name: 'Debrider',       logo: 'services/debrider.svg',    isDebrid: true,  isUsenet: false, url: 'https://debrider.app',    credentialsUrl: 'https://debrider.app/dashboard/account', credentialFields: [apiKeyField('Debrider')] },
   {
