@@ -117,6 +117,7 @@ function getSidebarStatsRows(summary) {
     label: 'Addons',
     variant: 'addons',
     items: [
+      { key: 'p2p', title: 'P2P', count: summary.addons?.p2p ?? 0, emoji: '🧲' },
       { key: 'anime', title: 'Anime', count: summary.addons?.anime ?? 0, emoji: '🍥' },
       {
         key: 'http',
@@ -132,7 +133,6 @@ function getSidebarStatsRows(summary) {
         wide: true,
       },
       { key: 'debridio', title: 'Debridio', count: summary.addons?.debridio ?? 0, emoji: '🧊' },
-      { key: 'p2p', title: 'P2P', count: summary.addons?.p2p ?? 0, emoji: '🧲' },
     ],
   });
 
