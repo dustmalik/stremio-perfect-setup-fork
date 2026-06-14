@@ -43,6 +43,7 @@ interface BuildCompletionPayloadOptions {
   addonCount: number;
   target: 'stremio' | 'nuvio';
   credentials: Credentials;
+  instantDebrid: boolean;
   aioStreamsInputs: AioStreamsInputs;
   catalogSelection: CatalogSelection;
   templates: LoadedTemplates | null;
@@ -140,6 +141,7 @@ export function buildWizardCompletionPayload({
   addonCount,
   target,
   credentials,
+  instantDebrid,
   aioStreamsInputs,
   catalogSelection,
   templates,
@@ -167,6 +169,8 @@ export function buildWizardCompletionPayload({
   ].filter(Boolean);
   const keysValue = joinWithinLimit(ownKeyIds);
   if (keysValue && !deniedParams.has('services_keys')) params.services_keys = keysValue;
+
+  if (!deniedParams.has('instant_debrid')) params.instant_debrid = instantDebrid ? 'true' : 'false';
 
   const categories = deriveEnabledCatalogCategories(templates, catalogSelection, wizardConfig);
   const categoryValue = joinWithinLimit(categories);

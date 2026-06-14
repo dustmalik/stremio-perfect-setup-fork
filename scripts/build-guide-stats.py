@@ -270,7 +270,8 @@ def build_wizard_analytics_summary(rows: list[dict[str, Any]]) -> dict[str, Any]
             "subtitles": [],
             "catalogs": {"discover": [], "categories": []},
             "formatter": [],
-            "addons": {"anime": 0, "debridio": 0, "httpInstall": 0, "httpOnly": 0},
+            "addons": {"anime": 0, "debridio": 0, "httpInstall": 0, "httpOnly": 0, "p2p": 0},
+            "keys": {"tmdb": 0, "tvdb": 0, "rpdb": 0, "gemini": 0, "instantDebrid": 0},
             "rowCount": 0,
         }
 
@@ -382,6 +383,14 @@ def build_wizard_analytics_summary(rows: list[dict[str, Any]]) -> dict[str, Any]
             "debridio": get_boolean_total(index, "Addons", "Debridio"),
             "httpInstall": get_row_total(index, "Addons", "HTTP", "install"),
             "httpOnly": get_row_total(index, "Addons", "HTTP", "only"),
+            "p2p": get_row_total(index, "Addons", "P2P", "p2p"),
+        },
+        "keys": {
+            "tmdb": get_row_total(index, "Services", "Keys", "tmdb"),
+            "tvdb": get_row_total(index, "Services", "Keys", "tvdb"),
+            "rpdb": get_row_total(index, "Services", "Keys", "rpdb"),
+            "gemini": get_row_total(index, "Services", "Keys", "gemini"),
+            "instantDebrid": get_boolean_total(index, "Services", "Instant Debrid"),
         },
         "rowCount": len(rows),
     }

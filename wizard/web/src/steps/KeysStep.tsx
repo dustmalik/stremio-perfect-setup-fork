@@ -196,8 +196,8 @@ export function KeysStep({ keyIndex }: Props) {
     nextStep,
     wizardConfig,
     target,
-    nuvioInstantDebrid,
-    setNuvioInstantDebrid,
+    instantDebrid,
+    setInstantDebrid,
   } = useWizard();
 
   if (!screen) { nextStep(); return null; }
@@ -244,7 +244,7 @@ export function KeysStep({ keyIndex }: Props) {
     ? getDebridContinueState(credentials.debridServices)
     : getContinueState(screen.id, fieldValues, fallbackAvailable);
 
-  const effectiveContinueState = screen.id === 'debrid' && nuvioInstantDebrid && continueState.canContinue
+  const effectiveContinueState = screen.id === 'debrid' && instantDebrid && continueState.canContinue
     ? { ...continueState, label: 'Continue with Instant Debrid' }
     : continueState;
 
@@ -298,7 +298,7 @@ export function KeysStep({ keyIndex }: Props) {
               const selected = credentials.debridServices.some(d => d.id === service.id);
               const logoUrl = resolveLogoUrl(service.logo);
               const divider = selected ? 'var(--accent)' : 'var(--border)';
-              const isInstantDebridLocked = nuvioInstantDebrid && !(INSTANT_DEBRID_SERVICE_IDS as readonly string[]).includes(service.id);
+              const isInstantDebridLocked = instantDebrid && !(INSTANT_DEBRID_SERVICE_IDS as readonly string[]).includes(service.id);
               return (
                 <div
                   key={service.id}
@@ -441,14 +441,14 @@ export function KeysStep({ keyIndex }: Props) {
 
           {showInstantDebridToggle && (
             <div
-              className={`wizard-hover-lift${nuvioInstantDebrid ? '' : ' wizard-hover-lift--guide'}`}
+              className={`wizard-hover-lift${instantDebrid ? '' : ' wizard-hover-lift--guide'}`}
               style={{
                 '--wizard-hover-selected-bg': 'var(--panel-2)',
                 '--wizard-hover-selected-border': 'var(--accent)',
                 '--wizard-hover-selected-color': 'var(--text)',
                 borderRadius: '14px',
-                border: `2px solid ${nuvioInstantDebrid ? 'var(--accent)' : 'var(--border)'}`,
-                background: nuvioInstantDebrid ? 'var(--panel-2)' : 'var(--panel)',
+                border: `2px solid ${instantDebrid ? 'var(--accent)' : 'var(--border)'}`,
+                background: instantDebrid ? 'var(--panel-2)' : 'var(--panel)',
                 transition: 'all 0.15s',
                 overflow: 'hidden',
                 marginBottom: '0.5rem',
@@ -456,8 +456,8 @@ export function KeysStep({ keyIndex }: Props) {
             >
               <button
                 type="button"
-                onClick={() => setNuvioInstantDebrid(!nuvioInstantDebrid)}
-                aria-pressed={nuvioInstantDebrid}
+                onClick={() => setInstantDebrid(!instantDebrid)}
+                aria-pressed={instantDebrid}
                 style={{
                   width: '100%', border: 'none', background: 'transparent',
                   color: 'var(--text)', cursor: 'pointer', textAlign: 'left',
@@ -473,22 +473,22 @@ export function KeysStep({ keyIndex }: Props) {
                     aria-hidden="true"
                     style={{
                       width: '3rem', height: '1.7rem', borderRadius: '999px',
-                      background: nuvioInstantDebrid ? 'var(--accent)' : 'color-mix(in srgb, var(--border) 70%, var(--panel) 30%)',
-                      border: `1px solid ${nuvioInstantDebrid ? 'var(--accent)' : 'var(--border)'}`,
+                      background: instantDebrid ? 'var(--accent)' : 'color-mix(in srgb, var(--border) 70%, var(--panel) 30%)',
+                      border: `1px solid ${instantDebrid ? 'var(--accent)' : 'var(--border)'}`,
                       padding: '0.12rem', display: 'flex', alignItems: 'center',
-                      justifyContent: nuvioInstantDebrid ? 'flex-end' : 'flex-start',
+                      justifyContent: instantDebrid ? 'flex-end' : 'flex-start',
                       transition: 'all 0.15s',
                     }}
                   >
                     <span style={{ width: '1.2rem', height: '1.2rem', borderRadius: '999px', background: '#fff', display: 'block' }} />
                   </div>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: nuvioInstantDebrid ? 'var(--accent)' : 'var(--muted)' }}>
-                    {nuvioInstantDebrid ? 'Enabled' : 'Disabled'}
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: instantDebrid ? 'var(--accent)' : 'var(--muted)' }}>
+                    {instantDebrid ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
               </button>
               <div style={{
-                borderTop: `1px solid ${nuvioInstantDebrid ? 'var(--accent)' : 'var(--border)'}`,
+                borderTop: `1px solid ${instantDebrid ? 'var(--accent)' : 'var(--border)'}`,
                 padding: '0.65rem 1rem',
                 background: 'var(--panel-2)',
               }}>

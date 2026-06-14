@@ -53,6 +53,7 @@ export function DoneStep() {
     aioStreamsInputs,
     catalogSelection,
     watchly,
+    instantDebrid,
   } = useWizard();
   const { aiostreams, aiometadata, addonPasswordSource, previousAddons, warnings: rawWarnings, error } = installResult;
   const warnings = rawWarnings.filter(w => !w.includes('tried but failed'));
@@ -308,6 +309,7 @@ export function DoneStep() {
       addonCount: addons.length,
       target,
       credentials,
+      instantDebrid,
       aioStreamsInputs,
       catalogSelection,
       templates,
@@ -320,7 +322,7 @@ export function DoneStep() {
       runId,
       target,
     });
-  }, [accountMode, addons, aioStreamsInputs, catalogSelection, credentials, error, target, templates, wizardConfig]);
+  }, [accountMode, addons, aioStreamsInputs, catalogSelection, credentials, error, instantDebrid, target, templates, wizardConfig]);
 
   function handleDownload() {
     if (!addonDetailsFilename || !hasDownloadableDetails) return;

@@ -116,8 +116,8 @@ interface WizardState {
   wizardConfig: WizardConfig | null;
   watchly: WatchlyState;
   setWatchly: (w: Partial<WatchlyState>) => void;
-  nuvioInstantDebrid: boolean;
-  setNuvioInstantDebrid: (enabled: boolean) => void;
+  instantDebrid: boolean;
+  setInstantDebrid: (enabled: boolean) => void;
 
   setStep: (step: number) => void;
   nextStep: () => void;
@@ -171,7 +171,7 @@ export const useWizard = create<WizardState>((set) => ({
   aioSections: [],
   wizardConfig: null,
   watchly: { enabled: false, nuvioStremioLogin: null },
-  nuvioInstantDebrid: false,
+  instantDebrid: false,
 
   setStep: (step) => set(s => ({
     step,
@@ -199,12 +199,12 @@ export const useWizard = create<WizardState>((set) => ({
       ? existing.filter(d => d.id !== id)
       : [...existing, { id, credentials: {} }];
     const QUALIFYING = ['torbox', 'premiumize'];
-    const shouldResetInstantDebrid = s.nuvioInstantDebrid
+    const shouldResetInstantDebrid = s.instantDebrid
       && !!already  // we removed a service
       && !updated.some(d => QUALIFYING.includes(d.id));  // no qualifying services remain
     return {
       credentials: { ...s.credentials, debridServices: updated },
-      ...(shouldResetInstantDebrid ? { nuvioInstantDebrid: false } : {}),
+      ...(shouldResetInstantDebrid ? { instantDebrid: false } : {}),
     };
   }),
   setDebridCredential: (id, fieldId, value) => set(s => ({
@@ -249,11 +249,11 @@ export const useWizard = create<WizardState>((set) => ({
   setAioSections: (aioSections) => set({ aioSections }),
   setInstallResult: (r) => set(s => ({ installResult: { ...s.installResult, ...r } })),
   setWatchly: (w) => set(s => ({ watchly: { ...s.watchly, ...w } })),
-  setNuvioInstantDebrid: (enabled) => set(s => {
+  setInstantDebrid: (enabled) => set(s => {
     if (enabled) {
       const INSTANT_DEBRID_SERVICE_IDS = ['torbox', 'premiumize'];
       return {
-        nuvioInstantDebrid: true,
+        instantDebrid: true,
         credentials: {
           ...s.credentials,
           debridServices: s.credentials.debridServices.filter(d =>
@@ -262,7 +262,7 @@ export const useWizard = create<WizardState>((set) => ({
         },
       };
     }
-    return { nuvioInstantDebrid: false };
+    return { instantDebrid: false };
   }),
   setWizardConfig: (cfg) => set({
     wizardConfig: cfg,

@@ -121,12 +121,32 @@ function getSidebarStatsRows(summary) {
       {
         key: 'http',
         title: 'HTTP',
-        countText: `➕ ${formatNumber(summary.addons?.httpInstall ?? 0)} / 🔒 ${formatNumber(summary.addons?.httpOnly ?? 0)}`,
+        countParts: [
+          { text: '➕', small: true },
+          { text: formatNumber(summary.addons?.httpInstall ?? 0) },
+          { text: '/' },
+          { text: '🔒', small: true },
+          { text: formatNumber(summary.addons?.httpOnly ?? 0) },
+        ],
         emoji: '🌐',
+        wide: true,
       },
       { key: 'debridio', title: 'Debridio', count: summary.addons?.debridio ?? 0, emoji: '🧊' },
+      { key: 'p2p', title: 'P2P', count: summary.addons?.p2p ?? 0, emoji: '🧲' },
     ],
   });
+
+  const keys = summary.keys ?? {};
+  const keyItems = [
+    { key: 'instantDebrid', title: 'Instant Debrid', count: keys.instantDebrid ?? 0, emoji: '⚡' },
+    { key: 'tmdb', title: 'TMDB', count: keys.tmdb ?? 0, emoji: '🎥' },
+    { key: 'tvdb', title: 'TVDB', count: keys.tvdb ?? 0, emoji: '📺' },
+    { key: 'rpdb', title: 'RPDB', count: keys.rpdb ?? 0, emoji: '⭐' },
+    { key: 'gemini', title: 'Gemini', count: keys.gemini ?? 0, emoji: '✨' },
+  ];
+  if (keyItems.some((item) => item.count > 0)) {
+    rows.push({ label: 'Keys', variant: 'keys', items: keyItems });
+  }
 
   return rows;
 }
@@ -236,6 +256,9 @@ function renderSidebarStatsRow(rowModel, assetUrlResolver) {
   asArray(rowModel.items).forEach((item) => {
     const box = document.createElement('div');
     box.className = 'sidebar-stats-icon-item';
+    if (item && item.wide) {
+      box.classList.add('sidebar-stats-icon-item--wide');
+    }
     if (item && item.title) {
       box.setAttribute('title', item.title);
     }
@@ -256,7 +279,16 @@ function renderSidebarStatsRow(rowModel, assetUrlResolver) {
 
     const count = document.createElement('strong');
     count.className = 'sidebar-stats-icon-item__count';
-    count.textContent = item.countText || formatNumber(item.count);
+    if (Array.isArray(item.countParts)) {
+      item.countParts.forEach((part) => {
+        const span = document.createElement('span');
+        if (part.small) span.className = 'sidebar-stats-icon-item__count-emoji';
+        span.textContent = part.text;
+        count.appendChild(span);
+      });
+    } else {
+      count.textContent = item.countText || formatNumber(item.count);
+    }
     box.appendChild(count);
     grid.appendChild(box);
   });

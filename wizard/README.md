@@ -75,6 +75,8 @@ current `templates/AIOStreams.json`.
 - `services_keys`: comma-separated own-key ids from `tmdb,tvdb,gemini,rpdb`
   - A key id is present only when the user entered their own key for that service
   - Shared/default/fallback keys are omitted from this param
+- `instant_debrid`: `true` or `false`
+  - Reflects the Nuvio-only Instant Debrid toggle; `false` on Stremio and when the toggle is off
 - `catalog_categories`: comma-separated enabled catalog category keys
 - `catalog_discover`: comma-separated enabled discover keys
 

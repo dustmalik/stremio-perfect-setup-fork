@@ -72,6 +72,11 @@ title: "📜 Changelog"
 
 ## 🔮 Wizard
 
+### 1.0.3 (2026-06-12)
+
+- Added support for Nuvio **Instant Debrid** feature.
+- Added **Instant Debrid** and **Service Keys** in statistics counters.
+
 ### 1.0.2 (2026-06-10)
 
 - Fixed **Debrid Keys** page to accept credentials as needed (Put.io, Offcloud, PikPak).

@@ -63,7 +63,7 @@ export function InstallingStep() {
     try {
       const {
         target, stremioAccount, nuvioAccount, credentials, aioStreamsInputs,
-        catalogSelection, templates, wizardConfig, watchly, nuvioInstantDebrid,
+        catalogSelection, templates, wizardConfig, watchly, instantDebrid,
       } = wizard;
 
       if (!templates) {
@@ -115,7 +115,7 @@ export function InstallingStep() {
 
       push('Building your personalised AIOStreams configuration…');
 
-      const useInstantDebrid = target === 'nuvio' && nuvioInstantDebrid;
+      const useInstantDebrid = target === 'nuvio' && instantDebrid;
       const aiostreamsParams = {
         template: templates.aiostreams,
         inputs: aioStreamsInputs,

@@ -566,7 +566,8 @@ code, pre { font-family: "IBM Plex Mono", "Cascadia Code", monospace; }
 }
 
 .sidebar-stats-icon-row--logos,
-.sidebar-stats-icon-row--emoji {
+.sidebar-stats-icon-row--emoji,
+.sidebar-stats-icon-row--keys {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
@@ -583,7 +584,12 @@ code, pre { font-family: "IBM Plex Mono", "Cascadia Code", monospace; }
 }
 
 .sidebar-stats-icon-row--addons {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+/* HTTP carries two values, so it spans two columns. */
+.sidebar-stats-icon-row--addons .sidebar-stats-icon-item--wide {
+  grid-column: span 2;
 }
 
 .sidebar-stats-icon-item {
@@ -633,6 +639,10 @@ code, pre { font-family: "IBM Plex Mono", "Cascadia Code", monospace; }
   font-size: 0.68rem;
   line-height: 1.05;
   white-space: nowrap;
+}
+
+.sidebar-stats-icon-item__count-emoji {
+  font-size: 0.72em;
 }
 
 .sidebar-stat-card__eyebrow,
@@ -835,7 +845,8 @@ code, pre { font-family: "IBM Plex Mono", "Cascadia Code", monospace; }
   }
 
   .sidebar-stats-icon-row--logos,
-  .sidebar-stats-icon-row--emoji {
+  .sidebar-stats-icon-row--emoji,
+  .sidebar-stats-icon-row--keys {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }

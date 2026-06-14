@@ -10,7 +10,7 @@ Add an opt-in "Instant Debrid" toggle to the wizard's debrid step for Nuvio user
 |---|---|
 | `wizard/web/src/lib/services.ts` | Add `supportsInstantDebrid?: boolean` to `Service` interface; mark torbox and premiumize |
 | `wizard/web/src/lib/instantDebrid.ts` | **New** — constants + `buildInstantDebridSettingsPatch` helper |
-| `wizard/web/src/store/wizard.ts` | Add `nuvioInstantDebrid: boolean` state + `setNuvioInstantDebrid` action |
+| `wizard/web/src/store/wizard.ts` | Add `instantDebrid: boolean` state + `setInstantDebrid` action |
 | `wizard/web/src/steps/KeysStep.tsx` | Render toggle card; disable non-qualifying service cards; adapt continue button label |
 | `wizard/web/src/steps/InstallingStep.tsx` | When flag is on: empty aiostreams services/credentials; patch nuvioSettingsTemplate |
 
@@ -33,15 +33,15 @@ supportsInstantDebrid?: boolean;
 
 ```ts
 // New state field (top-level, not inside Credentials)
-nuvioInstantDebrid: boolean   // default: false
+instantDebrid: boolean   // default: false
 
 // New action
-setNuvioInstantDebrid: (enabled: boolean) => void
+setInstantDebrid: (enabled: boolean) => void
 ```
 
-Side effect of `setNuvioInstantDebrid(true)`: filters `credentials.debridServices` to keep only qualifying services (torbox, premiumize). This keeps the store self-consistent.
+Side effect of `setInstantDebrid(true)`: filters `credentials.debridServices` to keep only qualifying services (torbox, premiumize). This keeps the store self-consistent.
 
-Side effect of `setNuvioInstantDebrid(false)`: no side effect on `debridServices` (cleared services are not restored).
+Side effect of `setInstantDebrid(false)`: no side effect on `debridServices` (cleared services are not restored).
 
 `toggleDebridService` is unchanged — non-qualifying cards are simply not rendered as clickable in the UI when the toggle is on.
 
@@ -80,7 +80,7 @@ Returns `null` if no qualifying service has an API key entered.
 
 Shown when: `wizardConfig`-resolved `target === 'nuvio'` AND `credentials.debridServices` contains at least one qualifying service (`torbox` or `premiumize`).
 
-Hidden (and `nuvioInstantDebrid` auto-reset to `false`) when: the last qualifying service is deselected. This is handled by a check inside the `toggleDebridService` call path in `KeysStep` — after the store action, if no qualifying service remains selected and `nuvioInstantDebrid` is true, call `setNuvioInstantDebrid(false)`.
+Hidden (and `instantDebrid` auto-reset to `false`) when: the last qualifying service is deselected. This is handled by a check inside the `toggleDebridService` call path in `KeysStep` — after the store action, if no qualifying service remains selected and `instantDebrid` is true, call `setInstantDebrid(false)`.
 
 ### Toggle card layout
 
@@ -102,15 +102,15 @@ They cannot be clicked or selected. Qualifying cards remain fully interactive.
 
 ### Continue button
 
-When `nuvioInstantDebrid === true`: label → `"Continue with Instant Debrid"` (standard `KeyRound` icon).
+When `instantDebrid === true`: label → `"Continue with Instant Debrid"` (standard `KeyRound` icon).
 
-When `nuvioInstantDebrid === false`: unchanged from existing logic.
+When `instantDebrid === false`: unchanged from existing logic.
 
 `getDebridContinueState` still governs the enabled/disabled state — the user must still enter valid credentials for all selected qualifying service(s).
 
 ## Data Flow: `InstallingStep.tsx`
 
-When `target === 'nuvio'` AND `nuvioInstantDebrid === true`:
+When `target === 'nuvio'` AND `instantDebrid === true`:
 
 1. **AIOStreams params**: override `services: []` and `serviceCredentials: {}` so AIOStreams is configured for P2P/HTTP only.
 2. **Nuvio settings patch**: call `buildInstantDebridSettingsPatch(credentials.debridServices)`. If it returns a non-null patch (i.e. at least one qualifying service has an API key), deep-merge it into `nuvioSettingsTemplate` before passing to `runNuvioSetup`. If it returns `null` (no key entered for any qualifying service), proceed without patching — the Nuvio settings will not have `debrid_enabled` injected, which is effectively a no-op for instant debrid.

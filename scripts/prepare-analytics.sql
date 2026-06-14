@@ -95,7 +95,14 @@ WITH completed_events AS (
         FROM UNNEST(event_params)
         WHERE key = 'account_mode'
       )
-    ) AS account_mode_value
+    ) AS account_mode_value,
+
+    (
+      SELECT COUNT(1)
+      FROM UNNEST(event_params)
+      WHERE key = 'services_debrid'
+        AND COALESCE(value.string_value, '') != ''
+    ) > 0 AS has_debrid_key
 
   FROM
     `stremio-perfect-setup.analytics_525080461.events_*`
@@ -135,6 +142,7 @@ raw_params AS (
       WHEN 'aio_subtitles' THEN 'Languages'
       WHEN 'services_debrid' THEN 'Services'
       WHEN 'services_keys' THEN 'Services'
+      WHEN 'instant_debrid' THEN 'Services'
       WHEN 'aio_language' THEN 'Sorting'
       WHEN 'aio_seeders' THEN 'Sorting'
       ELSE 'Other'
@@ -156,6 +164,7 @@ raw_params AS (
       WHEN 'aio_subtitles' THEN 'Subtitles'
       WHEN 'services_debrid' THEN 'Debrid'
       WHEN 'services_keys' THEN 'Keys'
+      WHEN 'instant_debrid' THEN 'Instant Debrid'
       WHEN 'aio_language' THEN 'Language'
       WHEN 'aio_seeders' THEN 'Seeders'
       ELSE ep.key
@@ -189,6 +198,7 @@ raw_params AS (
       'aio_subtitles',
       'services_debrid',
       'services_keys',
+      'instant_debrid',
       'aio_language',
       'aio_seeders'
     )
@@ -350,6 +360,20 @@ platform_account_mode_summary AS (
     ce.platform_value,
     ce.account_mode_value,
     pt.platform_total_count
+),
+
+p2p_summary AS (
+  SELECT
+    stat_date,
+    'Addons' AS category,
+    'P2P' AS name,
+    'p2p' AS value,
+    COUNTIF(NOT has_debrid_key) AS true_count,
+    COUNTIF(has_debrid_key) AS false_count
+  FROM
+    completed_events
+  GROUP BY
+    stat_date
 )
 
 SELECT
@@ -396,7 +420,19 @@ SELECT
   true_count,
   false_count
 FROM
-  platform_account_mode_summary;
+  platform_account_mode_summary
+
+UNION ALL
+
+SELECT
+  stat_date,
+  category,
+  name,
+  value,
+  true_count,
+  false_count
+FROM
+  p2p_summary;
 
 
 
