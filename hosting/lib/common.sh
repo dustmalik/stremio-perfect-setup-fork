@@ -241,7 +241,7 @@ dialog_title_icon() {
     *cloudflare*)
       printf '☁️'
       ;;
-    *supabase*|*database*)
+    *postgres*|*supabase*|*database*)
       printf '🗄️'
       ;;
     *domain*|*hostname*|*dns*)
@@ -677,7 +677,7 @@ prompt_yes_no() {
 # Examples:
 #   module_param_env_var "authelia"       "username"          → AUTHELIA_USERNAME
 #   module_param_env_var "cloudflare-ddns" "api_token"        → CLOUDFLARE_DDNS_API_TOKEN
-#   module_param_env_var "supabase"        "connection_string" → SUPABASE_CONNECTION_STRING
+#   module_param_env_var "postgres"        "connection_string" → POSTGRES_CONNECTION_STRING
 module_param_env_var() {
   local module="$1" key="$2"
   local sanitized="${module//-/_}"

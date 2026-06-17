@@ -1,7 +1,7 @@
 -- Creates one schema and one login role per selected AIO addon.
 --
 -- Variables expected from db/create-addon-schemas.sh:
---   base_connection_string  Full Supabase connection string with password set.
+--   base_connection_string  Full PostgreSQL connection string with password set.
 --   addon_names_csv         Comma-separated addon names.
 --   shared_password         Password assigned to every generated addon role.
 --
@@ -9,8 +9,8 @@
 --   addon_name, schema_name, role_name, connection_string
 --
 -- Connection string generation deliberately rewrites only the username portion
--- of base_connection_string. For Supabase pooler URLs this preserves the
--- project suffix, host, port, database, and query parameters.
+-- of base_connection_string. For pooler URLs (such as Supabase's) this preserves
+-- the project suffix, host, port, database, and query parameters.
 
 \set ON_ERROR_STOP on
 

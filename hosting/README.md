@@ -19,7 +19,7 @@ The hosting scripts do the heavy lifting for you:
 - let you choose which modules you want to run
 - stage the important config files in an editable area
 - ask for the values the stack cannot guess for you
-- apply module-specific automation, such as Supabase or Cloudflare adjustments
+- apply module-specific automation, such as PostgreSQL or Cloudflare adjustments
 - deploy the final stack into your Docker directory
 - optionally create a restore-friendly backup ZIP
 - optionally start the stack right away
@@ -34,7 +34,7 @@ You should have these things ready:
 - SSH access to that VPS from your current machine
 - a domain name if you want public HTTPS services through Traefik
 - Cloudflare nameservers already active if you plan to use `cloudflare-ddns`
-- a Supabase project ready only if you want the AIO modules to use Postgres instead of local SQLite
+- a PostgreSQL database (Supabase, Neon, or any other Postgres provider) ready only if you want the AIO modules to use Postgres instead of local SQLite
 
 Important: the setup itself always runs on the Linux machine that will host Docker. You can launch it from your own computer — `main.sh` then prepares SSH, copies `hosting/` to the VPS, and runs it there — or you can SSH into the VPS first, get `hosting/` onto it, and run `main.sh` directly. Either way the work happens on the VPS.
 
@@ -258,7 +258,7 @@ Now the script applies module-specific logic based on what you selected.
 Examples:
 
 - `cloudflare-ddns` asks for a Cloudflare API token and adjusts DNS challenge settings
-- AIO modules can offer Supabase instead of local SQLite
+- AIO modules can offer PostgreSQL (Supabase, Neon, etc.) instead of local SQLite
 - some modules stage extra files or update hostnames automatically
 
 These prompts now use the same visual UI style when possible.
@@ -352,7 +352,7 @@ If you just want the shortest possible beginner path, this is the usual order:
 9. If that target already has a live setup, choose whether to overwrite it or continue from it.
 10. On a fresh install, pick a preset package (or "none"), then select your modules.
 11. Fill in timezone, domain, and Let's Encrypt email.
-12. Complete any module-specific prompts such as Cloudflare or Supabase.
+12. Complete any module-specific prompts such as Cloudflare or PostgreSQL.
 13. Review the staged config.
 14. Confirm deployment.
 15. Create the backup ZIP.
@@ -425,7 +425,7 @@ Run the whole thing unattended from your local computer (prepares SSH, copies th
 - The setup always runs on the VPS. Either launch `./main.sh` from your own computer and let it connect and copy files over, or run it on the VPS directly — pick whichever the first prompt offers.
 - If Docker group membership was just added, a fresh login may be needed before Docker works without `sudo`.
 - `cloudflare-ddns` only makes sense when the domain is actually managed by Cloudflare.
-- Supabase is optional. If you do not configure it, the supported addons stay on their default SQLite setup.
+- PostgreSQL is optional. If you do not configure it, the supported addons stay on their default SQLite setup.
 - The temporary work directory is cleaned up at the end, so if you want to keep artifacts from a dry run, send the backup ZIP to a directory outside `hosting/.work/`.
 
 ## Folder Layout
@@ -435,7 +435,7 @@ Run the whole thing unattended from your local computer (prepares SSH, copies th
 - `modules/`: addon-specific automation hooks
 - `apps/`: bundled apps not in the upstream template; each folder with a `compose.yaml` is overlaid onto the fetched template and offered as a selectable module
 - `configs/`: shared config data used by hooks (`presets.json` defines the selectable module packages; `honey.json` is the Honey dashboard catalog)
-- `db/`: Supabase-related helper scripts and SQL
+- `db/`: PostgreSQL helper scripts and SQL for creating/deleting addon schemas
 - `lib/`: shared Bash helpers for prompts, staging, and template logic
 - `defaults.env`: default values used by the scripts
 

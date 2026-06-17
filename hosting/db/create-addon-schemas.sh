@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# Creates Supabase schemas and per-addon roles for selected AIO addons.
+# Creates PostgreSQL schemas and per-addon roles for selected AIO addons.
 #
 # Purpose:
-#   This standalone helper is used by modules/all.supabase.sh and can also be
-#   called manually. It connects to Supabase with the admin/base connection
+#   This standalone helper is used by modules/all.postgres.sh and can also be
+#   called manually. It connects to the database with the admin/base connection
 #   string, replaces [YOUR-PASSWORD] if present, executes db/create-addon-
 #   schemas.sql, and prints tab-separated rows containing generated addon
-#   connection strings.
+#   connection strings. Works with any PostgreSQL provider (Supabase, Neon, etc.).
 #
 # Usage:
 #   ./hosting/db/create-addon-schemas.sh \

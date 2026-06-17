@@ -4,7 +4,7 @@
 --   addon_names_csv  Comma-separated addon names to remove.
 --
 -- This script is intentionally destructive and should only be run manually when
--- the user wants to remove addon database state from Supabase.
+-- the user wants to remove addon database state from the PostgreSQL database.
 
 \set ON_ERROR_STOP on
 

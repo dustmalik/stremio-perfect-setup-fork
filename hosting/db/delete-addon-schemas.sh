@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Removes Supabase schemas and per-addon roles created by create-addon-schemas.
+# Removes PostgreSQL schemas and per-addon roles created by create-addon-schemas.
 #
 # Purpose:
 #   This standalone rollback helper drops the per-addon schemas and login roles

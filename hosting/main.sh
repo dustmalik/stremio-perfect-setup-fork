@@ -146,7 +146,7 @@ collect_module_metadata() {
     meta_output="$("${script_path}" --metadata 2>/dev/null)" || continue
     current_module=""
     derived_name="$(basename "${script_path}" .sh)"
-    derived_name="${derived_name#all.}"  # "all.supabase" -> "supabase"
+    derived_name="${derived_name#all.}"  # "all.postgres" -> "postgres"
     while IFS= read -r line; do
       if [[ "${line}" =~ ^module=(.+)$ ]]; then
         current_module="${BASH_REMATCH[1]}"
@@ -657,7 +657,7 @@ if (( DRY_RUN )); then
   export HOSTING_DRY_RUN=1
   SKIP_REVIEW=1
   SKIP_START=1
-  dry_run_log "SSH setup, Docker installation, Docker Compose start, external IP lookup, and Supabase changes are skipped."
+  dry_run_log "SSH setup, Docker installation, Docker Compose start, external IP lookup, and PostgreSQL changes are skipped."
   DOCKER_DIR_VALUE="${WORK_ROOT_ABS}/dry-run/deploy"
   if (( ! BACKUP_DIR_SET )); then
     BACKUP_DIR_VALUE="${WORK_ROOT_ABS}/dry-run/backup"
@@ -1103,8 +1103,8 @@ module_hook_title() {
 
   hook_name="$(basename "${script_path}" .sh)"
   case "${hook_name}" in
-    all.supabase)
-      printf 'Supabase setup'
+    all.postgres)
+      printf 'PostgreSQL setup'
       ;;
     authelia)
       printf 'Authelia setup'

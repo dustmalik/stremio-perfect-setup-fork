@@ -21,7 +21,7 @@ Self-hosting is the next level for achieving the ultimate streaming experience. 
 * **Server / VPS**: Obviously the most important component for self-hosting, either a local server at home, or a cloud VPS. Check out [**Viren's Guide**](https://guides.viren070.me/selfhosting/oracle) for instructions on how to prepare one of the best free VPS solutions currently around.
 * **Domain Name**: Needed for publicly accessing your instances through HTTPS URLs like `aiostreams.yourdomain.com`.
 * **Cloudflare Account**: *Optional*, but highly recommended to protect your server's IP and access by proxying it through Cloudflare, and if you want *Cloudflare DDNS* to automatically update DNS records when you make changes.
-* **Supabase Account**: *Optional* if you want to separate the data layer by storing the tables (currently automated for *AIOStreams*, *AIOMetadata*, and/or *AIOManager*) on a cloud database instead of locally.
+* **PostgreSQL Database**: *Optional* if you want to separate the data layer by storing the tables (currently automated for *AIOStreams*, *AIOMetadata*, and/or *AIOManager*) on a cloud database instead of locally. Any Postgres provider works, such as Supabase or Neon.
 
 >**📢 DISCLAIMER:**
 >* The setup scripts guide you step by step through everything. Normally you don't need to understand Docker, DNS, or server administration beforehand. However, as mentioned in the beginning, you do need to have at least some basic technical understanding to be able to work through this, and even debug in case issues arise. These are complex topics and may vary depending on many factors, and I cannot address them all. Please take everything with a grain of salt and tread carefully. 
@@ -81,7 +81,7 @@ However you start it, the guided setup runs on the VPS and moves through these p
 4. **Module Selection**: pick a preset package (on fresh installs) and toggle the modules to deploy.
 5. **Config Staging**: copies the selected module configs into the staging area for review.
 6. **Core Values**: asks for timezone, domain, and Let's Encrypt email.
-7. **Module Automation**: runs per-module setup, such as Cloudflare DDNS or Supabase.
+7. **Module Automation**: runs per-module setup, such as Cloudflare DDNS or PostgreSQL.
 8. **Manual Review**: pauses and shows where the staged files are so you can inspect them.
 9. **Deployment Confirmation**: asks before copying files into the Docker directory.
 10. **Backup ZIP**: creates a backup of your configuration.
@@ -102,13 +102,15 @@ The script prompts for a handful of values it needs:
       2. *Create Token*, using the *Edit zone DNS* template.
       3. Set *Zone Resources* to your domain.
       4. Copy the token (shown once, so save it somewhere safe!).
-* **Supabase Connection String + Database Password** (*Optional*): if you want to host *AIOStreams*, *AIOMetadata*, or *AIOManager*, you can store their data on Supabase instead of locally on the VPS.
-   * To get the values:
-      * Go to [Supabase](https://www.supabase.com), create a project, and set a password for the Database.
-      * Once the project is ready, press the *Connect* icon on the header.
-      * Choose *Direct Connection String* and then *Session Pooler*.
-      * Copy the *URI* value (the `postgresql://...` string).
-      * See *Automatic Configuration* for what the script does with them.
+* **PostgreSQL Connection String** (*Optional*): if you want to host *AIOStreams*, *AIOMetadata*, or *AIOManager*, you can store their data on any PostgreSQL database instead of locally on the VPS. Any provider works; two common free options:
+   * **Supabase**:
+      * Go to [Supabase](https://www.supabase.com), create a project, and set a database password.
+      * Press the *Connect* icon on the header, choose *Direct Connection String* and then *Session Pooler*.
+      * Copy the *URI* value (the `postgresql://...` string). It contains a `[YOUR-PASSWORD]` placeholder, so the script asks for the password on the next screen.
+   * **Neon**:
+      * Go to [Neon](https://neon.tech), create a project.
+      * Open *Connect* and copy the pooled connection string. It already includes the password, so no extra password prompt is shown.
+   * Paste the `postgresql://...` string when prompted. See *Automatic Configuration* for what the script does with it.
 
 ## Module Selection
 
@@ -142,7 +144,7 @@ After you pick your modules, depending on whether there's any automated script s
 * **AIOMetadata**: Encryption keys and JWT secrets are generated automatically.
 * **Authelia**: Some needed cryptographic secrets (session, storage, JWT) are generated automatically, but you need to set the admin username, display name, email, and password.
 * **Honey**: The dashboard is filtered to show only the services you enabled, with the correct URLs already filled in.
-* **Supabase** (*Optional*): *AIOStreams*, *AIOMetadata*, and *AIOManager* use local SQLite by default. With Supabase, the script creates one isolated schema and one database user per addon inside a single project, so each addon only sees its own data and applies the schemas, roles, and permissions via the bundled SQL. You can skip it to stay on SQLite.
+* **PostgreSQL** (*Optional*): *AIOStreams*, *AIOMetadata*, and *AIOManager* use local SQLite by default. With a Postgres connection string (Supabase, Neon, or any other provider), the script creates one isolated schema and one database user per addon inside a single project, so each addon only sees its own data and applies the schemas, roles, and permissions via the bundled SQL. You can skip it to stay on SQLite.
 * **Secrets and Keys**: all security secrets are generated automatically with `openssl`.
 
 ## Other Modes
@@ -175,9 +177,9 @@ The scripts have been designed in a modular approach, meaning they can be extend
 * **`main.sh`**: the main orchestrator, every setup phase runs through here.
 * **`init.sh`**: the bootstrapper that pulls the `hosting/` folder from GitHub.
 * **`steps/`**: reusable building blocks (Docker install, template fetch, backup, deploy, start) that `main.sh` calls in order.
-* **`modules/`**: one script per addon or task (for example `aiostreams.sh` sets AIOStreams defaults, `all.supabase.sh` provisions Supabase schemas). The script discovers and runs the ones matching your selection. Add your own here to extend the setup.
+* **`modules/`**: one script per addon or task (for example `aiostreams.sh` sets AIOStreams defaults, `all.postgres.sh` provisions PostgreSQL schemas). The script discovers and runs the ones matching your selection. Add your own here to extend the setup.
 * **`lib/`**: shared helpers for logging, prompts, `.env` editing, ZIP creation, and template logic.
-* **`db/`**: SQL for creating and deleting Supabase schemas, runnable by hand if needed.
+* **`db/`**: SQL for creating and deleting PostgreSQL schemas, runnable by hand if needed.
 * **`apps/`**: bundled apps that are not in [*Viren's Docker Templates*](https://github.com/Viren070/docker-compose-template) (for example `watchly`, `proxy`), where ach folder with a `compose.yaml` is overlaid onto the template and offered as a selectable module.
 * **`configs/`**: shared config data used by the hooks, for example `presets.json` defines the pre-selected packages, and `honey.json` is the Honey dashboard catalog of services, icons, and URL templates that are not included in [*Viren's Docker Templates*](https://github.com/Viren070/docker-compose-template).
 * **`defaults.env`**: fallback values for every setting, used when you do not pass a flag.

@@ -88,8 +88,8 @@ Current declared module params:
 | `authelia` | `password` | `AUTHELIA_PASSWORD` | secret | true |
 | `cloudflare-ddns` | `api_token` | `CLOUDFLARE_DDNS_API_TOKEN` | secret | false |
 | `cloudflare-ddns` | `proxied` | `CLOUDFLARE_DDNS_PROXIED` | bool | false |
-| `supabase` | `connection_string` | `SUPABASE_CONNECTION_STRING` | string | false |
-| `supabase` | `db_password` | `SUPABASE_DB_PASSWORD` | secret | false |
+| `postgres` | `connection_string` | `POSTGRES_CONNECTION_STRING` | string | false |
+| `postgres` | `db_password` | `POSTGRES_DB_PASSWORD` | secret | false |
 | `aiostreams` | `auth` | `AIOSTREAMS_AUTH` | string | false |
 | `watchly` | `tmdb_api_key` | `WATCHLY_TMDB_API_KEY` | string | false |
 
@@ -154,7 +154,7 @@ ENV_VAR = uppercase(MODULE_NAME with - replaced by _) + "_" + uppercase(key)
 |---|---|---|
 | `authelia` | `username` | `AUTHELIA_USERNAME` |
 | `cloudflare-ddns` | `api_token` | `CLOUDFLARE_DDNS_API_TOKEN` |
-| `supabase` | `connection_string` | `SUPABASE_CONNECTION_STRING` |
+| `postgres` | `connection_string` | `POSTGRES_CONNECTION_STRING` |
 | `aiostreams` | `auth` | `AIOSTREAMS_AUTH` |
 | `watchly` | `tmdb_api_key` | `WATCHLY_TMDB_API_KEY` |
 
